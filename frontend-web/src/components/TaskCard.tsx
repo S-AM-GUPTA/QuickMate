@@ -48,25 +48,18 @@ export default function TaskCard({
   onReleasePayment,
 }: TaskCardProps) {
   const urgencyColors = {
-    low: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-800/30",
-    medium:
-      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-800/30",
-    urgent:
-      "bg-rose-50 text-rose-700 border-rose-200 animate-pulse dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-800/30",
+    low: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    medium: "bg-amber-50 text-amber-700 border-amber-200",
+    urgent: "bg-rose-50 text-rose-700 border-rose-200 animate-pulse",
   };
 
   const statusColors = {
-    OPEN: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-800/30",
-    ASSIGNED:
-      "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-800/30",
-    IN_PROGRESS:
-      "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/20 dark:text-yellow-400 dark:border-yellow-800/30",
-    COMPLETED:
-      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-800/30",
-    CANCELLED:
-      "bg-zinc-50 text-zinc-600 border-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:border-zinc-800",
-    DISPUTED:
-      "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-800/30",
+    OPEN: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    ASSIGNED: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    IN_PROGRESS: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    COMPLETED: "bg-emerald-100 text-emerald-800 border-emerald-300",
+    CANCELLED: "bg-slate-50 text-slate-600 border-slate-200",
+    DISPUTED: "bg-red-50 text-red-700 border-red-200",
   };
 
   const [formattedDate, setFormattedDate] = React.useState<string>("");
@@ -83,14 +76,14 @@ export default function TaskCard({
   }, [task.scheduledTime]);
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-zinc-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/40">
+    <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
         {/* Category & Title */}
         <div>
-          <span className="inline-flex items-center rounded-md bg-zinc-50 px-2.5 py-0.5 text-xs font-medium text-zinc-600 uppercase tracking-wider dark:bg-zinc-800 dark:text-zinc-300">
+          <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
             {task.category}
           </span>
-          <h3 className="mt-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="mt-2 text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
             {task.title}
           </h3>
         </div>
@@ -110,7 +103,7 @@ export default function TaskCard({
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 line-clamp-2">
+      <p className="mt-3 text-sm leading-relaxed text-slate-500 line-clamp-2">
         {task.description}
       </p>
 
@@ -120,9 +113,9 @@ export default function TaskCard({
           {task.attachmentUrls.map((url, index) => (
             <div
               key={index}
-              className="flex items-center gap-1.5 rounded-lg border border-zinc-100 bg-zinc-50/50 p-2 text-xs text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/20"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs font-semibold text-slate-500"
             >
-              <ImageIcon className="h-3.5 w-3.5 text-zinc-400" />
+              <ImageIcon className="h-3.5 w-3.5 text-slate-400" />
               <span className="truncate max-w-[120px]">
                 Attachment {index + 1}
               </span>
@@ -132,32 +125,32 @@ export default function TaskCard({
       )}
 
       {/* Meta Stats: Location, Distance, Time, Budget */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-zinc-50 pt-4 dark:border-zinc-800/50">
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-400">
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-slate-500">
           <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-3.5 w-3.5 text-slate-400" />
             {formattedDate}
           </span>
           <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5" />
+            <MapPin className="h-3.5 w-3.5 text-slate-400" />
             {task.distanceMeters !== undefined
               ? `${task.distanceMeters}m away`
               : `Delhi NCR`}
           </span>
         </div>
 
-        <div className="flex items-center gap-1 text-base font-bold text-zinc-950 dark:text-zinc-50">
-          <IndianRupee className="h-4.5 w-4.5 text-zinc-500 dark:text-zinc-400" />
+        <div className="flex items-center gap-1 text-lg font-extrabold text-slate-900">
+          <IndianRupee className="h-4.5 w-4.5 text-slate-500" />
           <span>{task.budget}</span>
         </div>
       </div>
 
       {/* Interactive CTA buttons based on role */}
-      <div className="mt-5 border-t border-zinc-50 pt-4 dark:border-zinc-800/50">
+      <div className="mt-5 border-t border-slate-100 pt-4">
         {viewMode === "helper" && task.status === "OPEN" && onPlaceBid && (
           <button
             onClick={() => onPlaceBid(task)}
-            className="w-full flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 hover:shadow transition duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition duration-200 cursor-pointer"
           >
             Place a Bid
           </button>
@@ -166,9 +159,9 @@ export default function TaskCard({
         {viewMode === "customer" && task.status === "OPEN" && onViewBids && (
           <button
             onClick={() => onViewBids(task)}
-            className="w-full flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 transition duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition duration-200 cursor-pointer"
           >
-            Review Bids
+            Review Offers
           </button>
         )}
 

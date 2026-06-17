@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Plus,
   Search,
@@ -23,6 +24,9 @@ import {
   FileText,
   Loader2,
   Save,
+  Mail,
+  Phone,
+  MapPin,
 } from "lucide-react";
 
 import TaskCard, { Task } from "../../components/TaskCard";
@@ -113,14 +117,7 @@ export default function Home() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    } else {
-      setIsLoggedIn(true);
-    }
-  }, [router]);
+  // Moved to below profileData
 
   const [activeRole, setActiveRole] = useState<"customer" | "helper">(
     "customer",
@@ -128,6 +125,7 @@ export default function Home() {
   const [currentTab, setCurrentTab] = useState<
     "dashboard" | "profile" | "settings"
   >("dashboard");
+  const [accountTab, setAccountTab] = useState("Profile");
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [helpers, setHelpers] = useState<Helper[]>(initialHelpers);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -174,7 +172,30 @@ export default function Home() {
     bio: "I am a reliable local helper ready to assist with daily tasks.",
     address: "New Delhi, India",
     skills: ["Delivery", "Errands"],
+    postalCode: "110001",
   });
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+    } else {
+      setIsLoggedIn(true);
+      const userProfileRaw = localStorage.getItem("userProfile");
+      if (userProfileRaw) {
+        try {
+          const up = JSON.parse(userProfileRaw);
+          setProfileData(prev => ({
+            ...prev,
+            name: up.name || prev.name,
+            email: up.email || prev.email,
+            phone: up.phone || prev.phone,
+            postalCode: up.postalCode || "110001",
+          }));
+        } catch(e) {}
+      }
+    }
+  }, [router]);
 
   const [verificationState, setVerificationState] = useState({
     status: "Pending Upload", // 'Pending Upload' | 'Uploading' | 'Pending Review' | 'Verified'
@@ -381,7 +402,7 @@ export default function Home() {
         );
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 transition-colors duration-300 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="min-h-screen bg-[#f6f6f6] font-sans text-[#212529]">
       {/* Simulation Alert banner */}
       {notification && (
         <div className="fixed top-4 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-4">
@@ -398,88 +419,49 @@ export default function Home() {
       )}
 
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-[#e9ecef] bg-white">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
-              <Shield className="h-5 w-5 fill-current" />
-            </div>
-            <div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-zinc-50">
-                Quick
-                <span className="text-blue-600 dark:text-blue-400">Mate</span>
-              </span>
-              <span className="ml-2 rounded-md bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                MVP DEMO
-              </span>
-            </div>
+            <button onClick={() => setCurrentTab('dashboard')} className="flex items-center cursor-pointer h-16 w-56 relative overflow-hidden">
+              <img src="/logo-v3.png" alt="QuickMate Logo" className="absolute top-1/2 -translate-y-1/2 left-0 w-[180%] max-w-none object-contain mix-blend-multiply origin-left" />
+            </button>
           </div>
 
-          {/* Toggle Role Selector & Profile */}
-          <div className="flex items-center gap-4">
-            <div className="flex rounded-xl bg-slate-100 p-1 dark:bg-zinc-900 border border-slate-200/50 dark:border-zinc-800">
-              <button
-                onClick={() => {
-                  setActiveRole("customer");
-                  setCurrentTab("dashboard");
-                }}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                  activeRole === "customer"
-                    ? "bg-white text-blue-600 shadow-sm dark:bg-zinc-800 dark:text-blue-400"
-                    : "text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                }`}
-              >
-                Customer Mode
-              </button>
-              <button
-                onClick={() => {
-                  setActiveRole("helper");
-                  setCurrentTab("dashboard");
-                }}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold tracking-wide uppercase transition-all duration-200 cursor-pointer ${
-                  activeRole === "helper"
-                    ? "bg-white text-blue-600 shadow-sm dark:bg-zinc-800 dark:text-blue-400"
-                    : "text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-                }`}
-              >
-                Helper Mode
-              </button>
-            </div>
-
-            {/* Profile Dropdown */}
-            {isLoggedIn && (
-              <div className="relative group">
-                <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 transition-all cursor-pointer">
-                  <User className="h-4 w-4" />
-                  Profile
-                </button>
-                <div className="absolute right-0 top-full pt-2 hidden w-48 group-hover:block">
-                  <div className="flex flex-col overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-                    <button
-                      onClick={() => setCurrentTab("profile")}
-                      className="px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-zinc-300 dark:hover:bg-zinc-800 transition cursor-pointer"
-                    >
-                      My Account
-                    </button>
-                    <button
-                      onClick={() => setCurrentTab("settings")}
-                      className="px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-zinc-300 dark:hover:bg-zinc-800 transition cursor-pointer"
-                    >
-                      Settings
-                    </button>
-                    <button
-                      onClick={() => {
-                        localStorage.removeItem("token");
-                        router.push("/login");
-                      }}
-                      className="border-t border-slate-100 px-4 py-3 text-left text-sm font-medium text-rose-600 hover:bg-rose-50 dark:border-zinc-800 dark:text-rose-400 dark:hover:bg-rose-950/30 transition cursor-pointer"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+          <div className="flex items-center gap-8">
+            <button
+              onClick={() => {
+                setActiveRole("customer");
+                setCurrentTab("dashboard");
+                setShowPostModal(true);
+              }}
+              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
+            >
+              Book a Task
+            </button>
+            <button
+              onClick={() => {
+                setActiveRole("customer");
+                setCurrentTab("dashboard");
+              }}
+              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
+            >
+              My Tasks
+            </button>
+            <button
+              onClick={() => {
+                setActiveRole("helper");
+                setCurrentTab("dashboard");
+              }}
+              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
+            >
+              Become a Mate
+            </button>
+            <button
+              onClick={() => setCurrentTab("profile")}
+              className="text-[15px] font-extrabold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
+            >
+              Account
+            </button>
           </div>
         </div>
       </header>
@@ -488,15 +470,15 @@ export default function Home() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Category Filters */}
         {currentTab === "dashboard" && (
-          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-6 dark:border-zinc-800/60">
+          <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-8 mt-2">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`rounded-xl px-4 py-2 text-xs font-semibold transition cursor-pointer ${
+                className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                    : "bg-white border border-slate-200/50 text-slate-600 hover:bg-slate-50 dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
+                    : "bg-white border border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600"
                 }`}
               >
                 {cat}
@@ -511,27 +493,26 @@ export default function Home() {
             {/* Left side: Hero & Post Task */}
             <div className="lg:col-span-2 space-y-8">
               {/* Hero Banner */}
-              <div className="rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white shadow-xl shadow-blue-500/10">
-                <div className="max-w-xl">
+              <div className="rounded-3xl bg-white border border-slate-200 p-8 text-slate-900 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-50" />
+                <div className="max-w-xl relative z-10">
                   <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                    Get trusted local help in minutes.
+                    Good morning! <br/><span className="text-emerald-600">What do you need help with?</span>
                   </h1>
-                  <p className="mt-3 text-base text-blue-100">
-                    From deliveries to repairs — QuickMate connects you with
-                    verified nearby helpers instantly. Fast, verified, and held
-                    in escrow.
+                  <p className="mt-4 text-base text-slate-600">
+                    Book trusted help for home repairs, cleaning, moving, and more.
                   </p>
-                  <div className="mt-6 flex flex-wrap gap-4">
+                  <div className="mt-8 flex flex-wrap gap-4">
                     <button
                       onClick={() => setShowPostModal(true)}
-                      className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-600 shadow hover:bg-blue-50 transition cursor-pointer"
+                      className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition cursor-pointer"
                     >
                       <PlusCircle className="h-5 w-5" />
-                      Post a New Task
+                      Book a Task
                     </button>
-                    <div className="flex items-center gap-2 text-xs text-blue-100 font-semibold bg-blue-800/35 rounded-xl px-4 py-3 border border-blue-500/30 backdrop-blur-sm">
-                      <Shield className="h-4 w-4" />
-                      Delhi-NCR Active Coverage
+                    <div className="flex items-center gap-2 text-xs text-slate-600 font-semibold bg-slate-50 rounded-xl px-4 py-3 border border-slate-200">
+                      <Shield className="h-4 w-4 text-emerald-500" />
+                      Secure Escrow Protection
                     </div>
                   </div>
                 </div>
@@ -604,14 +585,81 @@ export default function Home() {
         {/* ==================== HELPER MODE VIEW ==================== */}
         {activeRole === "helper" && currentTab === "dashboard" && (
           <div className="mt-8 space-y-8">
+            {verificationState.status !== "Verified" ? (
+              <div className="rounded-2xl border border-[#ced4da] bg-white p-8 shadow-sm text-center">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-6">
+                  <AlertTriangle className="h-8 w-8" />
+                </div>
+                <h2 className="text-2xl font-extrabold text-[#212529] mb-2">
+                  Verify Your Identity to Become a Mate
+                </h2>
+                <p className="text-[#6c757d] mb-8 max-w-lg mx-auto">
+                  To ensure the safety of our community, all Mates must undergo a quick KYC verification before they can start accepting tasks.
+                </p>
+                <div className="max-w-md mx-auto space-y-4">
+                  <div className="text-left">
+                    <label className="block text-sm font-bold text-[#212529] mb-2">Select Document Type</label>
+                    <select
+                      value={verificationState.docType}
+                      onChange={(e) => setVerificationState(prev => ({ ...prev, docType: e.target.value }))}
+                      disabled={verificationState.status !== "Pending Upload"}
+                      className="w-full rounded-md border border-[#ced4da] bg-white px-4 py-3 outline-none focus:border-[#0D7F64] disabled:opacity-50"
+                    >
+                      <option>Aadhar Card</option>
+                      <option>PAN Card</option>
+                      <option>Driving License</option>
+                    </select>
+                  </div>
+                  
+                  {verificationState.status === "Pending Upload" && (
+                    <button
+                      onClick={() => {
+                        setVerificationState(prev => ({ ...prev, status: "Uploading" }));
+                        setTimeout(() => {
+                          setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
+                        }, 2000);
+                      }}
+                      className="w-full rounded-md border-2 border-dashed border-[#ced4da] bg-slate-50 py-10 font-bold text-[#0D7F64] hover:bg-[#e9ecef] transition-colors cursor-pointer flex flex-col items-center justify-center gap-2"
+                    >
+                      <Upload className="h-6 w-6" />
+                      Click to upload {verificationState.docType}
+                    </button>
+                  )}
+
+                  {verificationState.status === "Uploading" && (
+                    <div className="w-full rounded-md border border-[#ced4da] bg-slate-50 py-10 flex flex-col items-center justify-center gap-3">
+                      <Loader2 className="h-6 w-6 text-[#0D7F64] animate-spin" />
+                      <p className="font-bold text-[#212529]">Uploading securely...</p>
+                    </div>
+                  )}
+
+                  {verificationState.status === "Pending Review" && (
+                    <div className="w-full rounded-md border border-amber-200 bg-amber-50 py-6 px-4 flex items-center justify-center gap-3 text-left">
+                      <FileText className="h-6 w-6 text-amber-600 shrink-0" />
+                      <div>
+                        <p className="font-bold text-amber-800">Document under review</p>
+                        <p className="text-sm text-amber-700 mt-1">We will notify you once verified. You can simulate approval by refreshing the page later. (Demo mode)</p>
+                        <button 
+                          onClick={() => setVerificationState(prev => ({ ...prev, status: "Verified" }))}
+                          className="mt-3 text-xs font-bold bg-amber-200 text-amber-800 px-3 py-1 rounded hover:bg-amber-300 transition-colors cursor-pointer"
+                        >
+                          Dev: Force Approve
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full">
             {/* Dashboard Stats */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-xs font-medium uppercase tracking-wider">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">
                     Total Earnings
                   </span>
-                  <Wallet className="h-5 w-5 text-blue-500" />
+                  <Wallet className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
                   <span className="text-2xl font-bold">Rs. 12,450</span>
@@ -622,9 +670,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-xs font-medium uppercase tracking-wider">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">
                     Average Rating
                   </span>
                   <Star className="h-5 w-5 text-amber-500 fill-current" />
@@ -637,12 +685,12 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-xs font-medium uppercase tracking-wider">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">
                     Active Bids
                   </span>
-                  <Sliders className="h-5 w-5 text-indigo-500" />
+                  <Sliders className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="mt-2">
                   <span className="text-2xl font-bold">3</span>
@@ -652,12 +700,12 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between text-slate-400">
-                  <span className="text-xs font-medium uppercase tracking-wider">
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="flex items-center justify-between text-slate-500">
+                  <span className="text-xs font-bold uppercase tracking-wider">
                     Jobs Done
                   </span>
-                  <CheckCircle className="h-5 w-5 text-emerald-500" />
+                  <CheckCircle className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="mt-2">
                   <span className="text-2xl font-bold">
@@ -676,12 +724,12 @@ export default function Home() {
               {/* Tasks Map / List Feed */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                    Nearby Task Feed
+                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    Available Jobs Nearby
                   </h3>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
-                    <Map className="h-4 w-4" />
-                    Sorted by Proximity
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1.5 rounded-full">
+                    <Map className="h-4 w-4 text-emerald-600" />
+                    Sorted by distance
                   </div>
                 </div>
 
@@ -733,468 +781,278 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* ==================== CUSTOMER PROFILE VIEW ==================== */}
-        {currentTab === "profile" && activeRole === "customer" && (
-          <div className="mt-8 max-w-4xl mx-auto space-y-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-              Customer Profile
-            </h2>
-
-            <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30 transition-all">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="h-24 w-24 shrink-0 rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 flex items-center justify-center text-3xl font-bold shadow-inner relative group">
-                  {profileData.name.substring(0, 2).toUpperCase()}
-                  {isEditingProfile && (
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                      <Upload className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 w-full">
-                  {isEditingProfile ? (
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        name="name"
-                        value={profileData.name}
-                        onChange={handleProfileChange}
-                        className="w-full sm:max-w-xs rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-lg font-bold text-slate-900 outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                      />
-                      <div className="flex gap-2">
-                        <input
-                          type="email"
-                          name="email"
-                          value={profileData.email}
-                          onChange={handleProfileChange}
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                        />
-                        <input
-                          type="text"
-                          name="phone"
-                          value={profileData.phone}
-                          onChange={handleProfileChange}
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm text-slate-900 outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                        {profileData.name}
-                      </h3>
-                      <p className="mt-1 text-slate-500 dark:text-zinc-400">
-                        {profileData.email}
-                      </p>
-                      <p className="text-slate-500 dark:text-zinc-400">
-                        {profileData.phone}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="sm:ml-auto self-start sm:self-center w-full sm:w-auto">
-                  {isEditingProfile ? (
-                    <button
-                      onClick={() => setIsEditingProfile(false)}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 hover:bg-indigo-500 transition cursor-pointer"
-                    >
-                      <Save className="h-4 w-4" /> Save Changes
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setIsEditingProfile(true)}
-                      className="w-full sm:w-auto rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition cursor-pointer"
-                    >
-                      Edit Profile
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-slate-100 pt-8 dark:border-zinc-800">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">
-                    12
-                  </p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Tasks Posted
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">
-                    Rs. 4,500
-                  </p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Total Spent
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-amber-500">4.9</p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    My Rating
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-indigo-500">2</p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Active Tasks
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Customer Specific: Addresses & Payments */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
-                    Saved Addresses
-                  </h3>
-                  <button className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 font-semibold text-sm cursor-pointer">
-                    + Add New
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/50">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-slate-800 dark:text-zinc-200">
-                        Home
-                      </span>
-                      <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                        Primary
-                      </span>
-                    </div>
-                    <p className="text-sm text-slate-500 dark:text-zinc-400">
-                      {profileData.address}
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/50">
-                    <p className="font-semibold text-slate-800 dark:text-zinc-200 mb-1">
-                      Office
-                    </p>
-                    <p className="text-sm text-slate-500 dark:text-zinc-400">
-                      Connaught Place, New Delhi
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
-                    Payment Methods
-                  </h3>
-                  <button className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 font-semibold text-sm cursor-pointer">
-                    + Add Card
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/50">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded bg-blue-100 p-2 dark:bg-blue-900/30">
-                        <Wallet className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-zinc-200">
-                          Wallet Balance
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-zinc-400">
-                          Auto-reloads when below Rs. 500
-                        </p>
-                      </div>
-                    </div>
-                    <span className="font-bold text-slate-900 dark:text-zinc-50">
-                      Rs. 1,250
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-zinc-800 dark:bg-zinc-950/50">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded bg-slate-200 p-2 dark:bg-zinc-800">
-                        <div className="h-5 w-8 bg-slate-400 rounded-sm" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-800 dark:text-zinc-200">
-                          HDFC Visa •••• 4242
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-zinc-400">
-                          Expires 12/28
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ==================== HELPER PROFILE VIEW ==================== */}
-        {currentTab === "profile" && activeRole === "helper" && (
-          <div className="mt-8 max-w-4xl mx-auto space-y-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-              Helper Profile
-            </h2>
-
-            <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30 transition-all">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <div className="h-24 w-24 shrink-0 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center text-3xl font-bold shadow-inner relative group">
-                  {profileData.name.substring(0, 2).toUpperCase()}
-                  {isEditingProfile && (
-                    <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                      <Upload className="h-6 w-6 text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 w-full">
-                  {isEditingProfile ? (
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        name="name"
-                        value={profileData.name}
-                        onChange={handleProfileChange}
-                        className="w-full sm:max-w-xs rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-lg font-bold text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                      />
-                      <div className="flex gap-2">
-                        <input
-                          type="email"
-                          name="email"
-                          value={profileData.email}
-                          onChange={handleProfileChange}
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                        />
-                        <input
-                          type="text"
-                          name="phone"
-                          value={profileData.phone}
-                          onChange={handleProfileChange}
-                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 px-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3 className="text-2xl font-bold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                        {profileData.name}
-                        {verificationState.status === "Verified" && (
-                          <CheckCircle className="h-5 w-5 text-emerald-500" />
-                        )}
-                      </h3>
-                      <p className="mt-1 text-slate-500 dark:text-zinc-400">
-                        {profileData.email}
-                      </p>
-                      <p className="text-slate-500 dark:text-zinc-400">
-                        {profileData.phone}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                <div className="sm:ml-auto self-start sm:self-center w-full sm:w-auto">
-                  {isEditingProfile ? (
-                    <button
-                      onClick={() => setIsEditingProfile(false)}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 transition cursor-pointer"
-                    >
-                      <Save className="h-4 w-4" /> Save Changes
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setIsEditingProfile(true)}
-                      className="w-full sm:w-auto rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition cursor-pointer"
-                    >
-                      Edit Profile
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Helper Additional Edit Fields */}
-              {isEditingProfile && (
-                <div className="mt-6 space-y-4 border-t border-slate-100 pt-6 dark:border-zinc-800 animate-in fade-in slide-in-from-top-2">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                      Professional Bio
-                    </label>
-                    <textarea
-                      name="bio"
-                      value={profileData.bio}
-                      onChange={handleProfileChange}
-                      rows={3}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                      Base Location
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={profileData.address}
-                      onChange={handleProfileChange}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                      Helper Skills (Comma Separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={profileData.skills.join(", ")}
-                      onChange={(e) =>
-                        setProfileData((prev) => ({
-                          ...prev,
-                          skills: e.target.value
-                            .split(",")
-                            .map((s) => s.trim())
-                            .filter(Boolean),
-                        }))
-                      }
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                      Service Radius (km)
-                    </label>
-                    <input
-                      type="number"
-                      defaultValue={10}
-                      className="w-full sm:max-w-xs rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-slate-100 pt-8 dark:border-zinc-800">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">
-                    4
-                  </p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Tasks Done
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-amber-500">4.9</p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Avg Rating
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-slate-900 dark:text-zinc-50">
-                    Rs. 2,150
-                  </p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Total Earned
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-emerald-500">Tier 1</p>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">
-                    Status
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Helper Identity Verification */}
-            {verificationState.status === "Verified" ? (
-              <div className="rounded-3xl border border-emerald-100 bg-emerald-50/30 p-8 dark:border-emerald-900/30 dark:bg-emerald-950/10">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
-                    <Shield className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
-                      Identity Verified
-                    </h4>
-                    <p className="text-sm text-slate-500 dark:text-zinc-400">
-                      Your KYC documents have been reviewed and approved.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-                    <AlertTriangle className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-900 dark:text-zinc-50">
-                      Complete KYC Verification
-                    </h4>
-                    <p className="text-sm text-slate-500 dark:text-zinc-400">
-                      Upload your documents to become a verified helper and
-                      withdraw payouts.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-2">
-                      Select Document Type
-                    </label>
-                    <select
-                      value={verificationState.docType}
-                      onChange={(e) =>
-                        setVerificationState((prev) => ({
-                          ...prev,
-                          docType: e.target.value,
-                        }))
-                      }
-                      className="w-full sm:w-1/2 rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-zinc-900 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50"
-                      disabled={verificationState.status !== "Pending Upload"}
-                    >
-                      <option value="Aadhar Card">Aadhar Card</option>
-                      <option value="PAN Card">PAN Card</option>
-                      <option value="Driving License">Driving License</option>
-                    </select>
-                  </div>
-
-                  {verificationState.status === "Pending Upload" && (
-                    <button
-                      onClick={handleUploadKyc}
-                      className="w-full sm:w-1/2 flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 py-8 text-sm font-semibold text-slate-600 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-600 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-400 transition cursor-pointer"
-                    >
-                      <Upload className="h-5 w-5" />
-                      Click to upload {verificationState.docType}
-                    </button>
-                  )}
-
-                  {verificationState.status === "Uploading" && (
-                    <div className="w-full sm:w-1/2 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-slate-200 bg-slate-50 py-8 dark:border-zinc-800 dark:bg-zinc-900/50">
-                      <Loader2 className="h-6 w-6 text-blue-600 animate-spin" />
-                      <p className="text-sm font-medium text-slate-600 dark:text-zinc-400">
-                        Uploading securely...
-                      </p>
-                    </div>
-                  )}
-
-                  {verificationState.status === "Pending Review" && (
-                    <div className="w-full sm:w-1/2 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 py-4 px-4 dark:border-amber-900/50 dark:bg-amber-950/30">
-                      <FileText className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                      <div>
-                        <p className="text-sm font-bold text-amber-800 dark:text-amber-300">
-                          Document under review
-                        </p>
-                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
-                          We will notify you once verified.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             )}
           </div>
         )}
 
+        {/* ==================== UNIFIED ACCOUNT VIEW ==================== */}
+        {currentTab === "profile" && (
+          <div className="mt-8 max-w-[1000px] mx-auto space-y-6">
+            <h1 className="text-[32px] font-extrabold text-[#212529] mb-6">Your Account</h1>
+            
+            <div className="flex flex-col md:flex-row border border-[#ced4da] rounded-sm bg-white overflow-hidden">
+              {/* Left Sidebar */}
+              <div className="w-full md:w-[280px] bg-[#f8f9fa] border-r border-[#ced4da] flex flex-col shrink-0">
+                {[
+                  "Profile",
+                  "Password",
+                  "Account Security",
+                  "Notifications",
+                  "Billing Info",
+                  "Cancel a Task",
+                  "Business Information",
+                  "Account Balance",
+                  "Transactions",
+                  "Delete Account"
+                ].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setAccountTab(tab)}
+                    className={`px-6 py-4 text-left text-[15px] font-bold transition-colors cursor-pointer ${
+                      accountTab === tab
+                        ? "text-[#212529] border-l-4 border-[#0D7F64] bg-white"
+                        : "text-[#0D7F64] border-l-4 border-transparent hover:bg-white hover:text-[#0a6650]"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Main Content Box */}
+              <div className="flex-1 p-8">
+                {accountTab === "Profile" && (
+                  <>
+                    <div className="flex justify-between items-center border-b border-[#ced4da] pb-3 mb-6">
+                      <h2 className="text-[22px] font-extrabold text-[#212529]">Account</h2>
+                      <button className="rounded-md border border-[#ced4da] bg-white px-5 py-1.5 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors cursor-pointer">
+                        Edit
+                      </button>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-8 items-start">
+                      <div className="h-[160px] w-[160px] rounded-full bg-[#e9ecef] flex items-center justify-center overflow-hidden shrink-0 border border-[#ced4da]">
+                        <User className="h-[100px] w-[100px] text-[#ced4da]" />
+                      </div>
+                      <div className="space-y-4 pt-2">
+                        <div className="flex items-center gap-3 text-[#212529]">
+                          <User className="h-[18px] w-[18px] text-[#495057]" />
+                          <span className="text-[17px] font-bold">{profileData.name}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[#212529]">
+                          <Mail className="h-[18px] w-[18px] text-[#495057]" />
+                          <span className="text-[17px] font-bold">{profileData.email}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[#212529]">
+                          <Phone className="h-[18px] w-[18px] text-[#495057]" />
+                          <span className="text-[17px] font-bold">{profileData.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-[#212529]">
+                          <MapPin className="h-[18px] w-[18px] text-[#495057]" />
+                          <span className="text-[17px] font-bold">{profileData.postalCode || '110001'}</span>
+                        </div>
+                        <div className="pt-4">
+                          <button 
+                            onClick={() => {
+                              localStorage.removeItem("accessToken");
+                              localStorage.removeItem("token");
+                              router.push("/login");
+                            }}
+                            className="rounded-md border border-[#ced4da] bg-white px-5 py-2 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors cursor-pointer"
+                          >
+                            Log Out
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {accountTab === "Password" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Password</h2>
+                    <div className="space-y-4 max-w-sm">
+                      <div>
+                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Current Password</label>
+                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#212529] mb-1.5">New Password</label>
+                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Confirm New Password</label>
+                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
+                      </div>
+                      <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Password</button>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Account Security" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Account Security</h2>
+                    <div className="p-6 border border-[#ced4da] rounded-md flex justify-between items-center bg-[#f8f9fa]">
+                      <div>
+                        <p className="font-bold text-[#212529]">Two-Factor Authentication (2FA)</p>
+                        <p className="text-sm text-[#6c757d]">Add an extra layer of security to your account.</p>
+                      </div>
+                      <button className="rounded-full bg-white border border-[#ced4da] text-[#212529] px-6 py-2 font-semibold hover:bg-gray-50 transition-colors">Enable 2FA</button>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Notifications" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Notifications</h2>
+                    <div className="space-y-4">
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" defaultChecked className="w-5 h-5 accent-[#0D7F64]" />
+                        <span className="font-semibold text-[#212529]">Email Notifications (Task Updates, Promotions)</span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" defaultChecked className="w-5 h-5 accent-[#0D7F64]" />
+                        <span className="font-semibold text-[#212529]">SMS Notifications (Urgent Alerts)</span>
+                      </label>
+                      <label className="flex items-center gap-3">
+                        <input type="checkbox" className="w-5 h-5 accent-[#0D7F64]" />
+                        <span className="font-semibold text-[#212529]">Push Notifications</span>
+                      </label>
+                      <div className="pt-4">
+                        <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Preferences</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Billing Info" && (
+                  <div className="space-y-6">
+                    <div className="flex justify-between items-center border-b border-[#ced4da] pb-3 mb-6">
+                      <h2 className="text-[22px] font-extrabold text-[#212529]">Billing Info</h2>
+                      <button className="rounded-md border border-[#ced4da] bg-white px-5 py-1.5 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors">
+                        Add New Card
+                      </button>
+                    </div>
+                    <div className="p-4 border border-[#ced4da] rounded-md flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="bg-[#e9ecef] w-12 h-8 rounded flex items-center justify-center text-xs font-bold text-[#495057]">VISA</div>
+                        <div>
+                          <p className="font-bold text-[#212529]">Visa ending in 4242</p>
+                          <p className="text-sm text-[#6c757d]">Expires 12/2028 (Default)</p>
+                        </div>
+                      </div>
+                      <button className="text-red-600 text-sm font-bold hover:underline">Remove</button>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Cancel a Task" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Cancel a Task</h2>
+                    {tasks.filter(t => t.status === "OPEN").length === 0 ? (
+                      <p className="text-[#6c757d]">You have no open tasks to cancel.</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {tasks.filter(t => t.status === "OPEN").map(task => (
+                          <div key={task.id} className="p-4 border border-[#ced4da] rounded-md flex justify-between items-center">
+                            <div>
+                              <p className="font-bold text-[#212529]">{task.title}</p>
+                              <p className="text-sm text-[#6c757d]">Scheduled: {new Date(task.scheduledTime).toLocaleDateString()}</p>
+                            </div>
+                            <button className="rounded-full bg-white border border-red-200 text-red-600 px-4 py-1.5 text-sm font-bold hover:bg-red-50 transition-colors">Cancel Task</button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {accountTab === "Business Information" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Business Information</h2>
+                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-6 text-sm text-yellow-800">
+                      If you provide services as a registered business, please fill in your details below for tax and invoicing purposes.
+                    </div>
+                    <div className="space-y-4 max-w-sm">
+                      <div>
+                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Business Name</label>
+                        <input type="text" placeholder="e.g. Acme Services" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#212529] mb-1.5">GST/Tax ID</label>
+                        <input type="text" placeholder="Tax Number" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
+                      </div>
+                      <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Details</button>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Account Balance" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Account Balance</h2>
+                    <div className="p-8 border border-[#ced4da] rounded-md text-center bg-[#f8f9fa]">
+                      <p className="text-sm font-bold text-[#6c757d] uppercase tracking-wider mb-2">Available Wallet Balance</p>
+                      <p className="text-4xl font-extrabold text-[#212529] mb-6">₹ 4,500.00</p>
+                      <div className="flex gap-4 justify-center">
+                        <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Add Funds</button>
+                        <button className="rounded-full bg-white border border-[#ced4da] text-[#212529] px-6 py-2.5 font-bold hover:bg-gray-50 transition-colors">Withdraw</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Transactions" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Transactions</h2>
+                    <div className="border border-[#ced4da] rounded-md overflow-hidden">
+                      <table className="w-full text-left text-sm">
+                        <thead className="bg-[#f8f9fa] border-b border-[#ced4da]">
+                          <tr>
+                            <th className="p-3 font-bold text-[#495057]">Date</th>
+                            <th className="p-3 font-bold text-[#495057]">Description</th>
+                            <th className="p-3 font-bold text-[#495057]">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#e9ecef]">
+                          <tr>
+                            <td className="p-3 text-[#212529]">Oct 12, 2026</td>
+                            <td className="p-3 text-[#212529]">Payment for Delivery Task</td>
+                            <td className="p-3 font-bold text-red-600">- ₹ 150.00</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-[#212529]">Oct 10, 2026</td>
+                            <td className="p-3 text-[#212529]">Wallet Top-up</td>
+                            <td className="p-3 font-bold text-green-600">+ ₹ 1,000.00</td>
+                          </tr>
+                          <tr>
+                            <td className="p-3 text-[#212529]">Oct 01, 2026</td>
+                            <td className="p-3 text-[#212529]">Refund (Cancelled Task)</td>
+                            <td className="p-3 font-bold text-green-600">+ ₹ 500.00</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {accountTab === "Delete Account" && (
+                  <div className="space-y-6">
+                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Delete Account</h2>
+                    <div className="p-6 border border-red-200 bg-red-50 rounded-md">
+                      <h3 className="font-bold text-red-700 text-lg mb-2">Warning: Permanent Action</h3>
+                      <p className="text-red-700 text-sm mb-6">
+                        Deleting your account will permanently erase your profile, wallet balance, active tasks, and transaction history. This action cannot be undone.
+                      </p>
+                      <button className="rounded-full bg-red-600 text-white px-6 py-2.5 font-bold hover:bg-red-700 transition-colors">
+                        Permanently Delete My Account
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {/* ==================== SETTINGS VIEW ==================== */}
         {currentTab === "settings" && (
           <div className="mt-8 max-w-4xl mx-auto space-y-8">
@@ -1501,7 +1359,7 @@ export default function Home() {
                     }
                     className="flex-1 flex items-center justify-center rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition cursor-pointer"
                   >
-                    Accept Bid & Pay
+                    Hire & Pay Securely
                   </button>
                   <button
                     onClick={() => {

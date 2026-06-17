@@ -8,6 +8,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { StorageModule } from './storage/storage.module';
 import { TasksModule } from './tasks/tasks.module';
+import { BidsModule } from './bids/bids.module';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -20,8 +22,11 @@ import { TasksModule } from './tasks/tasks.module';
     UsersModule,
     StorageModule,
     TasksModule,
+    BidsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,],
 })
 export class AppModule {}

@@ -103,7 +103,43 @@ export class AuthService {
     };
   }
 
-  async login(identifier: string, pass: string) {
+  async register(
+    identifier: string,
+    password?: string,
+    name?: string,
+    phone?: string
+  ) {
+    const isEmail = identifier.includes('@');
+    let user = await this.prisma.user.findFirst({
+      where: { OR: [{ email: identifier }, { phone: identifier }] },
+    });
+
+    if (user) {
+      throw new BadRequestException('User already exists');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = password ? await bcrypt.hash(password, salt) : null;
+
+    user = await this.prisma.user.create({
+      data: {
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
+        email: isEmail ? identifier : `${identifier}@placeholder.com`,
+        phone: phone || (!isEmail ? identifier : null),
+        name: name || 'New User',
+        password: hashedPassword,
+        isVerified: true,
+      },
+    });
+
+    const payload = { sub: user.id, role: user.role };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      user: { id: user.id, email: user.email, name: user.name, phone: user.phone },
+    };
+  }
+
+  async login(identifier: string, pass?: string) {
     const user = await this.prisma.user.findFirst({
       where: { OR: [{ email: identifier }, { phone: identifier }] },
     });
@@ -112,7 +148,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isMatch = await bcrypt.compare(pass, user.password);
+    const isMatch = await bcrypt.compare(pass || '', user.password);
     if (!isMatch) {
       throw new UnauthorizedException('Invalid credentials');
     }

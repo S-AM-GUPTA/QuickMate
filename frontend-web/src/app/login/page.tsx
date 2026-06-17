@@ -1,386 +1,359 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Mail,
-  Phone,
-  Lock,
-  ArrowRight,
-  Shield,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+import { api } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
 
-  const [step, setStep] = useState<
-    "IDENTIFIER" | "PASSWORD" | "OTP" | "CREATE_PASSWORD"
-  >("IDENTIFIER");
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [name, setName] = useState("");
+  // Mode: login or signup
+  const [isSignup, setIsSignup] = useState(false);
+  
+  // Login fields
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  
+  // Signup fields
+  const [signupEmail, setSignupEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("🇮🇳 +91");
+  const [postalCode, setPostalCode] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [agreed, setAgreed] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
 
-  const checkUserExists = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    // Simulate API call to check if user exists
+    
     try {
-      const res = await fetch("http://localhost:3005/auth/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier }),
+      const response = await api.post("/auth/login", {
+        identifier: loginEmail,
+        password: loginPassword,
       });
-
-      const data = await res.json();
-
-      if (data.exists) {
-        setStep("PASSWORD");
-      } else {
-        // Automatically request OTP for new user
-        await requestOtp();
-      }
-    } catch (err) {
-      setError("Could not connect to server.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const requestOtp = async () => {
-    try {
-      if (!identifier.includes("@")) {
-        const isPhone = /^\d{10}$/.test(identifier);
-        if (!isPhone) {
-          setError("Please enter a valid 10-digit phone number or email.");
-          return;
-        }
-      }
-
-      const res = await fetch("http://localhost:3005/auth/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier }),
-      });
-
-      if (res.ok) {
-        setMessage("OTP sent to your console/email!");
-        setStep("OTP");
-      } else {
-        setError("Failed to send OTP.");
-      }
+      
+      const { access_token, user } = response.data;
+      localStorage.setItem("accessToken", access_token);
+      localStorage.setItem("userProfile", JSON.stringify(user));
+      
+      router.push("/dashboard");
     } catch (err: any) {
       console.error(err);
-      setError("Failed to send OTP: " + err.message);
-    }
-  };
-
-  const loginWithPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const res = await fetch("http://localhost:3005/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.access_token);
-        router.push("/dashboard");
-      } else {
-        setError("Invalid password.");
-      }
-    } catch (err) {
-      setError("Login failed.");
+      setError(err.response?.data?.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }
   };
 
-  const verifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (otp.length < 6) {
-      setError("OTP must be 6 digits.");
-      return;
-    }
-
-    // We will verify the OTP along with the password in the next step.
-    setMessage("OTP format valid. Please create a password.");
-    setStep("CREATE_PASSWORD");
-  };
-
-  const registerNewUser = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
-    if (!name.trim()) {
-      setError("Please enter your full name.");
-      setLoading(false);
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError("Password must be at least 6 characters.");
-      setLoading(false);
-      return;
-    }
-
+    
     try {
-      const res = await fetch("http://localhost:3005/auth/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, otpCode: otp, newPassword, name }),
+      const response = await api.post("/auth/register", {
+        identifier: signupEmail,
+        password: signupPassword,
+        name: `${firstName} ${lastName}`.trim(),
+        phone: `${countryCode.split(" ")[1]} ${phone}`.trim(),
       });
-
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem("token", data.access_token);
-        router.push("/dashboard");
+      
+      const { access_token, user } = response.data;
+      localStorage.setItem("accessToken", access_token);
+      localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
+      
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.error(err);
+      if (err.response?.data?.message === "User already exists" || err.response?.data?.message?.includes("already exists")) {
+        // Fallback to login if user already exists
+        try {
+          const loginRes = await api.post("/auth/login", {
+            identifier: signupEmail,
+            password: signupPassword,
+          });
+          const { access_token, user } = loginRes.data;
+          localStorage.setItem("accessToken", access_token);
+          localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
+          router.push("/dashboard");
+          return;
+        } catch (loginErr: any) {
+          setError("User exists, but password was incorrect. Please log in.");
+        }
       } else {
-        setError("Registration failed. Invalid OTP or user exists.");
+        setError(
+          err.response?.data?.message || 
+          (err.response?.data?.message && Array.isArray(err.response.data.message) ? err.response.data.message[0] : "An error occurred during signup")
+        );
       }
-    } catch (err) {
-      setError("Registration failed.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 p-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl shadow-blue-500/10 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 transition-all duration-300">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/30 mb-4">
-            <Shield className="h-7 w-7 fill-current" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-            {step === "IDENTIFIER" && "Welcome to QuickMate"}
-            {step === "PASSWORD" && "Welcome Back"}
-            {step === "OTP" && "Verify Your Identity"}
-            {step === "CREATE_PASSWORD" && "Secure Your Account"}
-          </h1>
-          <p className="mt-2 text-sm text-slate-500 dark:text-zinc-400">
-            {step === "IDENTIFIER" &&
-              "Enter your email or phone number to continue."}
-            {step === "PASSWORD" && "Enter your password to sign in."}
-            {step === "OTP" &&
-              "We've sent a 6-digit code. Please enter it below."}
-            {step === "CREATE_PASSWORD" &&
-              "Create a strong password for future logins."}
-          </p>
+    <div className="min-h-screen relative flex items-center justify-center font-sans">
+      {/* Full screen background image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1920&auto=format&fit=crop"
+          alt="Professional working"
+          className="h-full w-full object-cover"
+        />
+        {/* Subtle overlay to ensure card pops */}
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
+
+      {/* Floating Card */}
+      <div className="relative z-10 w-full max-w-[440px] bg-white rounded-[24px] shadow-2xl p-8 sm:p-10 my-8 mx-4">
+        <div className="flex justify-center mb-10 mt-4">
+          <Link href="/">
+            <div className="h-20 sm:h-24 w-64 sm:w-80 relative overflow-hidden">
+              <img src="/logo-v3.png" alt="QuickMate Logo" className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[180%] max-w-none object-contain mix-blend-multiply" />
+            </div>
+          </Link>
         </div>
 
-        {/* Alerts */}
+        <h1 className="text-[32px] font-extrabold text-[#212529] mb-8">
+          {isSignup ? "Create your account" : "Welcome"}
+        </h1>
+
         {error && (
-          <div className="mb-6 flex items-center gap-2 rounded-xl bg-rose-50 p-3 text-sm text-rose-600 border border-rose-100 dark:bg-rose-950/30 dark:border-rose-900/50">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <p>{error}</p>
+          <div className="mb-6 p-3 text-sm text-red-600 bg-red-50 rounded-lg border border-red-100">
+            {error}
           </div>
         )}
 
-        {message && (
-          <div className="mb-6 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-600 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900/50">
-            <CheckCircle className="h-4 w-4 shrink-0" />
-            <p>{message}</p>
-          </div>
-        )}
-
-        {/* STEP 1: Enter Identifier */}
-        {step === "IDENTIFIER" && (
-          <form onSubmit={checkUserExists} className="space-y-5">
+        {!isSignup ? (
+          /* LOGIN FORM */
+          <form onSubmit={handleLogin} className="space-y-5">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2">
-                Email or Phone
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Email Address*
+              </label>
+              <input
+                type="email"
+                required
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full rounded-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Password*
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                  {identifier.includes("@") ? (
-                    <Mail className="h-5 w-5" />
-                  ) : (
-                    <Phone className="h-5 w-5" />
-                  )}
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="Enter a password"
+                  className="w-full rounded-[24px] border border-[#ced4da] pl-4 pr-12 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6c757d] hover:text-[#212529]"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link href="#" className="text-sm font-bold text-[#0D7F64] hover:underline">
+                Need help with your password?
+              </Link>
+            </div>
+
+            <div className="pt-4 space-y-4">
+              <button
+                type="submit"
+                disabled={loading || !loginEmail || !loginPassword}
+                className="w-full rounded-[24px] bg-[#0D7F64] py-3 text-[15px] font-bold text-white hover:bg-[#0a6650] disabled:opacity-50 transition-colors"
+              >
+                {loading ? "Loading..." : "Continue"}
+              </button>
+
+              <div className="relative flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[#ced4da]"></div>
                 </div>
+                <div className="relative bg-white px-4 text-xs font-semibold text-[#6c757d] uppercase">
+                  OR
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsSignup(true)}
+                className="w-full rounded-[24px] border border-[#ced4da] bg-white py-3 text-[15px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors"
+              >
+                Sign up instead
+              </button>
+            </div>
+          </form>
+        ) : (
+          /* SIGNUP FORM */
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Email Address*
+              </label>
+              <input
+                type="email"
+                required
+                value={signupEmail}
+                onChange={(e) => setSignupEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full rounded-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                First Name*
+              </label>
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name"
+                className="w-full rounded-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Last Name*
+              </label>
+              <input
+                type="text"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name"
+                className="w-full rounded-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Phone Number*
+              </label>
+              <div className="flex">
+                <select 
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="flex items-center justify-center px-4 py-3 border border-[#ced4da] border-r-0 rounded-l-[24px] bg-white text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors cursor-pointer appearance-none text-center min-w-[80px]"
+                >
+                  <option>🇮🇳 +91</option>
+                  <option>🇺🇸 +1</option>
+                  <option>🇬🇧 +44</option>
+                  <option>🇦🇺 +61</option>
+                </select>
                 <input
                   type="text"
                   required
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="name@example.com or 9876543210"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:focus:bg-zinc-900"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full rounded-r-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors"
                 />
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading || !identifier}
-              className="group w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              {loading ? "Checking..." : "Continue"}
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </form>
-        )}
-
-        {/* STEP 2: Password Login (Existing User) */}
-        {step === "PASSWORD" && (
-          <form onSubmit={loginWithPassword} className="space-y-5">
-            <div className="rounded-xl border border-slate-200 p-3 bg-slate-50 dark:bg-zinc-900 dark:border-zinc-800 flex justify-between items-center text-sm">
-              <span className="text-slate-600 dark:text-zinc-300 font-medium truncate">
-                {identifier}
-              </span>
-              <button
-                type="button"
-                onClick={() => setStep("IDENTIFIER")}
-                className="text-blue-600 dark:text-blue-400 font-semibold text-xs uppercase cursor-pointer"
-              >
-                Edit
-              </button>
-            </div>
-
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:focus:bg-zinc-900"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || !password}
-              className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-          </form>
-        )}
-
-        {/* STEP 3: OTP Verification (New User) */}
-        {step === "OTP" && (
-          <form onSubmit={verifyOtp} className="space-y-5">
-            <div className="rounded-xl border border-slate-200 p-3 bg-slate-50 dark:bg-zinc-900 dark:border-zinc-800 flex justify-between items-center text-sm">
-              <span className="text-slate-600 dark:text-zinc-300 font-medium truncate">
-                {identifier}
-              </span>
-              <button
-                type="button"
-                onClick={() => setStep("IDENTIFIER")}
-                className="text-blue-600 dark:text-blue-400 font-semibold text-xs uppercase cursor-pointer"
-              >
-                Change
-              </button>
-            </div>
-
-            <div>
-              <label className="block text-center text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-4">
-                Enter 6-Digit Code
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Postal Code*
               </label>
               <input
                 type="text"
                 required
-                maxLength={6}
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ""))}
-                placeholder="000000"
-                className="w-full text-center tracking-[0.5em] font-mono text-2xl rounded-xl border border-slate-200 bg-slate-50 py-4 px-4 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:focus:bg-zinc-900"
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                placeholder="Postal code"
+                className="w-full rounded-[24px] border border-[#ced4da] px-4 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={otp.length !== 6}
-              className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 hover:bg-blue-500 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              Verify OTP
-            </button>
+            <div>
+              <label className="block text-xs font-bold text-[#212529] mb-1.5">
+                Password*
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={signupPassword}
+                  onChange={(e) => setSignupPassword(e.target.value)}
+                  placeholder="Enter a password"
+                  className="w-full rounded-[24px] border border-[#ced4da] pl-4 pr-12 py-3 text-[15px] text-[#212529] outline-none focus:border-[#0D7F64] transition-colors placeholder:text-[#6c757d]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6c757d] hover:text-[#212529]"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+            </div>
 
-            <div className="text-center">
+            <div className="flex items-start gap-3 pt-2">
+              <input
+                type="checkbox"
+                required
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-[#0D7F64] focus:ring-[#0D7F64]"
+              />
+              <span className="text-xs text-[#212529] leading-tight">
+                I agree to the <Link href="#" className="font-bold text-[#0D7F64] hover:underline">Terms of Service</Link> and have reviewed the <Link href="#" className="font-bold text-[#0D7F64] hover:underline">Privacy Policy</Link>.
+              </span>
+            </div>
+
+            <div className="pt-6 space-y-4">
+              <button
+                type="submit"
+                disabled={!signupEmail || !firstName || !lastName || !phone || !postalCode || !signupPassword || !agreed}
+                className="w-full rounded-[24px] bg-[#0D7F64] py-3 text-[15px] font-bold text-white disabled:bg-[#e9ecef] disabled:text-[#adb5bd] transition-colors"
+              >
+                Sign Up
+              </button>
+
               <button
                 type="button"
-                onClick={requestOtp}
-                className="text-xs text-slate-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400 cursor-pointer"
+                onClick={() => setIsSignup(false)}
+                className="w-full rounded-[24px] border border-[#ced4da] bg-white py-3 text-[15px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors"
               >
-                Didn't receive code? Resend
+                Log in instead
               </button>
             </div>
           </form>
         )}
+      </div>
 
-        {/* STEP 4: Create Profile & Password (New User) */}
-        {step === "CREATE_PASSWORD" && (
-          <form onSubmit={registerNewUser} className="space-y-5">
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2">
-                Full Name
-              </label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:focus:bg-zinc-900 mb-4"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-2">
-                Create a Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
-                  <Lock className="h-5 w-5" />
-                </div>
-                <input
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Must be at least 6 characters"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-50 dark:focus:bg-zinc-900"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading || newPassword.length < 6}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-500 disabled:opacity-50 transition-all cursor-pointer"
-            >
-              {loading ? "Creating Account..." : "Complete Registration"}
-              <CheckCircle className="h-4 w-4" />
-            </button>
-          </form>
-        )}
+      {/* Floating Help Button */}
+      <div className="fixed bottom-6 left-6 z-50">
+        <button className="flex items-center gap-2 rounded-full bg-[#0D7F64] px-4 py-2.5 text-sm font-bold text-white shadow-lg hover:bg-[#0a6650] transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          Help
+        </button>
       </div>
     </div>
   );

@@ -34,4 +34,43 @@ export class TasksService {
       },
     });
   }
+
+  async getTasks(user: any) {
+    if (user.role === 'customer') {
+      // Return tasks posted by this customer
+      return this.prisma.task.findMany({
+        where: { customerId: user.id },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          assignedHelper: {
+            select: { id: true, name: true, phone: true, rating: true, isVerified: true }
+          }
+        }
+      });
+    } else {
+      // Return open tasks for helpers, or tasks assigned to them
+      return this.prisma.task.findMany({
+        where: {
+          OR: [
+            { status: 'OPEN' },
+            { assignedHelperId: user.id }
+          ]
+        },
+        orderBy: { createdAt: 'desc' },
+        include: {
+          customer: {
+            select: { id: true, name: true, rating: true, isVerified: true }
+          }
+        }
+      });
+    }
+  }
+
+  async updateTaskStatus(taskId: string, status: any, userId: string) {
+    // Basic update
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: { status }
+    });
+  }
 }
