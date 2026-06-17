@@ -422,8 +422,8 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-[#e9ecef] bg-white">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <button onClick={() => setCurrentTab('dashboard')} className="flex items-center cursor-pointer h-16 w-56 relative overflow-hidden">
-              <img src="/logo-v3.png" alt="QuickMate Logo" className="absolute top-1/2 -translate-y-1/2 left-0 w-[180%] max-w-none object-contain mix-blend-multiply origin-left" />
+            <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
+              <img src="/logo-v3.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply scale-[2.5] origin-left" />
             </button>
           </div>
 

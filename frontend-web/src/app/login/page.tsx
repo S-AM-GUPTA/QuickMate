@@ -118,8 +118,8 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-[440px] bg-white rounded-[24px] shadow-2xl p-8 sm:p-10 my-8 mx-4">
         <div className="flex justify-center mb-10 mt-4">
           <Link href="/">
-            <div className="h-20 sm:h-24 w-64 sm:w-80 relative overflow-hidden">
-              <img src="/logo-v3.png" alt="QuickMate Logo" className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[180%] max-w-none object-contain mix-blend-multiply" />
+            <div className="flex items-center justify-center">
+              <img src="/logo-v3.png" alt="QuickMate Logo" className="h-20 sm:h-24 w-auto object-contain mix-blend-multiply scale-[2.5] origin-center" />
             </div>
           </Link>
         </div>

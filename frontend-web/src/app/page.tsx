@@ -26,14 +26,12 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <Link href="/">
-            <div className="h-16 w-56 relative overflow-hidden">
-              <img
-                src="/logo-v3.png"
-                alt="QuickMate"
-                className="absolute top-1/2 -translate-y-1/2 left-0 w-[180%] max-w-none object-contain mix-blend-multiply cursor-pointer"
-              />
-            </div>
+          <Link href="/" className="ml-4 flex items-center">
+            <img
+              src="/logo-v3.png"
+              alt="QuickMate"
+              className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply scale-[2.5] origin-left cursor-pointer"
+            />
           </Link>
         </div>
         <div className="flex items-center gap-6">
@@ -59,52 +57,90 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative bg-emerald-50/50 px-6 py-20 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
-            Get help. <span className="text-emerald-600">Gain happiness.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-            Book trusted help for home repairs, cleaning, moving, and more.
-            Everyday tasks, handled.
-          </p>
+      <main className="relative bg-gradient-to-b from-emerald-50/80 to-white px-6 py-16 md:py-28 overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none overflow-hidden -z-10">
+          <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-emerald-100/50 blur-[100px]" />
+          <div className="absolute top-[20%] -left-[10%] w-[600px] h-[600px] rounded-full bg-teal-50/50 blur-[80px]" />
+        </div>
 
-          {/* Search Bar */}
-          <div className="relative max-w-2xl mx-auto mb-10 group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-6 w-6 text-emerald-600 group-focus-within:text-emerald-700 transition-colors" />
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          {/* Left Text Content */}
+          <div className="text-left max-w-2xl z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-200/50">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
+              </span>
+              Over 10,000 tasks completed in your area
             </div>
-            <input
-              type="text"
-              placeholder="What do you need help with?"
-              className="block w-full pl-12 pr-32 py-5 rounded-full border-2 border-emerald-100 bg-white text-lg placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-xl shadow-emerald-900/5"
-            />
-            <button
-              onClick={() => router.push("/login")}
-              className="absolute inset-y-2 right-2 rounded-full bg-emerald-600 px-6 py-2 font-bold text-white hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20"
-            >
-              Get Help
-            </button>
+            
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-[1.1]">
+              Get help. <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">Gain happiness.</span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
+              Book trusted, background-checked help for home repairs, cleaning, moving, and more. Everyday tasks, handled instantly.
+            </p>
+
+            {/* Search Bar */}
+            <div className="relative max-w-xl mb-10 group">
+              <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                <Search className="h-6 w-6 text-emerald-600 group-focus-within:text-emerald-700 transition-colors" />
+              </div>
+              <input 
+                type="text" 
+                placeholder="What do you need help with?" 
+                className="block w-full pl-14 pr-36 py-5 rounded-full border-2 border-slate-200 bg-white text-lg placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-xl shadow-emerald-900/5"
+              />
+              <button 
+                onClick={() => router.push("/login")}
+                className="absolute inset-y-2 right-2 rounded-full bg-emerald-600 px-6 sm:px-8 py-2 font-bold text-white hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20 whitespace-nowrap"
+              >
+                Get Help
+              </button>
+            </div>
+
+            {/* Quick Links */}
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm font-medium text-slate-500 mr-2">Popular:</span>
+              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
+                <Wrench className="h-4 w-4" /> Assembly
+              </button>
+              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
+                <Truck className="h-4 w-4" /> Moving
+              </button>
+              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
+                <Paintbrush className="h-4 w-4" /> Cleaning
+              </button>
+            </div>
           </div>
 
-          {/* Quick Categories */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {[
-              { icon: Wrench, label: "Assembly" },
-              { icon: Package, label: "Mounting" },
-              { icon: Truck, label: "Moving" },
-              { icon: Paintbrush, label: "Cleaning" },
-              { icon: Home, label: "Handyman" },
-            ].map((cat) => (
-              <button
-                key={cat.label}
-                onClick={() => router.push("/login")}
-                className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all"
-              >
-                <cat.icon className="h-4 w-4" />
-                {cat.label}
-              </button>
-            ))}
+          {/* Right Graphics - Image Collage */}
+          <div className="relative hidden lg:block h-[600px] w-full">
+            {/* Top Right Image */}
+            <div className="absolute top-[5%] right-[5%] w-[60%] h-[55%] rounded-3xl overflow-hidden shadow-2xl border-8 border-white z-20 rotate-3 transform hover:rotate-0 hover:scale-105 transition-all duration-500">
+              <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=800&auto=format&fit=crop" alt="Cleaning Services" className="w-full h-full object-cover" />
+            </div>
+            
+            {/* Bottom Left Image */}
+            <div className="absolute bottom-[10%] left-[5%] w-[55%] h-[50%] rounded-3xl overflow-hidden shadow-2xl border-8 border-white z-30 -rotate-6 transform hover:rotate-0 hover:scale-105 transition-all duration-500">
+              <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=800&auto=format&fit=crop" alt="Furniture Assembly" className="w-full h-full object-cover" />
+            </div>
+
+            {/* Middle decorative graphic */}
+            <div className="absolute top-[40%] right-[60%] bg-white p-4 rounded-2xl shadow-xl z-40 animate-bounce" style={{ animationDuration: '3s' }}>
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Trusted Pros</p>
+                  <p className="text-xs text-slate-500">Verified & Background Checked</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -246,14 +282,12 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-12 text-center text-slate-500">
         <div className="flex items-center justify-center mb-6">
-          <Link href="/">
-            <div className="h-16 w-56 relative overflow-hidden mb-6 mx-auto flex items-center justify-center">
-              <img
-                src="/logo-v3.png"
-                alt="QuickMate"
-                className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[180%] max-w-none object-contain mix-blend-multiply opacity-90"
-              />
-            </div>
+          <Link href="/" className="flex items-center justify-center">
+            <img
+              src="/logo-v3.png"
+              alt="QuickMate"
+              className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply opacity-90 scale-[2.5] origin-center"
+            />
           </Link>
         </div>
         <p className="text-sm font-medium">
