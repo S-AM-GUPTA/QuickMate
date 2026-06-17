@@ -423,7 +423,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo-v3.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply scale-[2.5] origin-left" />
+              <img src="/logo-v3.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply scale-[2.5] origin-left [clip-path:inset(25%_0_25%_0)]" />
             </button>
           </div>
 
@@ -467,7 +467,13 @@ export default function Home() {
       </header>
 
       {/* Main Body */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
+        {/* Animated Background decorative elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="absolute top-10 -right-20 w-[600px] h-[600px] rounded-full bg-emerald-100/40 blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
+          <div className="absolute top-40 -left-20 w-[500px] h-[500px] rounded-full bg-teal-50/40 blur-[80px] animate-pulse" style={{ animationDuration: '6s' }} />
+        </div>
+
         {/* Category Filters */}
         {currentTab === "dashboard" && (
           <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-8 mt-2">
@@ -555,7 +561,7 @@ export default function Home() {
             {/* Right side: Nearby Helpers */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-50">
+                <h3 className="text-xl font-bold text-slate-900">
                   Verified Helpers Nearby
                 </h3>
                 <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400">
