@@ -1,0 +1,16 @@
+{
+  "name": "quickmate-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend-web",
+    "frontend-mobile",
+    "shared"
+  ],
+  "scripts": {
+    "backend:dev": "npm run start:dev --workspace=backend",
+    "web:dev": "npm run dev --workspace=frontend-web",
+    "mobile:start": "npm run start --workspace=frontend-mobile"
+  }
+}

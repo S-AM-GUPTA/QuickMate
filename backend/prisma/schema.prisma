@@ -1,0 +1,160 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  customer
+  helper
+  admin
+}
+
+enum TaskUrgency {
+  low
+  medium
+  urgent
+}
+
+enum TaskStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum BidStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User {
+  id                   String            @id
+  email                String            @unique
+  name                 String
+  role                 UserRole          @default(customer)
+  phone                String?
+  password             String?
+  otpCode              String?           @map("otp_code")
+  otpExpiresAt         DateTime?         @map("otp_expires_at")
+  skills               String[]          @default([])
+  latitude             Float?
+  longitude            Float?
+  coords               Unsupported("geometry(Point, 4326)")?
+  rating               Float             @default(5.0)
+  completedTasksCount  Int               @default(0) @map("completed_tasks_count")
+  isVerified           Boolean           @default(false) @map("is_verified")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  postedTasks          Task[]            @relation("CustomerTasks")
+  assignedTasks        Task[]            @relation("HelperTasks")
+  bids                 Bid[]
+  reviewsWritten       Review[]          @relation("Reviewer")
+  reviewsReceived      Review[]          @relation("TargetUser")
+  messages             Message[]
+  activityLogs         ActivityLog[]
+
+  @@map("users")
+}
+
+model Task {
+  id               String            @id @default(uuid()) @db.Uuid
+  title            String
+  description      String
+  budget           Float
+  category         String
+  urgency          TaskUrgency       @default(medium)
+  status           TaskStatus        @default(OPEN)
+  latitude         Float
+  longitude        Float
+  coords           Unsupported("geometry(Point, 4326)")?
+  scheduledTime    DateTime          @map("scheduled_time")
+  attachmentUrls   String[]          @default([]) @map("attachment_urls")
+  
+  customerId       String            @map("customer_id")
+  assignedHelperId String?           @map("assigned_helper_id")
+  
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  customer         User              @relation("CustomerTasks", fields: [customerId], references: [id], onDelete: Cascade)
+  assignedHelper   User?             @relation("HelperTasks", fields: [assignedHelperId], references: [id], onDelete: SetNull)
+  bids             Bid[]
+  reviews          Review[]
+  messages         Message[]
+
+  @@map("tasks")
+}
+
+model Bid {
+  id                        String            @id @default(uuid()) @db.Uuid
+  taskId                    String            @map("task_id") @db.Uuid
+  helperId                  String            @map("helper_id")
+  proposedAmount            Float             @map("proposed_amount")
+  estimatedCompletionTime  DateTime          @map("estimated_completion_time")
+  note                      String?
+  status                    BidStatus         @default(PENDING)
+  createdAt                 DateTime          @default(now()) @map("created_at")
+  updatedAt                 DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  task                      Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  helper                    User              @relation(fields: [helperId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, helperId])
+  @@map("bids")
+}
+
+model Review {
+  id           String            @id @default(uuid()) @db.Uuid
+  taskId       String            @map("task_id") @db.Uuid
+  reviewerId   String            @map("reviewer_id")
+  targetUserId String            @map("target_user_id")
+  rating       Int
+  feedbackText String?           @map("feedback_text")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  task         Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  reviewer     User              @relation("Reviewer", fields: [reviewerId], references: [id], onDelete: Cascade)
+  targetUser   User              @relation("TargetUser", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Message {
+  id          String            @id @default(uuid()) @db.Uuid
+  taskId      String            @map("task_id") @db.Uuid
+  senderId    String            @map("sender_id")
+  messageText String            @map("message_text")
+  mediaUrl    String?           @map("media_url")
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  task        Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  sender      User              @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model ActivityLog {
+  id        String            @id @default(uuid()) @db.Uuid
+  userId    String?           @map("user_id")
+  action    String
+  metadata  Json              @default("{}")
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  user      User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
