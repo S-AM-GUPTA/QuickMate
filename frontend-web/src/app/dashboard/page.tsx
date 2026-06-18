@@ -423,7 +423,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo-v5.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
+              <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">QuickMate</span>
             </button>
           </div>
 
