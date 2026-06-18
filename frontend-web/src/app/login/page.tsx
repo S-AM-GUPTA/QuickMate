@@ -119,7 +119,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-10 mt-4">
           <Link href="/">
             <div className="flex items-center gap-2">
-              <span className="text-3xl font-extrabold text-emerald-600 tracking-tight">QuickMate</span>
+              <img src="/logo-v6.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain" />
             </div>
           </Link>
         </div>

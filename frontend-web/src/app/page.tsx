@@ -27,7 +27,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <span className="text-2xl font-extrabold text-emerald-600 tracking-tight cursor-pointer">QuickMate</span>
+            <img src="/logo-v6.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer" />
           </Link>
         </div>
         <div className="flex items-center gap-6">
@@ -53,7 +53,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative bg-gradient-to-b from-emerald-50/80 to-white px-6 py-16 md:py-28 overflow-hidden">
+      <main className="relative bg-gradient-to-b from-emerald-50/80 to-white px-6 pt-6 pb-16 md:pt-8 md:pb-28 overflow-hidden">
         {/* Background decorative elements */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none overflow-hidden -z-10">
           <div className="absolute -top-[20%] -right-[10%] w-[800px] h-[800px] rounded-full bg-emerald-100/50 blur-[100px]" />
@@ -62,7 +62,7 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left Text Content */}
-          <div className="text-left max-w-2xl z-10">
+          <div className="text-left max-w-2xl z-10 lg:-translate-y-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-200/50">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
@@ -126,7 +126,7 @@ export default function LandingPage() {
             </div>
 
             {/* Middle decorative graphic */}
-            <div className="absolute top-[40%] right-[60%] bg-white p-4 rounded-2xl shadow-xl z-40 animate-bounce" style={{ animationDuration: '3s' }}>
+            <div className="absolute top-[45%] left-[45%] -translate-x-1/2 -translate-y-1/2 bg-white p-4 rounded-2xl shadow-xl z-40 animate-bounce" style={{ animationDuration: '3s' }}>
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
                   <ShieldCheck className="h-5 w-5 text-emerald-600" />
@@ -279,7 +279,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white py-12 text-center text-slate-500">
         <div className="flex items-center justify-center mb-6">
           <Link href="/" className="flex items-center justify-center">
-            <span className="text-2xl font-extrabold text-slate-400 tracking-tight">QuickMate</span>
+            <img src="/logo-v6.png" alt="QuickMate" className="h-12 sm:h-14 w-auto object-contain opacity-90" />
           </Link>
         </div>
         <p className="text-sm font-medium">

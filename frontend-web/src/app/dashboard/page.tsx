@@ -157,8 +157,13 @@ export default function Home() {
     latitude: 28.6304,
     longitude: 77.2177,
     scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+    estimatedDuration: "1-2 hours",
+    address: "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Profile Modal State
+  const [selectedProfile, setSelectedProfile] = useState<Helper | null>(null);
 
   // Simulation notification
   const [notification, setNotification] = useState<string | null>(null);
@@ -311,6 +316,8 @@ export default function Home() {
       latitude: 28.6304,
       longitude: 77.2177,
       scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+      estimatedDuration: "1-2 hours",
+      address: "",
     });
     setFormErrors({});
   };
@@ -423,7 +430,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">QuickMate</span>
+              <img src="/logo-v6.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
           </div>
 
@@ -562,17 +569,20 @@ export default function Home() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900">
-                  Verified Helpers Nearby
+                  Available Mates {selectedCategory !== "All" && `for ${selectedCategory}`}
                 </h3>
-                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400">
+                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
                   Online
                 </span>
               </div>
               <div className="space-y-4">
-                {helpers.map((helper) => (
+                {helpers
+                  .filter(h => selectedCategory === "All" || h.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase())))
+                  .map((helper) => (
                   <HelperCard
                     key={helper.id}
                     helper={helper}
+                    onViewProfile={setSelectedProfile}
                     onHire={(h) => {
                       const matchedTask =
                         tasks.find(
@@ -583,6 +593,12 @@ export default function Home() {
                     }}
                   />
                 ))}
+                
+                {helpers.filter(h => selectedCategory === "All" || h.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase()))).length === 0 && (
+                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-10">
+                    <p className="text-sm text-slate-500 font-medium">No mates available for this category right now.</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1151,23 +1167,26 @@ export default function Home() {
 
       {/* 1. Post Task Modal */}
       {showPostModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-zinc-50 pb-4 dark:border-zinc-800">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                Post a New Task
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto scrollbar-hide">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-800">
+                  Post a New Task
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">Fill in the details to find the best helper.</p>
+              </div>
               <button
                 onClick={() => setShowPostModal(false)}
-                className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handlePostTask} className="mt-4 space-y-4">
+            <form onSubmit={handlePostTask} className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Task Title
                 </label>
                 <input
@@ -1176,17 +1195,17 @@ export default function Home() {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="e.g. Fix leaking kitchen faucet"
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                 />
                 {formErrors.title && (
-                  <p className="mt-1 text-xs text-rose-500 font-medium">
+                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
                     {formErrors.title}
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Detailed Description
                 </label>
                 <textarea
@@ -1195,10 +1214,10 @@ export default function Home() {
                   onChange={handleInputChange}
                   rows={3}
                   placeholder="Describe what needs to be done. Minimum 10 characters."
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
                 ></textarea>
                 {formErrors.description && (
-                  <p className="mt-1 text-xs text-rose-500 font-medium">
+                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
                     {formErrors.description}
                   </p>
                 )}
@@ -1206,7 +1225,7 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                     Budget (Rs.)
                   </label>
                   <input
@@ -1214,24 +1233,24 @@ export default function Home() {
                     name="budget"
                     value={formData.budget}
                     onChange={handleInputChange}
-                    className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                   />
                   {formErrors.budget && (
-                    <p className="mt-1 text-xs text-rose-500 font-medium">
+                    <p className="mt-1.5 text-xs text-rose-500 font-medium">
                       {formErrors.budget}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                     Category
                   </label>
                   <select
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
-                    className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                   >
                     <option>Delivery</option>
                     <option>Repair</option>
@@ -1243,11 +1262,57 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-4">
-                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
-                  Select Task Location
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Estimated Duration
+                  </label>
+                  <select
+                    name="estimatedDuration"
+                    value={(formData as any).estimatedDuration || "1-2 hours"}
+                    onChange={handleInputChange}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                  >
+                    <option>Under 1 hour</option>
+                    <option>1-2 hours</option>
+                    <option>2-4 hours</option>
+                    <option>Half day (4+ hours)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Scheduled Date & Time
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="scheduledTime"
+                    value={formData.scheduledTime}
+                    onChange={handleInputChange}
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Full Address / Landmark
                 </label>
-                <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
+                <input
+                  type="text"
+                  name="address"
+                  value={(formData as any).address || ""}
+                  onChange={handleInputChange}
+                  placeholder="e.g. House No. 42, Near Metro Station"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Pin Location on Map
+                </label>
+                <div className="rounded-xl overflow-hidden border-2 border-slate-200">
                   <LocationPickerMap
                     initialLocation={{
                       lat: formData.latitude,
@@ -1265,41 +1330,24 @@ export default function Home() {
                         longitude: "",
                       }));
                     }}
-                    height="250px"
+                    height="200px"
                   />
                 </div>
                 {(formErrors.latitude || formErrors.longitude) && (
-                  <p className="mt-1 text-xs text-rose-500 font-medium">
+                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
                     Please select a valid location.
                   </p>
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                  Scheduled Date & Time
-                </label>
-                <input
-                  type="datetime-local"
-                  name="scheduledTime"
-                  value={formData.scheduledTime}
-                  onChange={handleInputChange}
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
-                />
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all cursor-pointer"
+                >
+                  Post Task Now
+                </button>
               </div>
-
-              <div className="flex gap-2">
-                <span className="inline-block rounded-md bg-amber-50 px-2 py-1 text-[10px] font-semibold text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/40">
-                  PostGIS coordinate indexing coordinates will be generated.
-                </span>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-500 transition cursor-pointer"
-              >
-                Post Task
-              </button>
             </form>
           </div>
         </div>
@@ -1307,21 +1355,20 @@ export default function Home() {
 
       {/* 2. Review Bids placed on Task Modal */}
       {showBidsModal && activeTaskForBids && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-50 pb-4 dark:border-zinc-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                <h3 className="text-lg font-bold text-slate-800">
                   Review Bids
                 </h3>
-                <p className="text-xs text-zinc-500">
-                  Offers placed by nearby helpers for "{activeTaskForBids.title}
-                  "
+                <p className="text-xs text-slate-500">
+                  Offers placed by nearby helpers for "{activeTaskForBids.title}"
                 </p>
               </div>
               <button
                 onClick={() => setShowBidsModal(false)}
-                className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1329,14 +1376,14 @@ export default function Home() {
 
             <div className="mt-4 space-y-4">
               {/* Bid 1 */}
-              <div className="rounded-xl border border-zinc-100 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-900/40">
+              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-600">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700">
                       R
                     </div>
                     <div>
-                      <h4 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                      <h4 className="font-semibold text-slate-800">
                         Rahul Sharma
                       </h4>
                       <div className="flex items-center gap-1 text-xs text-amber-500">
@@ -1346,29 +1393,23 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="block text-base font-bold text-blue-600">
+                    <span className="block text-base font-bold text-emerald-600">
                       Rs. {activeTaskForBids.budget - 10}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      ETA: 20 mins
+                    <span className="text-[10px] text-slate-500">
+                      Slightly below budget
                     </span>
                   </div>
                 </div>
-                <p className="mt-3 text-xs leading-relaxed text-slate-500 dark:text-zinc-400">
-                  "I have repair tools ready and I am just 200 meters away at
-                  the market. I can finish this errand immediately."
-                </p>
+                <div className="mt-3">
+                  <p className="text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-100">
+                    "Hi! I am available right now and can bring my own tools. Let's get this done!"
+                  </p>
+                </div>
                 <div className="mt-4 flex gap-2">
                   <button
-                    onClick={() =>
-                      handleAcceptBid(activeTaskForBids, helpers[0])
-                    }
-                    className="flex-1 flex items-center justify-center rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition cursor-pointer"
-                  >
-                    Hire & Pay Securely
-                  </button>
-                  <button
                     onClick={() => {
+                      // Navigate to Chat
                       setShowBidsModal(false);
                       setActiveChatTask(activeTaskForBids);
                       setShowChatModal(true);
@@ -1397,20 +1438,20 @@ export default function Home() {
 
       {/* 4. Chat modal overlay */}
       {showChatModal && activeChatTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-50 pb-3 dark:border-zinc-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
               <div>
-                <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+                <h3 className="text-lg font-bold text-slate-800">
                   Task Chat Hub
                 </h3>
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-slate-500">
                   Related Task: "{activeChatTask.title}"
                 </p>
               </div>
               <button
                 onClick={() => setShowChatModal(false)}
-                className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1431,35 +1472,35 @@ export default function Home() {
 
       {/* 5. Review & Rating Modal */}
       {showReviewModal && activeReviewTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
-            <div className="flex items-center justify-between border-b border-zinc-50 pb-4 dark:border-zinc-800">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+              <h3 className="text-lg font-bold text-slate-800">
                 Complete Task & Review
               </h3>
               <button
                 onClick={() => setShowReviewModal(false)}
-                className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleReviewSubmit} className="mt-4 space-y-4">
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div className="text-center">
-                <p className="text-xs text-zinc-500">
+                <p className="text-sm font-medium text-slate-500">
                   Please rate your helper, Rahul Sharma
                 </p>
-                <div className="mt-3 flex justify-center gap-1.5">
+                <div className="mt-3 flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setReviewRating(star)}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:scale-110 transition-transform"
                     >
                       <Star
-                        className={`h-8 w-8 ${star <= reviewRating ? "text-amber-500 fill-current" : "text-zinc-200"}`}
+                        className={`h-9 w-9 ${star <= reviewRating ? "text-amber-500 fill-current" : "text-slate-200"}`}
                       />
                     </button>
                   ))}
@@ -1467,7 +1508,7 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Feedback comments
                 </label>
                 <textarea
@@ -1475,23 +1516,113 @@ export default function Home() {
                   onChange={(e) => setReviewText(e.target.value)}
                   rows={3}
                   placeholder="Share details about their punctuality, speed, and helpfulness..."
-                  className="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 dark:border-zinc-800 dark:bg-zinc-950"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
                   required
                 ></textarea>
               </div>
 
-              <div className="rounded-xl bg-blue-50/50 p-4 dark:bg-blue-950/20 text-xs text-slate-500 dark:text-zinc-400">
+              <div className="rounded-xl bg-amber-50/80 p-4 border border-amber-100 text-xs text-amber-700 font-medium">
                 ⭐ Submitting this form releases the escrowed funds directly to
                 the helper's wallet.
               </div>
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition cursor-pointer"
+                className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all cursor-pointer"
               >
                 Submit & Release Funds
               </button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* 6. Helper Profile Modal */}
+      {selectedProfile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+              <h3 className="text-lg font-bold text-slate-800">
+                Mate Profile
+              </h3>
+              <button
+                onClick={() => setSelectedProfile(null)}
+                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex flex-col items-center text-center">
+              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 text-4xl font-extrabold text-emerald-600 mb-4 shadow-sm border border-emerald-100">
+                {selectedProfile.name.charAt(0)}
+                {selectedProfile.isVerified && (
+                  <span className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white border-4 border-white" title="Verified Background Check">
+                    <Shield className="h-4 w-4" />
+                  </span>
+                )}
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900">{selectedProfile.name}</h2>
+              <div className="mt-2 flex items-center justify-center gap-4 text-sm font-medium text-slate-600">
+                <div className="flex items-center gap-1 text-amber-500">
+                  <Star className="h-4 w-4 fill-current" />
+                  <span className="font-bold text-slate-700">{selectedProfile.rating.toFixed(1)}</span>
+                </div>
+                <span className="text-slate-300">•</span>
+                <div className="flex items-center gap-1">
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  <span>{selectedProfile.completedTasksCount} jobs done</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-5">
+              <div>
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">About</h4>
+                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  "Hi! I am {selectedProfile.name}, an experienced professional ready to help you with your tasks. I take pride in my work and guarantee 100% satisfaction."
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Skills</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedProfile.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
+              <button
+                onClick={() => {
+                  setSelectedProfile(null);
+                  // Just open chat directly for demo purposes
+                  const matchedTask = tasks.find((t) => t.customerId === "user_customer_123") || tasks[0];
+                  setActiveChatTask(matchedTask);
+                  setShowChatModal(true);
+                }}
+                className="w-full flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
+              >
+                Send Message
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedProfile(null);
+                  const matchedTask = tasks.find((t) => t.customerId === "user_customer_123") || tasks[0];
+                  setActiveChatTask(matchedTask);
+                  setShowChatModal(true);
+                }}
+                className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+              >
+                Hire Mate
+              </button>
+            </div>
           </div>
         </div>
       )}
