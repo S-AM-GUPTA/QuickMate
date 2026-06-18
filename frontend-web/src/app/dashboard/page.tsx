@@ -423,7 +423,7 @@ export default function Home() {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo-v3.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain mix-blend-multiply scale-[2.5] origin-left [clip-path:inset(25%_0_25%_0)]" />
+              <img src="/logo-v4.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
           </div>
 
