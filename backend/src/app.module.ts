@@ -10,6 +10,7 @@ import { StorageModule } from './storage/storage.module';
 import { TasksModule } from './tasks/tasks.module';
 import { BidsModule } from './bids/bids.module';
 import { MessagesModule } from './messages/messages.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MessagesModule } from './messages/messages.module';
     TasksModule,
     BidsModule,
     MessagesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

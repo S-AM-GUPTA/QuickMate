@@ -30,6 +30,7 @@ export default function ChatSim({
       senderId: otherUser.id,
       senderName: otherUser.name,
       text: `Hello! I noticed your task. I am located nearby and can help with this. Let me know if my offer works for you.`,
+      // eslint-disable-next-line react-hooks/purity
       timestamp: new Date(Date.now() - 60000),
     },
   ]);

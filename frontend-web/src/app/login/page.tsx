@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,15 @@ export default function LoginPage() {
 
   // Mode: login or signup
   const [isSignup, setIsSignup] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "signup") {
+        setIsSignup(true);
+      }
+    }
+  }, []);
   
   // Login fields
   const [loginEmail, setLoginEmail] = useState("");
@@ -119,7 +128,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-10 mt-4">
           <Link href="/">
             <div className="flex items-center gap-2">
-              <img src="/logo-v6.png" alt="QuickMate Logo" className="h-14 sm:h-16 w-auto object-contain" />
+              <img src="/logo-v7.png" alt="QuickMate Logo" className="h-20 sm:h-24 w-auto object-contain" />
             </div>
           </Link>
         </div>

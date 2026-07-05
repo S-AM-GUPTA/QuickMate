@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send, Bot } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function SupportChatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ export default function SupportChatbot() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -40,6 +42,11 @@ export default function SupportChatbot() {
       ]);
     }, 1500);
   };
+
+  // Do not render the chatbot on the admin panel
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

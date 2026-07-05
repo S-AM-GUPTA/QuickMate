@@ -193,7 +193,7 @@ export default function PaymentEscrow({
                 Funds Released Successfully!
               </h3>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Rs. {amount} has been successfully transferred to {helperName}'s
+                Rs. {amount} has been successfully transferred to {helperName}&apos;s
                 wallet.
               </p>
               <CheckCircle2 className="mx-auto mt-6 h-8 w-8 text-emerald-500 animate-bounce" />

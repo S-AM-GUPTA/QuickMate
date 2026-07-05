@@ -62,21 +62,24 @@ export default function TaskCard({
     DISPUTED: "bg-red-50 text-red-700 border-red-200",
   };
 
-  const [formattedDate, setFormattedDate] = React.useState<string>("");
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
-    setFormattedDate(
-      new Date(task.scheduledTime).toLocaleDateString("en-IN", {
+    setIsClient(true);
+  }, []);
+
+  const formattedDate = isClient 
+    ? new Date(task.scheduledTime).toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
+        year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-      }),
-    );
-  }, [task.scheduledTime]);
+      })
+    : "Loading date...";
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md">
+    <div className="group overflow-hidden rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_15px_30px_-10px_rgba(13,127,100,0.2)]">
       <div className="flex items-start justify-between gap-4">
         {/* Category & Title */}
         <div>

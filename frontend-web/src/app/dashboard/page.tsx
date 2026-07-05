@@ -116,6 +116,14 @@ const initialTasks: Task[] = [
 export default function Home() {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [greeting, setGreeting] = useState("Good morning");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 17) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+  }, []);
 
   // Moved to below profileData
 
@@ -164,6 +172,9 @@ export default function Home() {
 
   // Profile Modal State
   const [selectedProfile, setSelectedProfile] = useState<Helper | null>(null);
+  
+  // Profile Image Upload State
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // Simulation notification
   const [notification, setNotification] = useState<string | null>(null);
@@ -178,6 +189,7 @@ export default function Home() {
     address: "New Delhi, India",
     skills: ["Delivery", "Errands"],
     postalCode: "110001",
+    role: "customer",
   });
 
   useEffect(() => {
@@ -196,6 +208,7 @@ export default function Home() {
             email: up.email || prev.email,
             phone: up.phone || prev.phone,
             postalCode: up.postalCode || "110001",
+            role: up.role || "customer",
           }));
         } catch(e) {}
       }
@@ -426,11 +439,11 @@ export default function Home() {
       )}
 
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 border-b border-[#e9ecef] bg-white">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-sm transition-all">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-2">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo-v6.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
+              <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
           </div>
 
@@ -463,6 +476,14 @@ export default function Home() {
             >
               Become a Mate
             </button>
+            {profileData.role === 'admin' && (
+              <button
+                onClick={() => router.push("/admin")}
+                className="text-[15px] font-bold text-white bg-emerald-600 px-4 py-2 rounded-xl shadow-md hover:bg-emerald-700 hover:shadow-lg transition-all cursor-pointer"
+              >
+                Admin Panel
+              </button>
+            )}
             <button
               onClick={() => setCurrentTab("profile")}
               className="text-[15px] font-extrabold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
@@ -474,7 +495,7 @@ export default function Home() {
       </header>
 
       {/* Main Body */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 relative">
+      <main className="mx-auto max-w-7xl px-4 pt-4 pb-8 sm:px-6 lg:px-8 relative">
         {/* Animated Background decorative elements */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
           <div className="absolute top-10 -right-20 w-[600px] h-[600px] rounded-full bg-emerald-100/40 blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
@@ -483,7 +504,7 @@ export default function Home() {
 
         {/* Category Filters */}
         {currentTab === "dashboard" && (
-          <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-8 mt-2">
+          <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-4 mt-1">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -502,31 +523,48 @@ export default function Home() {
 
         {/* ==================== CUSTOMER MODE VIEW ==================== */}
         {activeRole === "customer" && currentTab === "dashboard" && (
-          <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Left side: Hero & Post Task */}
             <div className="lg:col-span-2 space-y-8">
-              {/* Hero Banner */}
-              <div className="rounded-3xl bg-white border border-slate-200 p-8 text-slate-900 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -mr-20 -mt-20 opacity-50" />
-                <div className="max-w-xl relative z-10">
-                  <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-                    Good morning! <br/><span className="text-emerald-600">What do you need help with?</span>
+              {/* Engaging Hero Banner */}
+              <div className="rounded-[2rem] bg-gradient-to-br from-emerald-600 to-teal-800 p-8 sm:p-12 min-h-[460px] text-white shadow-xl shadow-emerald-900/10 relative overflow-hidden flex flex-col md:flex-row items-center justify-between group">
+                <div className="absolute top-0 right-0 w-full h-full bg-[url('/furniture-assembly.png')] bg-cover bg-center opacity-[0.15] mix-blend-overlay pointer-events-none" />
+                
+                {/* Glow effects */}
+                <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-[60px]" />
+                <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-emerald-400/20 rounded-full blur-[50px]" />
+                
+                <div className="flex-1 relative z-10 pr-0 md:pr-8">
+                  <span className="inline-block py-1.5 px-4 rounded-full bg-white/20 backdrop-blur-md text-emerald-50 text-[11px] font-bold tracking-wider mb-5 border border-white/20 shadow-sm uppercase">
+                    ✨ Your Personal Helpers
+                  </span>
+                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md leading-tight">
+                    {greeting}! <br/><span className="text-emerald-200">What do you need help with?</span>
                   </h1>
-                  <p className="mt-4 text-base text-slate-600">
+                  <p className="mt-4 text-emerald-50/90 text-lg max-w-md font-medium leading-relaxed">
                     Book trusted help for home repairs, cleaning, moving, and more.
                   </p>
-                  <div className="mt-8 flex flex-wrap gap-4">
-                    <button
-                      onClick={() => setShowPostModal(true)}
-                      className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition cursor-pointer"
+                  <div className="mt-8 flex flex-wrap items-center gap-4">
+                    <button 
+                      onClick={() => setShowPostModal(true)} 
+                      className="px-6 py-3 rounded-full bg-white text-emerald-700 font-extrabold hover:scale-105 active:scale-95 transition-all shadow-xl hover:shadow-white/20 flex items-center gap-2 cursor-pointer"
                     >
-                      <PlusCircle className="h-5 w-5" />
-                      Book a Task
+                      Post a Task Now <ArrowRight className="h-4 w-4" />
                     </button>
-                    <div className="flex items-center gap-2 text-xs text-slate-600 font-semibold bg-slate-50 rounded-xl px-4 py-3 border border-slate-200">
-                      <Shield className="h-4 w-4 text-emerald-500" />
-                      Secure Escrow Protection
+                    <div className="flex items-center gap-2 text-xs text-emerald-50 font-medium bg-white/10 backdrop-blur-sm rounded-full px-4 py-3 border border-white/20 shadow-inner">
+                      <Shield className="h-4 w-4 text-emerald-200" />
+                      Secure Escrow
                     </div>
+                  </div>
+                </div>
+
+                {/* Right side beautifully constrained graphic */}
+                <div className="hidden md:block w-[40%] relative z-10 h-64 mt-8 md:mt-0">
+                  <div className="absolute inset-0 right-4 transform rotate-3 group-hover:rotate-0 transition-transform duration-500">
+                    <img src="/deep-cleaning.png" className="w-full h-full object-cover rounded-2xl shadow-2xl border-4 border-white/20" alt="Cleaning" />
+                  </div>
+                  <div className="absolute -bottom-6 -left-8 w-32 h-32 transform -rotate-6 group-hover:-rotate-12 transition-transform duration-500 shadow-xl rounded-2xl border-4 border-white/20 overflow-hidden">
+                    <img src="/tv-mounting.png" className="w-full h-full object-cover opacity-90" alt="Mounting" />
                   </div>
                 </div>
               </div>
@@ -568,10 +606,10 @@ export default function Home() {
             {/* Right side: Nearby Helpers */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900">
+                <h3 className="text-xl font-bold text-slate-900 drop-shadow-sm">
                   Available Mates {selectedCategory !== "All" && `for ${selectedCategory}`}
                 </h3>
-                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                <span className="rounded-full bg-emerald-100/50 backdrop-blur-sm border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800 shadow-sm">
                   Online
                 </span>
               </div>
@@ -853,8 +891,28 @@ export default function Home() {
                       </button>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-8 items-start">
-                      <div className="h-[160px] w-[160px] rounded-full bg-[#e9ecef] flex items-center justify-center overflow-hidden shrink-0 border border-[#ced4da]">
-                        <User className="h-[100px] w-[100px] text-[#ced4da]" />
+                      <div className="relative h-[160px] w-[160px] shrink-0 group">
+                        <div className="h-full w-full rounded-full bg-[#e9ecef] flex items-center justify-center overflow-hidden border border-[#ced4da]">
+                          {profileImage ? (
+                            <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
+                          ) : (
+                            <User className="h-[100px] w-[100px] text-[#ced4da]" />
+                          )}
+                        </div>
+                        <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                          <span className="text-sm font-semibold">Change Photo</span>
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files[0]) {
+                                const url = URL.createObjectURL(e.target.files[0]);
+                                setProfileImage(url);
+                              }
+                            }}
+                          />
+                        </label>
                       </div>
                       <div className="space-y-4 pt-2">
                         <div className="flex items-center gap-3 text-[#212529]">

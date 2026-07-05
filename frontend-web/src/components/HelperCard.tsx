@@ -26,7 +26,7 @@ interface HelperCardProps {
 
 export default function HelperCard({ helper, onHire, onViewProfile }: HelperCardProps) {
   return (
-    <div className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-md">
+    <div className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_15px_30px_-10px_rgba(13,127,100,0.2)]">
       <div className="flex items-start justify-between gap-4">
         {/* Avatar & Info */}
         <div 
