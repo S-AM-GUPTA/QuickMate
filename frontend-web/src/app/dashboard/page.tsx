@@ -135,9 +135,22 @@ export default function Home() {
     "dashboard" | "profile" | "settings"
   >("dashboard");
   const [accountTab, setAccountTab] = useState("Profile");
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [helpers, setHelpers] = useState<Helper[]>(initialHelpers);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+
+  const fetchTasks = async () => {
+    try {
+      const res = await api.get('/tasks');
+      setTasks(res.data);
+    } catch (err) {
+      console.error('Failed to fetch tasks', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [activeRole]);
 
   // Modals & Flows
   const [showPostModal, setShowPostModal] = useState(false);
@@ -336,40 +349,42 @@ export default function Home() {
     return Object.keys(errors).length === 0;
   };
 
-  const handlePostTask = (e: React.FormEvent) => {
+  const handlePostTask = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const newTask: Task = {
-      id: "task_" + Math.random().toString(36).substr(2, 9),
-      title: formData.title,
-      description: formData.description,
-      budget: formData.budget,
-      category: formData.category,
-      urgency: formData.urgency,
-      status: "OPEN",
-      latitude: formData.latitude,
-      longitude: formData.longitude,
-      scheduledTime: new Date(formData.scheduledTime).toISOString(),
-      customerId: "user_customer_123",
-    };
+    try {
+      await api.post('/tasks', {
+        title: formData.title,
+        description: formData.description,
+        budget: formData.budget,
+        category: formData.category,
+        urgency: formData.urgency,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        address: formData.address,
+        scheduledTime: new Date(formData.scheduledTime).toISOString(),
+      });
 
-    setTasks((prev) => [newTask, ...prev]);
-    setShowPostModal(false);
-    // Reset Form
-    setFormData({
-      title: "",
-      description: "",
-      budget: 50,
-      category: "Food Pickup",
-      urgency: "medium",
-      latitude: 28.6304,
-      longitude: 77.2177,
-      scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
-      estimatedDuration: "1-2 hours",
-      address: "",
-    });
-    setFormErrors({});
+      await fetchTasks();
+      setShowPostModal(false);
+      // Reset Form
+      setFormData({
+        title: "",
+        description: "",
+        budget: 50,
+        category: "Food Pickup",
+        urgency: "medium",
+        latitude: 28.6304,
+        longitude: 77.2177,
+        scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+        estimatedDuration: "1-2 hours",
+        address: "",
+      });
+    } catch (err: any) {
+      console.error("Failed to post task", err);
+      alert(err.response?.data?.message || "Failed to post task");
+    }
   };
 
   const handlePlaceBid = (task: Task) => {

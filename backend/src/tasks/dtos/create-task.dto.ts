@@ -44,6 +44,10 @@ export class CreateTaskDto {
   @Max(180)
   longitude: number;
 
+  @IsString()
+  @IsOptional()
+  address?: string;
+
   @IsDateString()
   scheduledTime: string;
 

@@ -75,6 +75,7 @@ model Task {
   status           TaskStatus        @default(OPEN)
   latitude         Float
   longitude        Float
+  address          String?
   coords           Unsupported("geometry(Point, 4326)")?
   scheduledTime    DateTime          @map("scheduled_time")
   attachmentUrls   String[]          @default([]) @map("attachment_urls")

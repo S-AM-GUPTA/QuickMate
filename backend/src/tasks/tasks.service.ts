@@ -28,6 +28,7 @@ export class TasksService {
         urgency: dto.urgency,
         latitude: dto.latitude,
         longitude: dto.longitude,
+        address: dto.address,
         scheduledTime: new Date(dto.scheduledTime),
         attachmentUrls: dto.attachmentUrls || [],
         customerId: customerId,
