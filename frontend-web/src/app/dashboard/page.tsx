@@ -195,16 +195,22 @@ export default function Home() {
       return;
     }
     setIsChangingPassword(true);
-    // Mock API call
-    setTimeout(() => {
-      setIsChangingPassword(false);
+    try {
+      await api.patch('/users/password', {
+        currentPassword,
+        newPassword
+      });
       setIsChangePasswordOpen(false);
       setNotification("Password successfully updated.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmNewPassword("");
       setTimeout(() => setNotification(null), 3000);
-    }, 1000);
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || "Failed to update password.");
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   // Profile & Verification states
