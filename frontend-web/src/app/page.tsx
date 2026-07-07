@@ -32,10 +32,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-emerald-500/30 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-2 backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-sm transition-all">
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-2 bg-white border-b border-slate-200 shadow-sm transition-all">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <img src="/logo-v7.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer mix-blend-multiply" />
+            <img src="/logo-v7.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer" />
           </Link>
         </div>
         <div className="flex items-center gap-6">

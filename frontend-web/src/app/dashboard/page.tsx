@@ -439,11 +439,11 @@ export default function Home() {
       )}
 
       {/* Navigation Header */}
-      <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-sm transition-all">
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm transition-all">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-2">
           <div className="flex items-center gap-3">
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain mix-blend-multiply" />
+              <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
           </div>
 
