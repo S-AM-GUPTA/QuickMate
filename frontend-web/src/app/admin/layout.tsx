@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="w-64 bg-white/80 backdrop-blur-2xl border-r border-emerald-100/50 text-slate-800 flex flex-col hidden md:flex shadow-[4px_0_24px_rgba(0,0,0,0.02)] relative z-20">
         <div className="h-20 flex items-center px-8 border-b border-emerald-50/50">
-          <img src="/logo-v7.png" alt="Logo" className="h-9 drop-shadow-sm" />
+          <img src="/logo-v7.png" alt="Logo" className="h-9 drop-shadow-sm mix-blend-multiply" />
         </div>
         <nav className="flex-1 px-4 py-8 space-y-3">
           {navigation.map((item) => {

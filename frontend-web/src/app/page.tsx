@@ -35,7 +35,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-2 backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-sm transition-all">
         <div className="flex items-center gap-3">
           <Link href="/">
-            <img src="/logo-v7.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer" />
+            <img src="/logo-v7.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer mix-blend-multiply" />
           </Link>
         </div>
         <div className="flex items-center gap-6">
@@ -356,7 +356,7 @@ export default function LandingPage() {
       <footer className="border-t border-slate-200 bg-white py-12 text-center text-slate-500">
         <div className="flex items-center justify-center mb-6">
           <Link href="/" className="flex items-center justify-center">
-            <img src="/logo-v7.png" alt="QuickMate" className="h-20 sm:h-24 w-auto object-contain opacity-90" />
+            <img src="/logo-v7.png" alt="QuickMate" className="h-20 sm:h-24 w-auto object-contain opacity-90 mix-blend-multiply" />
           </Link>
         </div>
         <p className="text-sm font-medium">
