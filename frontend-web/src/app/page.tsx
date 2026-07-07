@@ -118,7 +118,7 @@ export default function LandingPage() {
                   Get Help
                 </button>
                 <a 
-                  href="https://wa.me/919999999999?text=Hi,%20I%20need%20help%20with%20a%20task%20on%20QuickMate%20Campus."
+                  href="https://wa.me/918604994330?text=Hi,%20I%20need%20help%20with%20a%20task%20on%20QuickMate%20Campus."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full bg-[#25D366] px-4 py-2 font-bold text-white hover:bg-[#128C7E] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#25D366]/30 flex items-center gap-2 whitespace-nowrap hidden sm:flex"
