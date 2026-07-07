@@ -208,7 +208,9 @@ export default function Home() {
       setConfirmNewPassword("");
       setTimeout(() => setNotification(null), 3000);
     } catch (err: any) {
-      setPasswordError(err.response?.data?.message || "Failed to update password.");
+      const msg = err.response?.data?.message;
+      const errorText = Array.isArray(msg) ? msg[0] : (msg || "Failed to update password. Make sure backend is running.");
+      setPasswordError(errorText);
     } finally {
       setIsChangingPassword(false);
     }
