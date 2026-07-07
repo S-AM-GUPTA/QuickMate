@@ -178,6 +178,34 @@ export default function Home() {
 
   // Simulation notification
   const [notification, setNotification] = useState<string | null>(null);
+  
+  // Password Change state
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError("");
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+    setIsChangingPassword(true);
+    // Mock API call
+    setTimeout(() => {
+      setIsChangingPassword(false);
+      setIsChangePasswordOpen(false);
+      setNotification("Password successfully updated.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setTimeout(() => setNotification(null), 3000);
+    }, 1000);
+  };
 
   // Profile & Verification states
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -957,19 +985,12 @@ export default function Home() {
                   <div className="space-y-6">
                     <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Password</h2>
                     <div className="space-y-4 max-w-sm">
-                      <div>
-                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Current Password</label>
-                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-[#212529] mb-1.5">New Password</label>
-                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Confirm New Password</label>
-                        <input type="password" placeholder="••••••••" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
-                      </div>
-                      <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Password</button>
+                      <button 
+                        onClick={() => setIsChangePasswordOpen(true)}
+                        className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors"
+                      >
+                        Change Password
+                      </button>
                     </div>
                   </div>
                 )}
@@ -1201,7 +1222,10 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
-                    <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition cursor-pointer">
+                    <button 
+                      onClick={() => setIsChangePasswordOpen(true)}
+                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition cursor-pointer"
+                    >
                       Change Password
                     </button>
                   </div>
@@ -1227,6 +1251,82 @@ export default function Home() {
       </main>
 
       {/* ==================== DIALOG MODALS & OVERLAYS ==================== */}
+
+      {/* Change Password Modal */}
+      {isChangePasswordOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[24px] bg-white p-6 sm:p-8 shadow-2xl dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
+            <h3 className="mb-6 text-xl font-bold text-slate-900 dark:text-zinc-50">Change Password</h3>
+            
+            {passwordError && (
+              <div className="mb-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
+                {passwordError}
+              </div>
+            )}
+
+            <form onSubmit={handlePasswordChange} className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setIsChangePasswordOpen(false)}
+                  className="flex-1 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition"
+                  disabled={isChangingPassword}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition disabled:opacity-50"
+                  disabled={isChangingPassword}
+                >
+                  {isChangingPassword ? "Updating..." : "Update Password"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* 1. Post Task Modal */}
       {showPostModal && (

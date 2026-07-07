@@ -2,6 +2,7 @@ import { Controller, Get, Patch, Body } from '@nestjs/common';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { UsersService } from './users.service';
 import { UpdateProfileDto } from './dtos/update-profile.dto';
+import { ChangePasswordDto } from './dtos/change-password.dto';
 import type { User } from '@prisma/client';
 
 @Controller('users')
@@ -19,5 +20,14 @@ export class UsersController {
     @Body() dto: UpdateProfileDto,
   ) {
     return this.usersService.updateProfile(user.id, dto);
+  }
+
+  @Patch('password')
+  async changePassword(
+    @CurrentUser() user: User,
+    @Body() dto: ChangePasswordDto,
+  ) {
+    await this.usersService.changePassword(user.id, dto);
+    return { success: true, message: 'Password updated successfully' };
   }
 }
