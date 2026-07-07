@@ -119,7 +119,7 @@ export default function AdminPostTaskPage() {
             name="customerId" 
             value={formData.customerId} 
             onChange={handleChange}
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+            className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
             required
           >
             {users.map(u => (
@@ -136,7 +136,7 @@ export default function AdminPostTaskPage() {
             value={formData.title} 
             onChange={handleChange}
             placeholder="e.g. Need Notes Printed ASAP"
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+            className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
             required
           />
         </div>
@@ -149,7 +149,7 @@ export default function AdminPostTaskPage() {
             onChange={handleChange}
             rows={3}
             placeholder="Details about the task..."
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none resize-none"
+            className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none resize-none"
             required
           ></textarea>
         </div>
@@ -164,7 +164,7 @@ export default function AdminPostTaskPage() {
               onChange={handleChange}
               placeholder="e.g. 50"
               min="10"
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+              className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               required
             />
           </div>
@@ -174,7 +174,7 @@ export default function AdminPostTaskPage() {
               name="category" 
               value={formData.category} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -188,7 +188,7 @@ export default function AdminPostTaskPage() {
               name="urgency" 
               value={formData.urgency} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -202,7 +202,7 @@ export default function AdminPostTaskPage() {
               name="scheduledTime" 
               value={formData.scheduledTime} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none"
               required
             />
           </div>
