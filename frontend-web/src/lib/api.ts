@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Get API base URL or default to local backend
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === 'production' ? 'https://quickmate-u1gx.onrender.com' : 'http://localhost:3005');
 
 export const api = axios.create({
   baseURL: API_URL,
