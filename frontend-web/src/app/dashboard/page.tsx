@@ -672,18 +672,23 @@ export default function Home() {
                   </div>
                   
                   {verificationState.status === "Pending Upload" && (
-                    <button
-                      onClick={() => {
-                        setVerificationState(prev => ({ ...prev, status: "Uploading" }));
-                        setTimeout(() => {
-                          setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
-                        }, 2000);
-                      }}
-                      className="w-full rounded-md border-2 border-dashed border-[#ced4da] bg-slate-50 py-10 font-bold text-[#0D7F64] hover:bg-[#e9ecef] transition-colors cursor-pointer flex flex-col items-center justify-center gap-2"
-                    >
+                    <label className="w-full rounded-md border-2 border-dashed border-[#ced4da] bg-slate-50 py-10 font-bold text-[#0D7F64] hover:bg-[#e9ecef] transition-colors cursor-pointer flex flex-col items-center justify-center gap-2">
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*,.pdf"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files.length > 0) {
+                            setVerificationState(prev => ({ ...prev, status: "Uploading" }));
+                            setTimeout(() => {
+                              setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
+                            }, 2000);
+                          }
+                        }}
+                      />
                       <Upload className="h-6 w-6" />
-                      Click to upload {verificationState.docType}
-                    </button>
+                      Click to browse and upload {verificationState.docType}
+                    </label>
                   )}
 
                   {verificationState.status === "Uploading" && (

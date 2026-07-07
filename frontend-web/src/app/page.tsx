@@ -20,6 +20,14 @@ import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-emerald-500/30 overflow-x-hidden">
@@ -31,24 +39,35 @@ export default function LandingPage() {
           </Link>
         </div>
         <div className="flex items-center gap-6">
-          <button
-            onClick={() => router.push("/login")}
-            className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors hidden sm:block cursor-pointer"
-          >
-            Become a Helper
-          </button>
-          <button
-            onClick={() => router.push("/login")}
-            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-          >
-            Log in
-          </button>
-          <button
-            onClick={() => router.push("/login?mode=signup")}
-            className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors cursor-pointer"
-          >
-            Sign up
-          </button>
+          {isLoggedIn ? (
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors cursor-pointer"
+            >
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => router.push("/login")}
+                className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors hidden sm:block cursor-pointer"
+              >
+                Become a Helper
+              </button>
+              <button
+                onClick={() => router.push("/login")}
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => router.push("/login?mode=signup")}
+                className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-700 transition-colors cursor-pointer"
+              >
+                Sign up
+              </button>
+            </>
+          )}
         </div>
       </nav>
 
