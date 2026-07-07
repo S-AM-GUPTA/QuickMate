@@ -88,7 +88,7 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
-              Over 10,000 tasks completed in your area
+              Over 500 tasks completed in Campus
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter text-slate-900 mb-6 leading-[1.1] drop-shadow-sm">
@@ -97,7 +97,7 @@ export default function LandingPage() {
             </h1>
             
             <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed max-w-xl">
-              Book trusted, background-checked help for home repairs, cleaning, moving, and more. Everyday tasks, handled instantly.
+              Book trusted help for notes printing, food pickup, lab files, and everyday campus tasks, handled instantly.
             </p>
 
             {/* Search Bar */}
@@ -110,25 +110,37 @@ export default function LandingPage() {
                 placeholder="What do you need help with?" 
                 className="block w-full pl-16 pr-36 py-5 rounded-full border border-white/50 bg-white/80 backdrop-blur-md text-lg placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/10 transition-all shadow-inner"
               />
-              <button 
-                onClick={() => router.push("/login")}
-                className="absolute inset-y-2 right-2 rounded-full bg-emerald-600 px-6 sm:px-8 py-2 font-bold text-white hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/30 whitespace-nowrap"
-              >
-                Get Help
-              </button>
+              <div className="absolute inset-y-2 right-2 flex items-center gap-2">
+                <button 
+                  onClick={() => router.push("/login")}
+                  className="rounded-full bg-emerald-600 px-6 sm:px-8 py-2 font-bold text-white hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/30 whitespace-nowrap"
+                >
+                  Get Help
+                </button>
+                <a 
+                  href="https://wa.me/919999999999?text=Hi,%20I%20need%20help%20with%20a%20task%20on%20QuickMate%20Campus."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full bg-[#25D366] px-4 py-2 font-bold text-white hover:bg-[#128C7E] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-[#25D366]/30 flex items-center gap-2 whitespace-nowrap hidden sm:flex"
+                  title="Post via WhatsApp"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                  WhatsApp
+                </a>
+              </div>
             </div>
 
             {/* Quick Links */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm font-medium text-slate-500 mr-2">Popular:</span>
+              <span className="text-sm font-medium text-slate-500 mr-2">Popular Campus Tasks:</span>
               <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
-                <Wrench className="h-4 w-4" /> Assembly
+                <Package className="h-4 w-4" /> Notes Printing
               </button>
               <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
-                <Truck className="h-4 w-4" /> Moving
+                <Truck className="h-4 w-4" /> Food Pickup
               </button>
               <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700 hover:border-emerald-500 hover:text-emerald-600 hover:shadow-md transition-all">
-                <Paintbrush className="h-4 w-4" /> Cleaning
+                <Wrench className="h-4 w-4" /> Tech Help
               </button>
             </div>
           </div>
@@ -156,6 +168,41 @@ export default function LandingPage() {
                   <p className="text-xs text-slate-500">Verified & Background Checked</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Activity Stats */}
+        <div className="max-w-7xl mx-auto mt-16 lg:mt-24">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            <div className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+              <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                <div className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </div>
+                <span className="font-bold text-sm tracking-wide uppercase">Live Now</span>
+              </div>
+              <p className="text-3xl font-extrabold text-slate-900 mb-1">18</p>
+              <p className="text-sm font-semibold text-slate-500">Mates Online</p>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+              <Clock className="h-6 w-6 text-emerald-500 mb-2" />
+              <p className="text-3xl font-extrabold text-slate-900 mb-1">6 min</p>
+              <p className="text-sm font-semibold text-slate-500">Avg. Response Time</p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+              <Package className="h-6 w-6 text-emerald-500 mb-2" />
+              <p className="text-3xl font-extrabold text-slate-900 mb-1">12</p>
+              <p className="text-sm font-semibold text-slate-500">Tasks Posted Today</p>
+            </div>
+
+            <div className="bg-white/80 backdrop-blur-sm border border-emerald-100 rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center">
+              <ThumbsUp className="h-6 w-6 text-emerald-500 mb-2" />
+              <p className="text-3xl font-extrabold text-slate-900 mb-1">50+</p>
+              <p className="text-sm font-semibold text-slate-500">Happy Students</p>
             </div>
           </div>
         </div>
