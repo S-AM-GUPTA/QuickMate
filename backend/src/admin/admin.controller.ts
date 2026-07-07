@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -23,5 +23,25 @@ export class AdminController {
   @Get('tasks')
   getTasks() {
     return this.adminService.getAllTasks();
+  }
+
+  @Patch('users/:id/verify')
+  toggleUserVerification(@Param('id') id: string) {
+    return this.adminService.toggleUserVerification(id);
+  }
+
+  @Delete('users/:id')
+  deleteUser(@Param('id') id: string) {
+    return this.adminService.deleteUser(id);
+  }
+
+  @Patch('tasks/:id/status')
+  updateTaskStatus(@Param('id') id: string, @Body('status') status: any) {
+    return this.adminService.updateTaskStatus(id, status);
+  }
+
+  @Delete('tasks/:id')
+  deleteTask(@Param('id') id: string) {
+    return this.adminService.deleteTask(id);
   }
 }

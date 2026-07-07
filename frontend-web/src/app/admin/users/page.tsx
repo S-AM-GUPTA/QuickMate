@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { User, Shield, ShieldAlert, CheckCircle, Search } from "lucide-react";
+import { User, Shield, ShieldAlert, CheckCircle, Search, Trash2 } from "lucide-react";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -22,6 +22,27 @@ export default function AdminUsersPage() {
     };
     fetchUsers();
   }, []);
+
+  const handleVerifyToggle = async (userId: string) => {
+    try {
+      await api.patch(`/admin/users/${userId}/verify`);
+      setUsers(users.map(u => u.id === userId ? { ...u, isVerified: !u.isVerified } : u));
+    } catch (error) {
+      console.error("Failed to toggle verification", error);
+      alert("Failed to update user");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this user and all their tasks/bids?")) return;
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      setUsers(users.filter(u => u.id !== userId));
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      alert("Failed to delete user");
+    }
+  };
 
   const filteredUsers = users.filter((u) => 
     u.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -97,9 +118,25 @@ export default function AdminUsersPage() {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-emerald-600 hover:text-emerald-800 font-bold text-xs bg-emerald-50 px-3 py-1.5 rounded-full hover:bg-emerald-100 transition-colors">
-                      View Profile
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleVerifyToggle(user.id)}
+                        className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${
+                          user.isVerified 
+                            ? "bg-amber-50 text-amber-600 hover:bg-amber-100" 
+                            : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                        }`}
+                      >
+                        {user.isVerified ? "Unverify" : "Verify"}
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteUser(user.id)}
+                        className="text-red-600 hover:text-red-800 bg-red-50 p-1.5 rounded-full hover:bg-red-100 transition-colors"
+                        title="Delete User"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

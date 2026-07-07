@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { Briefcase, IndianRupee, Clock, CheckCircle, MapPin } from "lucide-react";
+import { Briefcase, IndianRupee, Clock, CheckCircle, MapPin, Trash2, Edit2 } from "lucide-react";
 
 export default function AdminTasksPage() {
   const [tasks, setTasks] = useState<any[]>([]);
@@ -21,6 +21,27 @@ export default function AdminTasksPage() {
     };
     fetchTasks();
   }, []);
+
+  const handleStatusChange = async (taskId: string, newStatus: string) => {
+    try {
+      await api.patch(`/admin/tasks/${taskId}/status`, { status: newStatus });
+      setTasks(tasks.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+    } catch (error) {
+      console.error("Failed to update status", error);
+      alert("Failed to update task status");
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm("Are you sure you want to permanently delete this task?")) return;
+    try {
+      await api.delete(`/admin/tasks/${taskId}`);
+      setTasks(tasks.filter(t => t.id !== taskId));
+    } catch (error) {
+      console.error("Failed to delete task", error);
+      alert("Failed to delete task");
+    }
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -81,9 +102,26 @@ export default function AdminTasksPage() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-slate-600 hover:text-slate-900 font-bold text-xs bg-white border border-slate-200 shadow-sm px-3 py-1.5 rounded-full hover:bg-slate-50 transition-colors">
-                      Details
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      <select 
+                        value={task.status}
+                        onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                        className="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-white text-slate-600 font-medium focus:outline-none focus:border-emerald-500 cursor-pointer"
+                      >
+                        <option value="OPEN">OPEN</option>
+                        <option value="ASSIGNED">ASSIGNED</option>
+                        <option value="IN_PROGRESS">IN PROGRESS</option>
+                        <option value="COMPLETED">COMPLETED</option>
+                        <option value="CANCELLED">CANCELLED</option>
+                      </select>
+                      <button 
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="text-red-600 hover:text-red-800 bg-red-50 p-1.5 rounded-full hover:bg-red-100 transition-colors"
+                        title="Delete Task"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

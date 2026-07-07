@@ -41,4 +41,32 @@ export class AdminService {
       take: 50,
     });
   }
+
+  async toggleUserVerification(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { isVerified: !user.isVerified },
+    });
+  }
+
+  async deleteUser(userId: string) {
+    return this.prisma.user.delete({
+      where: { id: userId },
+    });
+  }
+
+  async updateTaskStatus(taskId: string, status: any) {
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: { status },
+    });
+  }
+
+  async deleteTask(taskId: string) {
+    return this.prisma.task.delete({
+      where: { id: taskId },
+    });
+  }
 }
