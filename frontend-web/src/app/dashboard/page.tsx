@@ -785,7 +785,7 @@ export default function Home() {
             </div>
 
             {/* Proximity Feed / Job Discovery */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
               {/* Tasks Map / List Feed */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="flex items-center justify-between">
@@ -819,27 +819,27 @@ export default function Home() {
               </div>
 
               {/* Helper Verification Status Panel */}
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30 space-y-4">
+              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
                 <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
                   Verification & Profile
                 </h4>
-                <div className="flex items-center gap-3 rounded-xl bg-blue-50/50 p-4 dark:bg-blue-950/20">
-                  <Award className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                <div className="flex items-center gap-3 rounded-xl bg-blue-50/50 p-4">
+                  <Award className="h-8 w-8 text-blue-600" />
                   <div>
-                    <h5 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                    <h5 className="font-semibold text-zinc-900">
                       Profile Rating Score
                     </h5>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="text-xs text-zinc-500">
                       You are in the top 5% of local helpers.
                     </p>
                   </div>
                 </div>
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50/20 p-4 dark:border-emerald-800/30 dark:bg-emerald-950/10 text-xs">
-                  <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/20 p-4 text-xs">
+                  <span className="font-bold text-emerald-700 flex items-center gap-1">
                     <CheckCircle className="h-3.5 w-3.5 fill-current" />
                     Verified Partner
                   </span>
-                  <p className="mt-1 text-slate-500 dark:text-slate-400">
+                  <p className="mt-1 text-slate-500">
                     Your KYC document verification and address proofs are
                     completed successfully.
                   </p>
