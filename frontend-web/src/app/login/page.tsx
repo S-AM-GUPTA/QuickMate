@@ -58,7 +58,13 @@ export default function LoginPage() {
       router.push("/dashboard");
     } catch (err: any) {
       console.error(err);
-      setError(err.response?.data?.message || "Invalid credentials");
+      if (!err.response) {
+        setError("Network error: Server is offline or updating. Please try again in 2-3 minutes.");
+      } else if (err.response.status >= 500) {
+        setError(`Server error (${err.response.status}): The backend is currently updating. Please wait a few minutes.`);
+      } else {
+        setError(err.response?.data?.message || "Invalid credentials");
+      }
     } finally {
       setLoading(false);
     }
@@ -99,6 +105,10 @@ export default function LoginPage() {
         } catch (loginErr: any) {
           setError("User exists, but password was incorrect. Please log in.");
         }
+      } else if (!err.response) {
+        setError("Network error: Server is offline or updating. Please try again in 2-3 minutes.");
+      } else if (err.response.status >= 500) {
+        setError(`Server error (${err.response.status}): The backend is currently updating. Please wait a few minutes.`);
       } else {
         setError(
           err.response?.data?.message || 
