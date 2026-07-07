@@ -303,7 +303,6 @@ export default function Home() {
     const checkBids = setTimeout(() => {
       const openCustomTasks = tasks.filter(
         (t) =>
-          t.customerId === "user_customer_123" &&
           t.status === "OPEN" &&
           t.id !== "task_delhi_101",
       );
@@ -628,7 +627,6 @@ export default function Home() {
                 </h3>
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {filteredTasks
-                    .filter((t) => t.customerId === "user_customer_123")
                     .map((task) => (
                       <TaskCard
                         key={task.id}
@@ -641,9 +639,7 @@ export default function Home() {
                         onReleasePayment={handleReleasePayment}
                       />
                     ))}
-                  {filteredTasks.filter(
-                    (t) => t.customerId === "user_customer_123",
-                  ).length === 0 && (
+                  {filteredTasks.length === 0 && (
                     <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-12 dark:border-zinc-800 dark:bg-zinc-900/10">
                       <AlertTriangle className="h-8 w-8 text-slate-300" />
                       <p className="mt-2 text-sm text-slate-400">
@@ -676,7 +672,7 @@ export default function Home() {
                     onHire={(h) => {
                       const matchedTask =
                         tasks.find(
-                          (t) => t.customerId === "user_customer_123",
+                          (t) => t.status === "OPEN",
                         ) || tasks[0];
                       setActiveChatTask(matchedTask);
                       setShowChatModal(true);
@@ -1807,7 +1803,7 @@ export default function Home() {
                 onClick={() => {
                   setSelectedProfile(null);
                   // Just open chat directly for demo purposes
-                  const matchedTask = tasks.find((t) => t.customerId === "user_customer_123") || tasks[0];
+                  const matchedTask = tasks.find((t) => t.status === "OPEN") || tasks[0];
                   setActiveChatTask(matchedTask);
                   setShowChatModal(true);
                 }}
@@ -1818,7 +1814,7 @@ export default function Home() {
               <button
                 onClick={() => {
                   setSelectedProfile(null);
-                  const matchedTask = tasks.find((t) => t.customerId === "user_customer_123") || tasks[0];
+                  const matchedTask = tasks.find((t) => t.status === "OPEN") || tasks[0];
                   setActiveChatTask(matchedTask);
                   setShowChatModal(true);
                 }}
