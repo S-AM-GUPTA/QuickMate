@@ -14,7 +14,9 @@ async function bootstrap() {
 
   app.enableCors();
 
-  await app.listen(process.env.PORT || 3005);
+  const port = process.env.BACKEND_PORT || process.env.PORT || 3005;
+  // If port 3000 is accidentally provided (Next.js default), force 3005
+  await app.listen(String(port) === '3000' ? 3005 : port);
 }
 bootstrap();
 // Trigger reload 2
