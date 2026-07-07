@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Briefcase, ArrowLeft, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, ArrowLeft, LogOut, PlusCircle } from "lucide-react";
 import { api } from "@/lib/api";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -56,6 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Overview", href: "/admin", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Tasks", href: "/admin/tasks", icon: Briefcase },
+    { name: "Post Task", href: "/admin/post-task", icon: PlusCircle },
   ];
 
   return (

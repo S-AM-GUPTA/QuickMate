@@ -69,4 +69,20 @@ export class AdminService {
       where: { id: taskId },
     });
   }
+
+  async createTaskForUser(customerId: string, data: any) {
+    return this.prisma.task.create({
+      data: {
+        title: data.title,
+        description: data.description,
+        budget: data.budget,
+        category: data.category,
+        urgency: data.urgency || 'medium',
+        latitude: data.latitude,
+        longitude: data.longitude,
+        scheduledTime: new Date(data.scheduledTime),
+        customerId: customerId,
+      },
+    });
+  }
 }

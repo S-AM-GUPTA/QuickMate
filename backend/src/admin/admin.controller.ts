@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Delete, Param, Body, UseGuards, Post } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -43,5 +43,10 @@ export class AdminController {
   @Delete('tasks/:id')
   deleteTask(@Param('id') id: string) {
     return this.adminService.deleteTask(id);
+  }
+
+  @Post('tasks')
+  createTaskForUser(@Body('customerId') customerId: string, @Body() data: any) {
+    return this.adminService.createTaskForUser(customerId, data);
   }
 }
