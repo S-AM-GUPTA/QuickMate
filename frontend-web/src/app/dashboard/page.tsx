@@ -238,6 +238,7 @@ export default function Home() {
   // Profile & Verification states
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileData, setProfileData] = useState({
+    id: "",
     name: "QuickMate User",
     email: "user@quickmate.local",
     phone: "+91 9876543210",

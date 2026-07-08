@@ -33,6 +33,19 @@ export interface Task {
   customerId: string;
   assignedHelperId?: string | null;
   distanceMeters?: number;
+  customer?: {
+    id: string;
+    name: string;
+    rating?: number;
+    isVerified?: boolean;
+  };
+  assignedHelper?: {
+    id: string;
+    name: string;
+    phone?: string;
+    rating?: number;
+    isVerified?: boolean;
+  };
 }
 
 interface TaskCardProps {
