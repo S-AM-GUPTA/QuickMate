@@ -48,7 +48,9 @@ export default function AdminUsersPage() {
   const filteredUsers = users.filter((u) => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
                           u.email.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = roleFilter === "all" || u.role === roleFilter;
+    const matchesRole = roleFilter === "all" || 
+                        u.role === roleFilter || 
+                        (roleFilter === "helper" && u.verificationStatus === "PENDING_REVIEW");
     return matchesSearch && matchesRole;
   });
 

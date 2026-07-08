@@ -598,7 +598,7 @@ export default function Home() {
               }}
               className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
             >
-              Become a Mate
+              {profileData.isVerified || profileData.role === "helper" ? "Mate Dashboard" : "Become a Mate"}
             </button>
             {profileData.role === 'admin' && (
               <button

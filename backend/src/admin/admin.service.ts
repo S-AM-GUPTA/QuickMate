@@ -51,6 +51,7 @@ export class AdminService {
       data: { 
         isVerified: newIsVerified,
         verificationStatus: newIsVerified ? 'VERIFIED' : 'UNVERIFIED',
+        role: newIsVerified && user.role === 'customer' ? 'helper' : user.role === 'helper' && !newIsVerified ? 'customer' : user.role,
       },
     });
   }
