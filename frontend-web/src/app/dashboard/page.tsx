@@ -389,7 +389,7 @@ export default function Home() {
         scheduledTime: new Date(formData.scheduledTime).toISOString(),
       });
 
-      await fetchTasks();
+      await fetchDashboardData();
       setShowPostModal(false);
       showGlobalNotification(
         `Task "${formData.title}" posted! We will notify nearby helpers.`
