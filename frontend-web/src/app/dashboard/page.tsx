@@ -505,7 +505,7 @@ export default function Home() {
         );
 
   return (
-    <div className="min-h-screen bg-[#f6f6f6] font-sans text-[#212529]">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 md:pb-0 relative">
       {/* Simulation Alert banner */}
       {notification && (
         <div className="fixed top-4 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-4">
@@ -528,18 +528,19 @@ export default function Home() {
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
               <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
-            <div className="hidden sm:flex flex-col ml-6 cursor-pointer group">
-               <span className="text-[15px] font-extrabold text-slate-900 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
-                  Delivery Location
+            <div className="flex flex-col ml-3 sm:ml-6 cursor-pointer group max-w-[140px] sm:max-w-none">
+               <span className="text-[13px] sm:text-[15px] font-extrabold text-slate-900 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
+                  <span className="hidden sm:inline">Delivery Location</span>
+                  <span className="sm:hidden text-emerald-700">Location</span>
                </span>
-               <span className="text-[13px] text-slate-500 truncate max-w-[250px] font-medium mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
+               <span className="text-[11px] sm:text-[13px] text-slate-500 truncate font-medium mt-0 sm:mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
                   {formData.address || "Fetching location..."}
-                  <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8">
             <button
               onClick={() => {
                 setActiveRole("customer");
@@ -1391,8 +1392,9 @@ export default function Home() {
 
       {/* 1. Post Task Modal */}
       {showPostModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto scrollbar-hide">
+        <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="w-full max-w-xl rounded-[1.5rem] bg-white p-5 sm:p-6 shadow-2xl border border-slate-100 text-left">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-800">
@@ -1867,6 +1869,24 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Mobile Bottom Navigation Bar */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 flex justify-around items-center px-2 py-2 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
+        <button onClick={() => setCurrentTab('dashboard')} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'dashboard' ? 'text-emerald-600' : 'text-slate-500'}`}>
+          <Briefcase className="w-5 h-5" />
+          <span className="text-[10px] font-bold mt-1">Tasks</span>
+        </button>
+        <button onClick={() => { setActiveRole("customer"); setShowPostModal(true); }} className="flex flex-col items-center gap-1 p-2 text-emerald-600 -mt-6 relative z-50">
+          <div className="bg-emerald-600 text-white p-3.5 rounded-full shadow-lg shadow-emerald-600/30">
+            <Plus className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-bold mt-1 text-slate-500">Post Task</span>
+        </button>
+        <button onClick={() => setCurrentTab('profile')} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'profile' ? 'text-emerald-600' : 'text-slate-500'}`}>
+          <User className="w-5 h-5" />
+          <span className="text-[10px] font-bold mt-1">Profile</span>
+        </button>
+      </div>
+
     </div>
   );
 }
