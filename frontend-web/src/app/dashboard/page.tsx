@@ -545,8 +545,7 @@ export default function Home() {
             </button>
             <div className="flex flex-col ml-3 sm:ml-6 cursor-pointer group max-w-[140px] sm:max-w-none">
                <span className="text-[13px] sm:text-[15px] font-extrabold text-slate-900 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
-                  <span className="hidden sm:inline">Delivery Location</span>
-                  <span className="sm:hidden text-emerald-700">Location</span>
+                  <span className="text-emerald-700">Location</span>
                </span>
                <span className="text-[11px] sm:text-[13px] text-slate-500 truncate font-medium mt-0 sm:mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
                   {formData.address || "Fetching location..."}
