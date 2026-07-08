@@ -719,6 +719,7 @@ export default function Home() {
                 </h3>
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {filteredTasks
+                    .filter((task) => task.customerId === profileData?.id)
                     .map((task) => (
                       <TaskCard
                         key={task.id}
@@ -945,7 +946,9 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {filteredTasks.map((task) => (
+                  {filteredTasks
+                    .filter((task) => task.customerId !== profileData?.id && task.status === "OPEN")
+                    .map((task) => (
                     <TaskCard
                       key={task.id}
                       task={task}
@@ -1754,10 +1757,14 @@ export default function Home() {
               <ChatSim
                 taskId={activeChatTask.id}
                 currentUser={{
-                  id: "user_customer_123",
-                  name: "Delhi Customer",
+                  id: profileData?.id || "user_123",
+                  name: profileData?.name || "You",
                 }}
-                otherUser={{ id: "helper_delhi_1", name: "Rahul Sharma" }}
+                otherUser={
+                  activeRole === "customer"
+                    ? { id: activeChatTask.assignedHelper?.id || "support", name: activeChatTask.assignedHelper?.name || "QuickMate Support" }
+                    : { id: activeChatTask.customer?.id || "customer", name: activeChatTask.customer?.name || "Customer" }
+                }
               />
             </div>
           </div>
