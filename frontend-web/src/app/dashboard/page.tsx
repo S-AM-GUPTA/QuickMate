@@ -361,17 +361,15 @@ export default function Home() {
     if (!validateForm()) return;
 
     try {
+      const payload = { ...formData };
+      delete (payload as any).estimatedDuration;
+      payload.scheduledTime = new Date(formData.scheduledTime).toISOString();
+
       if (editingTaskId) {
-        await api.patch(`/tasks/${editingTaskId}`, {
-          ...formData,
-          scheduledTime: new Date(formData.scheduledTime).toISOString(),
-        });
+        await api.patch(`/tasks/${editingTaskId}`, payload);
         showGlobalNotification(`Task "${formData.title}" updated successfully.`);
       } else {
-        await api.post("/tasks", {
-          ...formData,
-          scheduledTime: new Date(formData.scheduledTime).toISOString(),
-        });
+        await api.post("/tasks", payload);
         showGlobalNotification(`Task "${formData.title}" posted! We will notify nearby helpers.`);
       }
 

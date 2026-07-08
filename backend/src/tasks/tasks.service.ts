@@ -80,9 +80,18 @@ export class TasksService {
     if (!task) throw new NotFoundException('Task not found');
     if (task.customerId !== customerId) throw new ForbiddenException('Unauthorized');
     
+    // Only pick fields that belong to the model
+    const allowedFields = ['title', 'description', 'budget', 'category', 'urgency', 'latitude', 'longitude', 'address', 'scheduledTime'];
+    const updateData: any = {};
+    for (const key of allowedFields) {
+      if (dto[key] !== undefined) {
+        updateData[key] = dto[key];
+      }
+    }
+
     return this.prisma.task.update({
       where: { id: taskId },
-      data: dto,
+      data: updateData,
     });
   }
 
