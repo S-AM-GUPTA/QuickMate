@@ -10,7 +10,7 @@ export class BidsService {
     if (!task) throw new NotFoundException('Task not found');
     if (task.status !== 'OPEN') throw new BadRequestException('Task is not open for bids');
 
-    return this.prisma.bid.create({
+    const bid = await this.prisma.bid.create({
       data: {
         taskId: dto.taskId,
         helperId: helperId,
@@ -19,6 +19,16 @@ export class BidsService {
         note: dto.note
       }
     });
+
+    await this.prisma.notification.create({
+      data: {
+        userId: task.customerId,
+        title: 'New Bid Received',
+        message: `A helper has placed a bid of $${dto.proposedAmount} on your task "${task.title}".`,
+      }
+    });
+
+    return bid;
   }
 
   async getBidsForTask(taskId: string, customerId: string) {
@@ -49,6 +59,25 @@ export class BidsService {
 
     // Transaction to update bid status and task status
     return this.prisma.$transaction(async (prisma) => {
+      const customer = await prisma.user.findUnique({ where: { id: customerId } });
+      if ((customer?.walletBalance || 0) < bid.proposedAmount) {
+        throw new BadRequestException('Insufficient wallet balance. Please add funds first.');
+      }
+
+      // Deduct from wallet and create transaction
+      await prisma.user.update({
+        where: { id: customerId },
+        data: { walletBalance: { decrement: bid.proposedAmount } }
+      });
+      await prisma.transaction.create({
+        data: {
+          userId: customerId,
+          amount: bid.proposedAmount,
+          type: 'DEBIT',
+          description: `Payment for task: ${bid.task.title}`
+        }
+      });
+
       // Reject all other bids
       await prisma.bid.updateMany({
         where: { taskId: bid.taskId, id: { not: bidId } },

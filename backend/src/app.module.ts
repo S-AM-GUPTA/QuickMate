@@ -11,6 +11,8 @@ import { TasksModule } from './tasks/tasks.module';
 import { BidsModule } from './bids/bids.module';
 import { MessagesModule } from './messages/messages.module';
 import { AdminModule } from './admin/admin.module';
+import { WalletModule } from './wallet/wallet.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { AdminModule } from './admin/admin.module';
     BidsModule,
     MessagesModule,
     AdminModule,
+    WalletModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

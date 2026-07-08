@@ -9,8 +9,13 @@ import type { User } from '@prisma/client';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @Get('helpers')
+  getHelpers() {
+    return this.usersService.getHelpers();
+  }
+
   @Get('me')
-  async getMe(@CurrentUser() user: User) {
+  getProfile(@CurrentUser() user: User) {
     return user;
   }
 

@@ -53,70 +53,9 @@ const LocationPickerMap = dynamic(
   },
 );
 
-// Initial helpers near Delhi Connaught Place (matching coordinates in schema & test-db)
-const initialHelpers: Helper[] = [
-  {
-    id: "helper_delhi_1",
-    name: "Rahul Sharma",
-    email: "rahul@quickmate.com",
-    role: "helper",
-    phone: "+91 98765 43210",
-    skills: ["Tech Help", "Roommate Help", "Lab Files"],
-    latitude: 28.632,
-    longitude: 77.219,
-    rating: 4.9,
-    completedTasksCount: 34,
-    isVerified: true,
-    distanceMeters: 220,
-  },
-  {
-    id: "helper_delhi_2",
-    name: "Amit Patel",
-    email: "amit@quickmate.com",
-    role: "helper",
-    phone: "+91 87654 32109",
-    skills: ["Food Pickup", "Notes & Printouts", "Errands"],
-    latitude: 28.635,
-    longitude: 77.221,
-    rating: 4.7,
-    completedTasksCount: 18,
-    isVerified: true,
-    distanceMeters: 620,
-  },
-  {
-    id: "helper_delhi_3",
-    name: "Pooja Sen",
-    email: "pooja@quickmate.com",
-    role: "helper",
-    phone: "+91 76543 21098",
-    skills: ["Lab Files", "Notes & Printouts", "Food Pickup"],
-    latitude: 28.628,
-    longitude: 77.212,
-    rating: 4.8,
-    completedTasksCount: 27,
-    isVerified: false,
-    distanceMeters: 780,
-  },
-];
+// Helpers are fetched from backend
 
-// Initial tasks matching database structure
-const initialTasks: Task[] = [
-  {
-    id: "task_delhi_101",
-    title: "Food Pickup from Canteen",
-    description:
-      "Pick up my lunch order from the main canteen and deliver it to Hostel C.",
-    budget: 50,
-    category: "Food Pickup",
-    urgency: "medium",
-    status: "OPEN",
-    latitude: 28.635,
-    longitude: 77.221,
-    scheduledTime: new Date(Date.now() + 3600000).toISOString(),
-    customerId: "user_customer_123",
-    distanceMeters: 604,
-  },
-];
+// Tasks are fetched from backend
 
 export default function Home() {
   const router = useRouter();
@@ -140,20 +79,43 @@ export default function Home() {
   >("dashboard");
   const [accountTab, setAccountTab] = useState("Profile");
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [helpers, setHelpers] = useState<Helper[]>(initialHelpers);
+  const [helpers, setHelpers] = useState<Helper[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [notificationsData, setNotificationsData] = useState<any[]>([]);
 
-  const fetchTasks = async () => {
+  const handleAddFunds = async () => {
     try {
-      const res = await api.get('/tasks');
-      setTasks(res.data);
+      const res = await api.post('/wallet/add-funds', { amount: 1000 });
+      alert(res.data.message);
+      fetchDashboardData();
     } catch (err) {
-      console.error('Failed to fetch tasks', err);
+      console.error(err);
+      alert("Failed to add funds");
+    }
+  };
+
+  const fetchDashboardData = async () => {
+    try {
+      const [tasksRes, helpersRes, walletRes, notifRes] = await Promise.all([
+        api.get('/tasks'),
+        api.get('/users/helpers'),
+        api.get('/wallet/balance').catch(() => ({ data: { balance: 0, transactions: [] }})),
+        api.get('/notifications').catch(() => ({ data: [] }))
+      ]);
+      setTasks(tasksRes.data);
+      setHelpers(helpersRes.data);
+      setWalletBalance(walletRes.data.balance || 0);
+      setTransactions(walletRes.data.transactions || []);
+      setNotificationsData(notifRes.data || []);
+    } catch (err) {
+      console.error('Failed to fetch dashboard data', err);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchDashboardData();
   }, [activeRole]);
 
   // Modals & Flows
@@ -1232,9 +1194,9 @@ export default function Home() {
                     <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Account Balance</h2>
                     <div className="p-8 border border-[#ced4da] rounded-md text-center bg-[#f8f9fa]">
                       <p className="text-sm font-bold text-[#6c757d] uppercase tracking-wider mb-2">Available Wallet Balance</p>
-                      <p className="text-4xl font-extrabold text-[#212529] mb-6">₹ 4,500.00</p>
+                      <p className="text-4xl font-extrabold text-[#212529] mb-6">₹ {walletBalance.toFixed(2)}</p>
                       <div className="flex gap-4 justify-center">
-                        <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Add Funds</button>
+                        <button onClick={handleAddFunds} className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Add ₹1000 (Demo)</button>
                         <button className="rounded-full bg-white border border-[#ced4da] text-[#212529] px-6 py-2.5 font-bold hover:bg-gray-50 transition-colors">Withdraw</button>
                       </div>
                     </div>
@@ -1254,21 +1216,19 @@ export default function Home() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-[#e9ecef]">
-                          <tr>
-                            <td className="p-3 text-[#212529]">Oct 12, 2026</td>
-                            <td className="p-3 text-[#212529]">Payment for Delivery Task</td>
-                            <td className="p-3 font-bold text-red-600">- ₹ 150.00</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 text-[#212529]">Oct 10, 2026</td>
-                            <td className="p-3 text-[#212529]">Wallet Top-up</td>
-                            <td className="p-3 font-bold text-green-600">+ ₹ 1,000.00</td>
-                          </tr>
-                          <tr>
-                            <td className="p-3 text-[#212529]">Oct 01, 2026</td>
-                            <td className="p-3 text-[#212529]">Refund (Cancelled Task)</td>
-                            <td className="p-3 font-bold text-green-600">+ ₹ 500.00</td>
-                          </tr>
+                          {transactions.length === 0 ? (
+                            <tr>
+                              <td colSpan={3} className="p-4 text-center text-[#6c757d]">No transactions found</td>
+                            </tr>
+                          ) : transactions.map(tx => (
+                            <tr key={tx.id}>
+                              <td className="p-3 text-[#212529]">{new Date(tx.createdAt).toLocaleDateString()}</td>
+                              <td className="p-3 text-[#212529]">{tx.description}</td>
+                              <td className={`p-3 font-bold ${tx.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}>
+                                {tx.type === 'CREDIT' ? '+' : '-'} ₹ {tx.amount.toFixed(2)}
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
@@ -1944,9 +1904,21 @@ export default function Home() {
       )}
       {/* Mobile Bottom Navigation Bar */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 flex justify-around items-center px-2 py-2 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
-        <button onClick={() => setCurrentTab('dashboard')} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'dashboard' ? 'text-emerald-600' : 'text-slate-500'}`}>
+        <button onClick={() => { setActiveRole("customer"); setCurrentTab('dashboard'); }} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'dashboard' && activeRole === 'customer' ? 'text-emerald-600' : 'text-slate-500'}`}>
           <Briefcase className="w-5 h-5" />
           <span className="text-[10px] font-bold mt-1">Tasks</span>
+        </button>
+        <button onClick={() => {
+          if (profileData.isVerified || profileData.role === "helper") {
+            setActiveRole("helper");
+            setCurrentTab('dashboard');
+          } else {
+            setCurrentTab("profile");
+            setAccountTab("Verification");
+          }
+        }} className={`flex flex-col items-center gap-1 p-2 ${activeRole === 'helper' ? 'text-emerald-600' : 'text-slate-500'}`}>
+          <CheckCircle className="w-5 h-5" />
+          <span className="text-[10px] font-bold mt-1">Mate</span>
         </button>
         <button onClick={() => { setActiveRole("customer"); setShowPostModal(true); }} className="flex flex-col items-center gap-1 p-2 text-emerald-600 -mt-6 relative z-50">
           <div className="bg-emerald-600 text-white p-3.5 rounded-full shadow-lg shadow-emerald-600/30">

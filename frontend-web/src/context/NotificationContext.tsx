@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { api } from "@/lib/api";
 
 export interface Notification {
   id: string;
@@ -22,6 +23,29 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await api.get('/notifications');
+      const formatted = res.data.map((n: any) => ({
+        id: n.id,
+        message: n.message,
+        timestamp: new Date(n.createdAt),
+        read: n.isRead,
+      }));
+      setNotifications(formatted);
+    } catch (err) {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 15000); // poll every 15s
+    return () => clearInterval(interval);
+  }, []);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const addNotification = (message: string) => {
@@ -34,8 +58,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setNotifications((prev) => [newNotif, ...prev]);
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await api.post('/notifications/read-all');
+    } catch (err) {}
   };
 
   const clearNotifications = () => {

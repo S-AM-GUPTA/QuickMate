@@ -34,6 +34,24 @@ export class UsersService {
     });
   }
 
+  async getHelpers() {
+    return this.prisma.user.findMany({
+      where: { role: 'helper' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        skills: true,
+        latitude: true,
+        longitude: true,
+        rating: true,
+        completedTasksCount: true,
+        isVerified: true,
+      },
+    });
+  }
+
   async delete(id: string) {
     return this.prisma.user.delete({
       where: { id },
