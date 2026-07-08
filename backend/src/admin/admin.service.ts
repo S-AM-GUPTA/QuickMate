@@ -78,6 +78,13 @@ export class AdminService {
     });
   }
 
+  async updateTask(id: string, data: any) {
+    return this.prisma.task.update({
+      where: { id },
+      data,
+    });
+  }
+
   async deleteTask(taskId: string) {
     return this.prisma.task.delete({
       where: { id: taskId },

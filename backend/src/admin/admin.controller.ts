@@ -54,6 +54,11 @@ export class AdminController {
     return this.adminService.updateTaskDetails(id, title, description);
   }
 
+  @Patch('tasks/:id')
+  updateTask(@Param('id') id: string, @Body() data: any) {
+    return this.adminService.updateTask(id, data);
+  }
+
   @Delete('tasks/:id')
   deleteTask(@Param('id') id: string) {
     return this.adminService.deleteTask(id);

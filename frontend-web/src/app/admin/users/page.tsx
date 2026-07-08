@@ -71,6 +71,7 @@ export default function AdminUsersPage() {
             <tr>
               <th className="px-6 py-4">User</th>
               <th className="px-6 py-4">Role</th>
+              <th className="px-6 py-4">Helper Stats</th>
               <th className="px-6 py-4">Status</th>
               <th className="px-6 py-4">Joined</th>
               <th className="px-6 py-4 text-right">Actions</th>
@@ -79,11 +80,11 @@ export default function AdminUsersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading users...</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading users...</td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">No users found</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">No users found</td>
               </tr>
             ) : (
               filteredUsers.map((user) => (
@@ -100,12 +101,34 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
                       user.role === 'helper' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
                     }`}>
                       {user.role}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {user.role === 'helper' ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                           <span className="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">⭐ {typeof user.rating === 'number' ? user.rating.toFixed(1) : "5.0"}</span>
+                           <span className="text-[10px] text-slate-500 font-semibold">{user.completedTasksCount || 0} tasks done</span>
+                        </div>
+                        {user.skills && user.skills.length > 0 ? (
+                           <div className="flex flex-wrap gap-1 mt-1">
+                              {user.skills.slice(0, 2).map((s: string) => (
+                                 <span key={s} className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">{s}</span>
+                              ))}
+                              {user.skills.length > 2 && <span className="text-[9px] text-slate-400">+{user.skills.length - 2}</span>}
+                           </div>
+                        ) : (
+                           <span className="text-[10px] text-slate-400 italic">No skills listed</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400 italic">N/A</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {user.isVerified ? (
