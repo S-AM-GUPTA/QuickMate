@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { WalletService } from './wallet.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
-import { User } from '@prisma/client';
+import type { User } from '@prisma/client';
 
 @Controller('wallet')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AuthGuard)
 export class WalletController {
   constructor(private readonly walletService: WalletService) {}
 

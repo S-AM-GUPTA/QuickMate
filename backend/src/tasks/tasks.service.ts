@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
 
@@ -71,7 +71,28 @@ export class TasksService {
     // Basic update
     return this.prisma.task.update({
       where: { id: taskId },
-      data: { status }
+      data: { status },
+    });
+  }
+
+  async updateTask(taskId: string, customerId: string, dto: any) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.customerId !== customerId) throw new ForbiddenException('Unauthorized');
+    
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data: dto,
+    });
+  }
+
+  async deleteTask(taskId: string, customerId: string) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.customerId !== customerId) throw new ForbiddenException('Unauthorized');
+
+    return this.prisma.task.delete({
+      where: { id: taskId },
     });
   }
 }

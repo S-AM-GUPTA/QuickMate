@@ -7,6 +7,8 @@ import {
   IndianRupee,
   AlertCircle,
   Image as ImageIcon,
+  Edit2,
+  Trash2,
 } from "lucide-react";
 
 export interface Task {
@@ -39,6 +41,8 @@ interface TaskCardProps {
   onPlaceBid?: (task: Task) => void;
   onViewBids?: (task: Task) => void;
   onReleasePayment?: (task: Task) => void;
+  onEditTask?: (task: Task) => void;
+  onDeleteTask?: (task: Task) => void;
 }
 
 export default function TaskCard({
@@ -47,6 +51,8 @@ export default function TaskCard({
   onPlaceBid,
   onViewBids,
   onReleasePayment,
+  onEditTask,
+  onDeleteTask,
 }: TaskCardProps) {
   const urgencyColors = {
     low: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -94,11 +100,23 @@ export default function TaskCard({
 
         {/* Urgency and Status badges */}
         <div className="flex flex-col gap-2 items-end">
-          <span
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${urgencyColors[task.urgency]}`}
-          >
-            {task.urgency}
-          </span>
+          <div className="flex gap-2">
+            {viewMode === "customer" && task.status === "OPEN" && onEditTask && (
+              <button onClick={() => onEditTask(task)} className="p-1 text-slate-400 hover:text-emerald-600 transition-colors">
+                <Edit2 className="w-4 h-4" />
+              </button>
+            )}
+            {viewMode === "customer" && task.status === "OPEN" && onDeleteTask && (
+              <button onClick={() => onDeleteTask(task)} className="p-1 text-slate-400 hover:text-rose-600 transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+            <span
+              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${urgencyColors[task.urgency]}`}
+            >
+              {task.urgency}
+            </span>
+          </div>
           <span
             className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusColors[task.status]}`}
           >

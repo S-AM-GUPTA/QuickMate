@@ -120,6 +120,7 @@ export default function Home() {
 
   // Modals & Flows
   const [showPostModal, setShowPostModal] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showBidsModal, setShowBidsModal] = useState(false);
   const [activeTaskForBids, setActiveTaskForBids] = useState<Task | null>(null);
   const [showEscrowModal, setShowEscrowModal] = useState(false);
@@ -322,24 +323,7 @@ export default function Home() {
     "Errands",
   ];
 
-  // Simulation effect: When a customer posts a task, a helper automatically bids after 4 seconds
-  useEffect(() => {
-    const checkBids = setTimeout(() => {
-      const openCustomTasks = tasks.filter(
-        (t) =>
-          t.status === "OPEN" &&
-          t.id !== "task_delhi_101",
-      );
-      if (openCustomTasks.length > 0) {
-        const lastTask = openCustomTasks[openCustomTasks.length - 1];
-        setNotification(
-          `🔔 Rahul Sharma placed a bid of Rs. ${lastTask.budget - 10} on "${lastTask.title}"!`,
-        );
-        setTimeout(() => setNotification(null), 6000);
-      }
-    }, 4000);
-    return () => clearTimeout(checkBids);
-  }, [tasks]);
+
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -377,24 +361,24 @@ export default function Home() {
     if (!validateForm()) return;
 
     try {
-      await api.post('/tasks', {
-        title: formData.title,
-        description: formData.description,
-        budget: formData.budget,
-        category: formData.category,
-        urgency: formData.urgency,
-        latitude: formData.latitude,
-        longitude: formData.longitude,
-        address: formData.address,
-        scheduledTime: new Date(formData.scheduledTime).toISOString(),
-      });
+      if (editingTaskId) {
+        await api.patch(`/tasks/${editingTaskId}`, {
+          ...formData,
+          scheduledTime: new Date(formData.scheduledTime).toISOString(),
+        });
+        showGlobalNotification(`Task "${formData.title}" updated successfully.`);
+      } else {
+        await api.post("/tasks", {
+          ...formData,
+          scheduledTime: new Date(formData.scheduledTime).toISOString(),
+        });
+        showGlobalNotification(`Task "${formData.title}" posted! We will notify nearby helpers.`);
+      }
 
       await fetchDashboardData();
       setShowPostModal(false);
-      showGlobalNotification(
-        `Task "${formData.title}" posted! We will notify nearby helpers.`
-      );
-      // Reset Form
+      setEditingTaskId(null);
+      
       setFormData((prev) => ({
         ...prev,
         title: "",
@@ -406,8 +390,8 @@ export default function Home() {
         estimatedDuration: "1-2 hours",
       }));
     } catch (err: any) {
-      console.error("Failed to post task", err);
-      alert(err.response?.data?.message || "Failed to post task");
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to save task.");
     }
   };
 
@@ -499,6 +483,36 @@ export default function Home() {
       : tasks.filter(
           (t) => t.category.toLowerCase() === selectedCategory.toLowerCase(),
         );
+
+  const handleDeleteTask = async (task: Task) => {
+    if (confirm("Are you sure you want to delete this task?")) {
+      try {
+        await api.delete(`/tasks/${task.id}`);
+        fetchDashboardData();
+        showGlobalNotification("Task deleted successfully.");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete task.");
+      }
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    setFormData({
+      title: task.title,
+      description: task.description,
+      budget: task.budget,
+      category: task.category,
+      urgency: task.urgency,
+      latitude: task.latitude,
+      longitude: task.longitude,
+      scheduledTime: new Date(task.scheduledTime).toISOString().slice(0, 16),
+      estimatedDuration: "1-2 hours",
+      address: task.address || "",
+    });
+    setEditingTaskId(task.id);
+    setShowPostModal(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 md:pb-0 relative">
@@ -711,7 +725,12 @@ export default function Home() {
                           setActiveTaskForBids(t);
                           setShowBidsModal(true);
                         }}
-                        onReleasePayment={handleReleasePayment}
+                        onReleasePayment={(t) => {
+                          setActiveTaskForEscrow(t);
+                          setShowEscrowModal(true);
+                        }}
+                        onEditTask={handleEditTask}
+                        onDeleteTask={handleDeleteTask}
                       />
                     ))}
                   {filteredTasks.length === 0 && (
@@ -1430,12 +1449,15 @@ export default function Home() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
               <div>
                 <h3 className="text-xl font-extrabold text-slate-800">
-                  Post a New Task
+                  {editingTaskId ? "Edit Task" : "Post a New Task"}
                 </h3>
                 <p className="text-sm text-slate-500 mt-1">Fill in the details to find the best helper.</p>
               </div>
               <button
-                onClick={() => setShowPostModal(false)}
+                onClick={() => {
+                  setShowPostModal(false);
+                  setEditingTaskId(null);
+                }}
                 className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
               >
                 <X className="h-5 w-5" />
@@ -1598,30 +1620,23 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="pt-2 space-y-3">
+              <div className="pt-6 flex justify-end gap-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPostModal(false);
+                    setEditingTaskId(null);
+                  }}
+                  className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
-                  className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all cursor-pointer"
+                  className="rounded-xl bg-emerald-600 px-8 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700"
                 >
-                  Post Task Now
+                  {editingTaskId ? "Save Changes" : "Post Task"}
                 </button>
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-200"></div>
-                  </div>
-                  <div className="relative bg-white px-4 text-xs font-semibold text-slate-400 uppercase">
-                    OR
-                  </div>
-                </div>
-                <a 
-                  href="https://wa.me/918604994330?text=Hi,%20I%20want%20to%20post%20a%20task%20on%20QuickMate%20Campus."
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 text-sm font-bold text-white hover:bg-[#128C7E] hover:shadow-lg hover:shadow-[#25D366]/20 transition-all cursor-pointer"
-                >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  Post via WhatsApp instead
-                </a>
               </div>
             </form>
           </div>

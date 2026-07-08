@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param, Delete } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -25,5 +25,19 @@ export class TasksController {
     @CurrentUser() user: User,
   ) {
     return this.tasksService.updateTaskStatus(id, status, user.id);
+  }
+
+  @Patch(':id')
+  async updateTask(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateTaskDto>,
+    @CurrentUser() user: User,
+  ) {
+    return this.tasksService.updateTask(id, user.id, dto);
+  }
+
+  @Delete(':id')
+  async deleteTask(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.tasksService.deleteTask(id, user.id);
   }
 }
