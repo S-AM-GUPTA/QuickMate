@@ -28,6 +28,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Briefcase,
 } from "lucide-react";
 
 import TaskCard, { Task } from "../../components/TaskCard";
