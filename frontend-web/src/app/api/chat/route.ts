@@ -22,10 +22,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Convert chat history for Gemini
-    const history = messages.slice(0, -1).map((msg: any) => ({
+    let history = messages.slice(0, -1).map((msg: any) => ({
       role: msg.isBot ? "model" : "user",
       parts: [{ text: msg.text }],
     }));
+
+    // Gemini requires the history to always start with a user message
+    while (history.length > 0 && history[0].role === "model") {
+      history.shift();
+    }
 
     const latestMessage = messages[messages.length - 1].text;
 
