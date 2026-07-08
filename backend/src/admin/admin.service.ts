@@ -45,9 +45,13 @@ export class AdminService {
   async toggleUserVerification(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error('User not found');
+    const newIsVerified = !user.isVerified;
     return this.prisma.user.update({
       where: { id: userId },
-      data: { isVerified: !user.isVerified },
+      data: { 
+        isVerified: newIsVerified,
+        verificationStatus: newIsVerified ? 'VERIFIED' : 'UNVERIFIED',
+      },
     });
   }
 

@@ -59,6 +59,21 @@ export class UsersService {
     });
   }
 
+  async submitVerification(id: string, docUrl: string) {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: {
+        verificationStatus: 'PENDING_REVIEW',
+        verificationDocUrl: docUrl,
+      },
+    });
+  }
+
   async changePassword(id: string, dto: ChangePasswordDto) {
     const user = await this.findById(id);
     if (!user) {

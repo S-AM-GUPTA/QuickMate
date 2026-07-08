@@ -22,6 +22,14 @@ export class UsersController {
     return this.usersService.updateProfile(user.id, dto);
   }
 
+  @Patch('me/verification')
+  async submitVerification(
+    @CurrentUser() user: User,
+    @Body('docUrl') docUrl: string,
+  ) {
+    return this.usersService.submitVerification(user.id, docUrl);
+  }
+
   @Patch('password')
   async changePassword(
     @CurrentUser() user: User,

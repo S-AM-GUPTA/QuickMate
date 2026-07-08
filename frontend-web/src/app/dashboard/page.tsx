@@ -302,9 +302,26 @@ export default function Home() {
             phone: up.phone || prev.phone,
             postalCode: up.postalCode || "110001",
             role: up.role || "customer",
+            isVerified: up.isVerified || false,
+            verificationStatus: up.verificationStatus || "UNVERIFIED"
           }));
         } catch(e) {}
       }
+      
+      // Always fetch fresh data from backend
+      api.get("/users/me").then(res => {
+        const freshUser = res.data;
+        setProfileData(prev => ({
+          ...prev,
+          name: freshUser.name || prev.name,
+          email: freshUser.email || prev.email,
+          phone: freshUser.phone || prev.phone,
+          role: freshUser.role || "customer",
+          isVerified: freshUser.isVerified || false,
+          verificationStatus: freshUser.verificationStatus || "UNVERIFIED"
+        }));
+        localStorage.setItem("userProfile", JSON.stringify(freshUser));
+      }).catch(err => console.error("Failed to fetch fresh profile", err));
     }
   }, [router]);
 
@@ -787,7 +804,7 @@ export default function Home() {
         {/* ==================== HELPER MODE VIEW ==================== */}
         {activeRole === "helper" && currentTab === "dashboard" && (
           <div className="mt-8 space-y-8">
-            {verificationState.status !== "Verified" ? (
+            {!profileData.isVerified ? (
               <div className="rounded-2xl border border-[#ced4da] bg-white p-8 shadow-sm text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-6">
                   <AlertTriangle className="h-8 w-8" />
@@ -804,7 +821,7 @@ export default function Home() {
                     <select
                       value={verificationState.docType}
                       onChange={(e) => setVerificationState(prev => ({ ...prev, docType: e.target.value }))}
-                      disabled={verificationState.status !== "Pending Upload"}
+                      disabled={profileData.verificationStatus !== "UNVERIFIED" && verificationState.status !== "Pending Upload"}
                       className="w-full rounded-md border border-[#ced4da] bg-white px-4 py-3 outline-none focus:border-[#0D7F64] disabled:opacity-50"
                     >
                       <option>Aadhar Card</option>
@@ -813,18 +830,25 @@ export default function Home() {
                     </select>
                   </div>
                   
-                  {verificationState.status === "Pending Upload" && (
+                  {profileData.verificationStatus === "UNVERIFIED" && verificationState.status === "Pending Upload" && (
                     <label className="w-full rounded-md border-2 border-dashed border-[#ced4da] bg-slate-50 py-10 font-bold text-[#0D7F64] hover:bg-[#e9ecef] transition-colors cursor-pointer flex flex-col items-center justify-center gap-2">
                       <input
                         type="file"
                         className="hidden"
                         accept="image/*,.pdf"
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           if (e.target.files && e.target.files.length > 0) {
                             setVerificationState(prev => ({ ...prev, status: "Uploading" }));
-                            setTimeout(() => {
+                            try {
+                              // Send dummy document URL to backend
+                              await api.patch('/users/me/verification', { docUrl: "https://dummy-document-url.com/file.pdf" });
+                              setProfileData(prev => ({ ...prev, verificationStatus: "PENDING_REVIEW" }));
                               setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
-                            }, 2000);
+                            } catch (err) {
+                              console.error("Failed to submit verification", err);
+                              setVerificationState(prev => ({ ...prev, status: "Pending Upload" }));
+                              alert("Failed to submit document. Try again.");
+                            }
                           }
                         }}
                       />
@@ -840,18 +864,12 @@ export default function Home() {
                     </div>
                   )}
 
-                  {verificationState.status === "Pending Review" && (
+                  {(profileData.verificationStatus === "PENDING_REVIEW" || verificationState.status === "Pending Review") && (
                     <div className="w-full rounded-md border border-amber-200 bg-amber-50 py-6 px-4 flex items-center justify-center gap-3 text-left">
                       <FileText className="h-6 w-6 text-amber-600 shrink-0" />
                       <div>
                         <p className="font-bold text-amber-800">Document under review</p>
-                        <p className="text-sm text-amber-700 mt-1">We will notify you once verified. You can simulate approval by refreshing the page later. (Demo mode)</p>
-                        <button 
-                          onClick={() => setVerificationState(prev => ({ ...prev, status: "Verified" }))}
-                          className="mt-3 text-xs font-bold bg-amber-200 text-amber-800 px-3 py-1 rounded hover:bg-amber-300 transition-colors cursor-pointer"
-                        >
-                          Dev: Force Approve
-                        </button>
+                        <p className="text-sm text-amber-700 mt-1">We will notify you once an admin verifies your document.</p>
                       </div>
                     </div>
                   )}

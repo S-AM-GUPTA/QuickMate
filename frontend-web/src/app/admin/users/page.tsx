@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { User, Shield, ShieldAlert, CheckCircle, Search, Trash2 } from "lucide-react";
+import { User, Shield, ShieldAlert, CheckCircle, Search, Trash2, FileText, ExternalLink } from "lucide-react";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -158,6 +158,10 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4">
                     {user.isVerified ? (
                       <span className="flex items-center gap-1 text-emerald-600 font-semibold"><CheckCircle className="h-4 w-4" /> Verified</span>
+                    ) : user.verificationStatus === 'PENDING_REVIEW' ? (
+                      <span className="flex flex-col gap-1">
+                        <span className="flex items-center gap-1 text-amber-600 font-semibold"><FileText className="h-4 w-4" /> Review Pending</span>
+                      </span>
                     ) : (
                       <span className="flex items-center gap-1 text-slate-400 font-semibold"><ShieldAlert className="h-4 w-4" /> Unverified</span>
                     )}
@@ -167,6 +171,17 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      {user.verificationDocUrl && (
+                        <a 
+                          href={user.verificationDocUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1"
+                          title="View Document"
+                        >
+                          <ExternalLink className="h-3 w-3" /> Doc
+                        </a>
+                      )}
                       <button 
                         onClick={() => handleVerifyToggle(user.id)}
                         className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${

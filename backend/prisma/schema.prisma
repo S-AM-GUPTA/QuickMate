@@ -50,6 +50,8 @@ model User {
   rating               Float             @default(5.0)
   completedTasksCount  Int               @default(0) @map("completed_tasks_count")
   isVerified           Boolean           @default(false) @map("is_verified")
+  verificationStatus   String            @default("UNVERIFIED") @map("verification_status")
+  verificationDocUrl   String?           @map("verification_doc_url")
   createdAt            DateTime          @default(now()) @map("created_at")
   updatedAt            DateTime          @updatedAt @map("updated_at")
 
