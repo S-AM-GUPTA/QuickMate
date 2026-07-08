@@ -598,7 +598,7 @@ export default function Home() {
               }}
               className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
             >
-              {profileData.isVerified || profileData.role === "helper" ? "Mate Dashboard" : "Become a Mate"}
+              {profileData.verificationStatus === "VERIFIED" || profileData.role === "helper" ? "Mate Dashboard" : "Become a Mate"}
             </button>
             {profileData.role === 'admin' && (
               <button
@@ -804,7 +804,7 @@ export default function Home() {
         {/* ==================== HELPER MODE VIEW ==================== */}
         {activeRole === "helper" && currentTab === "dashboard" && (
           <div className="mt-8 space-y-8">
-            {!profileData.isVerified ? (
+            {profileData.verificationStatus !== "VERIFIED" && profileData.role !== "helper" ? (
               <div className="rounded-2xl border border-[#ced4da] bg-white p-8 shadow-sm text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-6">
                   <AlertTriangle className="h-8 w-8" />

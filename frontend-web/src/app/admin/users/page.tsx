@@ -158,8 +158,8 @@ export default function AdminUsersPage() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    {user.isVerified ? (
-                      <span className="flex items-center gap-1 text-emerald-600 font-semibold"><CheckCircle className="h-4 w-4" /> Verified</span>
+                    {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? (
+                      <span className="flex items-center gap-1 text-emerald-600 font-semibold"><CheckCircle className="h-4 w-4" /> Verified Mate</span>
                     ) : user.verificationStatus === 'PENDING_REVIEW' ? (
                       <span className="flex flex-col gap-1">
                         <span className="flex items-center gap-1 text-amber-600 font-semibold"><FileText className="h-4 w-4" /> Review Pending</span>
@@ -187,12 +187,12 @@ export default function AdminUsersPage() {
                       <button 
                         onClick={() => handleVerifyToggle(user.id)}
                         className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${
-                          user.isVerified 
+                          user.verificationStatus === 'VERIFIED' || user.role === 'helper'
                             ? "bg-amber-50 text-amber-600 hover:bg-amber-100" 
                             : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
                         }`}
                       >
-                        {user.isVerified ? "Unverify" : "Verify"}
+                        {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? "Unverify" : "Verify"}
                       </button>
                       <button 
                         onClick={() => handleDeleteUser(user.id)}
