@@ -20,27 +20,43 @@ export default function SupportChatbot() {
     }
   }, [messages, isTyping, isOpen]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
-    setMessages((prev) => [...prev, { id: Date.now(), text: inputText, isBot: false }]);
+    const userMsg = { id: Date.now(), text: inputText.trim(), isBot: false };
+    setMessages((prev) => [...prev, userMsg]);
     setInputText("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      setIsTyping(false);
-      const responses = [
-        "Thanks for reaching out! Our team will look into this.",
-        "I can certainly help with that. Could you provide a bit more detail?",
-        "Please check out our FAQ section for common issues, or I can connect you to a human agent.",
-        "That's a great question! Let me find the best answer for you.",
-      ];
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...messages, userMsg],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch response");
+      }
+
+      const data = await response.json();
+      
       setMessages((prev) => [
         ...prev,
-        { id: Date.now() + 1, text: responses[Math.floor(Math.random() * responses.length)], isBot: true },
+        { id: Date.now() + 1, text: data.text, isBot: true },
       ]);
-    }, 1500);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setMessages((prev) => [
+        ...prev,
+        { id: Date.now() + 1, text: "Sorry, I am having trouble connecting to the server.", isBot: true },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   // Do not render the chatbot on the admin panel
@@ -49,7 +65,7 @@ export default function SupportChatbot() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-[90px] md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end">
       {/* Chat Window */}
       {isOpen && (
         <div className="mb-4 w-80 overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-100 flex flex-col transition-all transform origin-bottom-right">
@@ -100,12 +116,14 @@ export default function SupportChatbot() {
       )}
 
       {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`h-14 w-14 rounded-full flex items-center justify-center text-white shadow-xl transition-transform hover:scale-110 active:scale-95 cursor-pointer ${isOpen ? "bg-slate-800" : "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30"}`}
-      >
-        {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-      </button>
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="h-14 w-14 bg-emerald-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-emerald-500/30 hover:scale-105 transition-all cursor-pointer border-4 border-white"
+        >
+          <MessageCircle className="h-6 w-6 text-white" />
+        </button>
+      )}
     </div>
   );
 }

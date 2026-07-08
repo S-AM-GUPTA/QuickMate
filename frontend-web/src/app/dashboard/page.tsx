@@ -29,7 +29,10 @@ import {
   Phone,
   MapPin,
   Briefcase,
+  Bell,
 } from "lucide-react";
+
+import { useNotification } from "@/context/NotificationContext";
 
 import TaskCard, { Task } from "../../components/TaskCard";
 import HelperCard, { Helper } from "../../components/HelperCard";
@@ -227,6 +230,15 @@ export default function Home() {
 
   // Simulation notification
   const [notification, setNotification] = useState<string | null>(null);
+  const { notifications, unreadCount, addNotification, markAllAsRead } = useNotification();
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  
+  const showGlobalNotification = (msg: string) => {
+    setNotification(msg);
+    addNotification(msg);
+    // Auto clear banner but keep in context history
+    setTimeout(() => setNotification(null), 4000);
+  };
   
   // Password Change state
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -250,11 +262,7 @@ export default function Home() {
         newPassword
       });
       setIsChangePasswordOpen(false);
-      setNotification("Password successfully updated.");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmNewPassword("");
-      setTimeout(() => setNotification(null), 3000);
+      showGlobalNotification("Password successfully updated.");
     } catch (err: any) {
       const msg = err.response?.data?.message;
       const errorText = Array.isArray(msg) ? msg[0] : (msg || "Failed to update password. Make sure backend is running.");
@@ -402,6 +410,9 @@ export default function Home() {
 
       await fetchTasks();
       setShowPostModal(false);
+      showGlobalNotification(
+        `Task "${formData.title}" posted! We will notify nearby helpers.`
+      );
       // Reset Form
       setFormData((prev) => ({
         ...prev,
@@ -420,16 +431,26 @@ export default function Home() {
   };
 
   const handlePlaceBid = (task: Task) => {
-    setNotification(
-      `✔ Bid of Rs. ${task.budget} successfully submitted for "${task.title}"!`,
+    showGlobalNotification(
+      `✔ Bid of Rs. ${task.budget} successfully submitted for "${task.title}"!`
     );
-    setTimeout(() => setNotification(null), 4000);
   };
 
-  const handleAcceptBid = (task: Task, helper: Helper) => {
-    setActiveTaskForEscrow(task);
-    setShowBidsModal(false);
-    setShowEscrowModal(true);
+  const handleAcceptBid = async (task: Task, helper: Helper) => {
+    setActiveTaskForBids(task);
+    try {
+      await api.patch(`/tasks/${activeTaskForBids.id}/status`, { status: "ASSIGNED" });
+      showGlobalNotification(
+        `You have assigned ${helper.name} to "${activeTaskForBids.title}".`
+      );
+      
+      setTasks((prev) => prev.map(t => t.id === task.id ? {...t, status: "IN_PROGRESS"} : t));
+      setShowBidsModal(false);
+      setShowEscrowModal(true);
+      setActiveTaskForEscrow(task);
+    } catch (err) {
+      console.error("Failed to assign helper", err);
+    }
   };
 
   const handlePaymentSuccess = () => {
@@ -449,10 +470,9 @@ export default function Home() {
 
     setTimeout(() => {
       setShowEscrowModal(false);
-      setNotification(
-        `🎉 Escrow locked! ${matchedHelper.name} has been assigned to your task.`,
+      showGlobalNotification(
+        `🎉 Escrow locked! ${matchedHelper.name} has been assigned to your task.`
       );
-      setTimeout(() => setNotification(null), 5000);
     }, 2000);
   };
 
@@ -465,7 +485,6 @@ export default function Home() {
     e.preventDefault();
     if (!activeReviewTask) return;
 
-    // Set task to COMPLETED
     setTasks((prev) =>
       prev.map((t) =>
         t.id === activeReviewTask.id ? { ...t, status: "COMPLETED" } : t,
@@ -473,29 +492,24 @@ export default function Home() {
     );
 
     // Update helper task count dynamically in local state
-    setHelpers((prev) =>
-      prev.map((h) =>
-        h.id === "helper_delhi_1"
-          ? {
-              ...h,
-              completedTasksCount: h.completedTasksCount + 1,
-              rating:
-                (h.rating * h.completedTasksCount + reviewRating) /
-                (h.completedTasksCount + 1),
-            }
-          : h,
-      ),
-    );
+    const helperId = "helper_delhi_1"; // Mock helper ID
+    const targetHelper = helpers.find((h) => h.id === helperId);
+    if (targetHelper) {
+      const updatedHelper = {
+        ...targetHelper,
+        completedTasksCount: targetHelper.completedTasksCount + 1,
+        rating: (targetHelper.rating * targetHelper.completedTasksCount + reviewRating) / (targetHelper.completedTasksCount + 1),
+      };
+      setHelpers((prev) => prev.map((h) => (h.id === helperId ? updatedHelper : h)));
+      showGlobalNotification(
+        `⭐ Thank you! Review submitted. Payment released to ${targetHelper.name}.`
+      );
+    }
 
     setShowReviewModal(false);
     setActiveReviewTask(null);
     setReviewText("");
     setReviewRating(5);
-
-    setNotification(
-      `⭐ Thank you! Review submitted. Payment released to Rahul Sharma.`,
-    );
-    setTimeout(() => setNotification(null), 5000);
   };
 
   const filteredTasks =
@@ -584,6 +598,44 @@ export default function Home() {
             >
               Account
             </button>
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowNotifDropdown(!showNotifDropdown);
+                  if (unreadCount > 0) markAllAsRead();
+                }}
+                className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors cursor-pointer rounded-full hover:bg-emerald-50"
+              >
+                <Bell className="w-6 h-6" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+                )}
+              </button>
+              
+              {showNotifDropdown && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden">
+                  <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="font-bold text-slate-800">Notifications</h3>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-slate-500 text-sm">
+                        No notifications yet.
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div key={n.id} className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                          <p className="text-sm text-slate-700">{n.message}</p>
+                          <span className="text-xs text-slate-400 mt-1 block">
+                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>

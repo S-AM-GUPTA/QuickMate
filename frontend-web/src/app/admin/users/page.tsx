@@ -8,6 +8,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -44,10 +45,12 @@ export default function AdminUsersPage() {
     }
   };
 
-  const filteredUsers = users.filter((u) => 
-    u.name.toLowerCase().includes(search.toLowerCase()) || 
-    u.email.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredUsers = users.filter((u) => {
+    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
+                          u.email.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter === "all" || u.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -65,6 +68,28 @@ export default function AdminUsersPage() {
         </div>
       </div>
       
+      {/* Tabs */}
+      <div className="flex border-b border-slate-200 px-6 gap-6 bg-slate-50/50">
+        <button
+          onClick={() => setRoleFilter("all")}
+          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "all" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+        >
+          All Users
+        </button>
+        <button
+          onClick={() => setRoleFilter("customer")}
+          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "customer" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+        >
+          Customers
+        </button>
+        <button
+          onClick={() => setRoleFilter("helper")}
+          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "helper" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+        >
+          Mates (Helpers)
+        </button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm text-slate-600">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200 font-bold">
