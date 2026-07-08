@@ -439,9 +439,9 @@ export default function Home() {
   const handleAcceptBid = async (task: Task, helper: Helper) => {
     setActiveTaskForBids(task);
     try {
-      await api.patch(`/tasks/${activeTaskForBids.id}/status`, { status: "ASSIGNED" });
+      await api.patch(`/tasks/${task.id}/status`, { status: "ASSIGNED" });
       showGlobalNotification(
-        `You have assigned ${helper.name} to "${activeTaskForBids.title}".`
+        `You have assigned ${helper.name} to "${task.title}".`
       );
       
       setTasks((prev) => prev.map(t => t.id === task.id ? {...t, status: "IN_PROGRESS"} : t));
