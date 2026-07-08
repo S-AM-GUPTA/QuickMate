@@ -26,8 +26,8 @@ export default function AdminUsersPage() {
 
   const handleVerifyToggle = async (userId: string) => {
     try {
-      await api.patch(`/admin/users/${userId}/verify`);
-      setUsers(users.map(u => u.id === userId ? { ...u, isVerified: !u.isVerified } : u));
+      const response = await api.patch(`/admin/users/${userId}/verify`);
+      setUsers(users.map(u => u.id === userId ? response.data : u));
     } catch (error) {
       console.error("Failed to toggle verification", error);
       alert("Failed to update user");
@@ -184,16 +184,18 @@ export default function AdminUsersPage() {
                           <ExternalLink className="h-3 w-3" /> Doc
                         </a>
                       )}
-                      <button 
-                        onClick={() => handleVerifyToggle(user.id)}
-                        className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${
-                          user.verificationStatus === 'VERIFIED' || user.role === 'helper'
-                            ? "bg-amber-50 text-amber-600 hover:bg-amber-100" 
-                            : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
-                        }`}
-                      >
-                        {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? "Unverify" : "Verify"}
-                      </button>
+                      {(user.verificationStatus !== 'UNVERIFIED' || user.role === 'helper') && (
+                        <button 
+                          onClick={() => handleVerifyToggle(user.id)}
+                          className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${
+                            user.verificationStatus === 'VERIFIED' || user.role === 'helper'
+                              ? "bg-amber-50 text-amber-600 hover:bg-amber-100" 
+                              : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                          }`}
+                        >
+                          {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? "Unverify" : "Verify"}
+                        </button>
+                      )}
                       <button 
                         onClick={() => handleDeleteUser(user.id)}
                         className="text-red-600 hover:text-red-800 bg-red-50 p-1.5 rounded-full hover:bg-red-100 transition-colors"
