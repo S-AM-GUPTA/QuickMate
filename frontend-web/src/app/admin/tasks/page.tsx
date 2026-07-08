@@ -43,6 +43,23 @@ export default function AdminTasksPage() {
     }
   };
 
+  const handleEditDetails = async (taskId: string, currentTitle: string, currentDescription: string) => {
+    const newTitle = prompt("Enter new title for this task:", currentTitle);
+    if (newTitle === null) return;
+    const newDescription = prompt("Enter new description:", currentDescription);
+    if (newDescription === null) return;
+
+    if (newTitle !== currentTitle || newDescription !== currentDescription) {
+      try {
+        await api.patch(`/admin/tasks/${taskId}/details`, { title: newTitle, description: newDescription });
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, title: newTitle, description: newDescription } : t));
+      } catch (error) {
+        console.error("Failed to update details", error);
+        alert("Failed to update task details");
+      }
+    }
+  };
+
   const handleEditLocation = async (taskId: string, currentAddress: string) => {
     const newAddress = prompt("Enter new location for this task:", currentAddress || "");
     if (newAddress !== null && newAddress !== currentAddress) {
@@ -87,8 +104,19 @@ export default function AdminTasksPage() {
               tasks.map((task) => (
                 <tr key={task.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="font-bold text-slate-900">{task.title}</p>
-                    <p className="text-xs text-slate-500 line-clamp-1 max-w-xs mt-1">{task.description}</p>
+                    <div className="flex items-start justify-between group/details">
+                      <div>
+                        <p className="font-bold text-slate-900">{task.title}</p>
+                        <p className="text-xs text-slate-500 line-clamp-1 max-w-[200px] mt-1" title={task.description}>{task.description}</p>
+                      </div>
+                      <button 
+                        onClick={() => handleEditDetails(task.id, task.title, task.description)}
+                        className="text-slate-400 hover:text-emerald-600 opacity-0 group-hover/details:opacity-100 transition-opacity p-1 ml-2 shrink-0 bg-slate-50 hover:bg-emerald-50 rounded"
+                        title="Edit Details"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-block px-2.5 py-1 bg-slate-100 rounded-full text-[10px] font-bold uppercase tracking-wider mb-1">
