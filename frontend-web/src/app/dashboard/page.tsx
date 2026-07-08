@@ -569,6 +569,11 @@ export default function Home() {
             </button>
             <button
               onClick={() => {
+                if (profileData.verificationStatus !== "VERIFIED" && profileData.role !== "helper") {
+                  setCurrentTab("profile");
+                  setAccountTab("Verification");
+                  return;
+                }
                 setActiveRole("helper");
                 setCurrentTab("dashboard");
               }}
