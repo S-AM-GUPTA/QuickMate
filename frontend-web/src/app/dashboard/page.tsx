@@ -184,6 +184,40 @@ export default function Home() {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          
+          setFormData((prev) => ({
+            ...prev,
+            latitude: lat,
+            longitude: lon,
+          }));
+
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
+              headers: { 'User-Agent': 'QuickMate-Web' }
+            });
+            const data = await res.json();
+            if (data && data.display_name) {
+              setFormData((prev) => ({
+                ...prev,
+                address: data.display_name,
+              }));
+            }
+          } catch (err) {
+            console.error("Reverse geocoding failed", err);
+          }
+        },
+        (err) => {
+          console.error("Geolocation error", err);
+        }
+      );
+    }
+  }, []);
   // Profile Modal State
   const [selectedProfile, setSelectedProfile] = useState<Helper | null>(null);
   
@@ -368,18 +402,16 @@ export default function Home() {
       await fetchTasks();
       setShowPostModal(false);
       // Reset Form
-      setFormData({
+      setFormData((prev) => ({
+        ...prev,
         title: "",
         description: "",
         budget: 50,
         category: "Food Pickup",
         urgency: "medium",
-        latitude: 28.6304,
-        longitude: 77.2177,
         scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
         estimatedDuration: "1-2 hours",
-        address: "",
-      });
+      }));
     } catch (err: any) {
       console.error("Failed to post task", err);
       alert(err.response?.data?.message || "Failed to post task");
