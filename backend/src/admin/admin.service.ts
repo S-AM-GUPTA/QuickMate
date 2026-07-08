@@ -56,6 +56,17 @@ export class AdminService {
     });
   }
 
+  async rejectUserVerification(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        isVerified: false,
+        verificationStatus: 'UNVERIFIED',
+        verificationDocUrl: null,
+      },
+    });
+  }
+
   async deleteUser(userId: string) {
     return this.prisma.user.delete({
       where: { id: userId },

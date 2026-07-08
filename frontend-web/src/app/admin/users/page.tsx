@@ -34,6 +34,17 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleReject = async (userId: string) => {
+    if (!window.confirm("Are you sure you want to reject this document? The user will have to upload again.")) return;
+    try {
+      const response = await api.patch(`/admin/users/${userId}/reject`);
+      setUsers(users.map(u => u.id === userId ? response.data : u));
+    } catch (error) {
+      console.error("Failed to reject verification", error);
+      alert("Failed to reject user");
+    }
+  };
+
   const handleDeleteUser = async (userId: string) => {
     if (!confirm("Are you sure you want to permanently delete this user and all their tasks/bids?")) return;
     try {
@@ -175,7 +186,7 @@ export default function AdminUsersPage() {
                     <div className="flex items-center justify-end gap-2">
                       {user.verificationDocUrl && (
                         <a 
-                          href={user.verificationDocUrl}
+                          href={user.verificationDocUrl.includes("dummy-document") ? "https://placehold.co/600x400/png?text=KYC+Document" : user.verificationDocUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="font-bold text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1"
@@ -183,6 +194,14 @@ export default function AdminUsersPage() {
                         >
                           <ExternalLink className="h-3 w-3" /> Doc
                         </a>
+                      )}
+                      {(user.verificationStatus === 'PENDING_REVIEW') && (
+                        <button 
+                          onClick={() => handleReject(user.id)}
+                          className="font-bold text-xs px-3 py-1.5 rounded-full transition-colors bg-red-50 text-red-600 hover:bg-red-100"
+                        >
+                          Reject
+                        </button>
                       )}
                       {(user.verificationStatus !== 'UNVERIFIED' || user.role === 'helper') && (
                         <button 

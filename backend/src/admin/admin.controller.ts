@@ -30,6 +30,11 @@ export class AdminController {
     return this.adminService.toggleUserVerification(id);
   }
 
+  @Patch('users/:id/reject')
+  rejectUserVerification(@Param('id') id: string) {
+    return this.adminService.rejectUserVerification(id);
+  }
+
   @Delete('users/:id')
   deleteUser(@Param('id') id: string) {
     return this.adminService.deleteUser(id);
