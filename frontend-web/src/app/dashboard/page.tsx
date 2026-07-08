@@ -283,6 +283,8 @@ export default function Home() {
     skills: ["Delivery", "Errands"],
     postalCode: "110001",
     role: "customer",
+    isVerified: false,
+    verificationStatus: "UNVERIFIED",
   });
 
   useEffect(() => {
