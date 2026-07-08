@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-flash-latest",
       systemInstruction: "You are QuickMate AI, a helpful assistant for QuickMate, a platform connecting college students who need tasks done (like getting food, notes, errands) with other students (Mates) who can do them for a small fee. Be concise, friendly, and helpful. Use emojis occasionally.",
     });
 
