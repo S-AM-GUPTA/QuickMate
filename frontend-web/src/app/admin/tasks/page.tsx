@@ -43,6 +43,19 @@ export default function AdminTasksPage() {
     }
   };
 
+  const handleEditLocation = async (taskId: string, currentAddress: string) => {
+    const newAddress = prompt("Enter new location for this task:", currentAddress || "");
+    if (newAddress !== null && newAddress !== currentAddress) {
+      try {
+        await api.patch(`/admin/tasks/${taskId}/location`, { address: newAddress });
+        setTasks(tasks.map(t => t.id === taskId ? { ...t, address: newAddress } : t));
+      } catch (error) {
+        console.error("Failed to update location", error);
+        alert("Failed to update task location");
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
       <div className="p-6 border-b border-slate-200">
@@ -56,6 +69,7 @@ export default function AdminTasksPage() {
               <th className="px-6 py-4">Task Details</th>
               <th className="px-6 py-4">Category / Budget</th>
               <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Location</th>
               <th className="px-6 py-4">Customer</th>
               <th className="px-6 py-4 text-right">Action</th>
             </tr>
@@ -63,11 +77,11 @@ export default function AdminTasksPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading tasks...</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading tasks...</td>
               </tr>
             ) : tasks.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">No tasks found on the platform</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">No tasks found on the platform</td>
               </tr>
             ) : (
               tasks.map((task) => (
@@ -92,6 +106,20 @@ export default function AdminTasksPage() {
                     }`}>
                       {task.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-start justify-between group/loc">
+                      <p className="text-xs text-slate-600 line-clamp-2 max-w-[150px]" title={task.address || "Not specified"}>
+                        {task.address || <span className="italic text-slate-400">Not specified</span>}
+                      </p>
+                      <button 
+                        onClick={() => handleEditLocation(task.id, task.address)}
+                        className="text-slate-400 hover:text-emerald-600 opacity-0 group-hover/loc:opacity-100 transition-opacity p-1 ml-1 shrink-0 bg-slate-50 hover:bg-emerald-50 rounded"
+                        title="Edit Location"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-semibold text-slate-700">{task.customer?.name || "Unknown"}</p>

@@ -528,6 +528,15 @@ export default function Home() {
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
               <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
+            <div className="hidden sm:flex flex-col ml-6 cursor-pointer group">
+               <span className="text-[15px] font-extrabold text-slate-900 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
+                  Delivery Location
+               </span>
+               <span className="text-[13px] text-slate-500 truncate max-w-[250px] font-medium mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
+                  {formData.address || "Fetching location..."}
+                  <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+               </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-8">

@@ -40,6 +40,11 @@ export class AdminController {
     return this.adminService.updateTaskStatus(id, status);
   }
 
+  @Patch('tasks/:id/location')
+  updateTaskLocation(@Param('id') id: string, @Body('address') address: string) {
+    return this.adminService.updateTaskLocation(id, address);
+  }
+
   @Delete('tasks/:id')
   deleteTask(@Param('id') id: string) {
     return this.adminService.deleteTask(id);

@@ -57,10 +57,17 @@ export class AdminService {
     });
   }
 
-  async updateTaskStatus(taskId: string, status: any) {
+  async updateTaskStatus(id: string, status: any) {
     return this.prisma.task.update({
-      where: { id: taskId },
+      where: { id },
       data: { status },
+    });
+  }
+
+  async updateTaskLocation(id: string, address: string) {
+    return this.prisma.task.update({
+      where: { id },
+      data: { address },
     });
   }
 
