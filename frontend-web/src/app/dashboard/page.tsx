@@ -1593,6 +1593,7 @@ export default function Home() {
               </div>
             </form>
           </div>
+          </div>
         </div>
       )}
 
