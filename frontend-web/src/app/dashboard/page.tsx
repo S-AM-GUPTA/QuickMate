@@ -843,7 +843,7 @@ export default function Home() {
                             setVerificationState(prev => ({ ...prev, status: "Uploading" }));
                             try {
                               // Send dummy document URL to backend
-                              await api.patch('/users/me/verification', { docUrl: "https://dummy-document-url.com/file.pdf" });
+                              await api.patch('/users/me/verification', { docUrl: "https://placehold.co/600x400/png?text=KYC+Document" });
                               setProfileData(prev => ({ ...prev, verificationStatus: "PENDING_REVIEW" }));
                               setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
                             } catch (err) {
