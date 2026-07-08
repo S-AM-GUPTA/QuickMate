@@ -99,8 +99,8 @@ export default function Home() {
   const fetchDashboardData = async () => {
     try {
       const [tasksRes, helpersRes, walletRes, notifRes] = await Promise.all([
-        api.get('/tasks'),
-        api.get('/users/helpers'),
+        api.get('/tasks').catch(() => ({ data: [] })),
+        api.get('/users/helpers').catch(() => ({ data: [] })),
         api.get('/wallet/balance').catch(() => ({ data: { balance: 0, transactions: [] }})),
         api.get('/notifications').catch(() => ({ data: [] }))
       ]);
