@@ -120,6 +120,7 @@ export default function Home() {
 
   // Modals & Flows
   const [showPostModal, setShowPostModal] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showBidsModal, setShowBidsModal] = useState(false);
   const [activeTaskForBids, setActiveTaskForBids] = useState<Task | null>(null);
@@ -257,6 +258,7 @@ export default function Home() {
       router.push("/login");
     } else {
       setIsLoggedIn(true);
+      setIsAuthChecking(false);
       const userProfileRaw = localStorage.getItem("userProfile");
       if (userProfileRaw) {
         try {
@@ -513,6 +515,21 @@ export default function Home() {
     setShowPostModal(true);
   };
 
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+          <p className="text-slate-500 font-medium">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return null; // Will redirect in useEffect
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 md:pb-0 relative">
       {/* Simulation Alert banner */}
@@ -537,14 +554,16 @@ export default function Home() {
             <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
               <img src="/logo-v7.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
             </button>
-            <div className="flex flex-col ml-3 sm:ml-6 cursor-pointer group max-w-[140px] sm:max-w-none">
-               <span className="text-[13px] sm:text-[15px] font-extrabold text-slate-900 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
-                  <span className="text-emerald-700">Location</span>
-               </span>
-               <span className="text-[11px] sm:text-[13px] text-slate-500 truncate font-medium mt-0 sm:mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
+            <div className="flex items-center gap-1 ml-3 sm:ml-6 cursor-pointer group">
+              <div className="flex flex-col">
+                <span className="text-[14px] font-bold text-slate-800 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
+                  Location
+                </span>
+                <span className="text-[11px] sm:text-[13px] text-slate-500 truncate font-medium mt-0 sm:mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
                   {formData.address || "Fetching location..."}
-                  <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-               </span>
+                </span>
+              </div>
+              <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
             </div>
           </div>
 
@@ -557,7 +576,7 @@ export default function Home() {
               }}
               className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
             >
-              Book a Task
+              Post a Task
             </button>
             <button
               onClick={() => {
@@ -686,14 +705,14 @@ export default function Home() {
                     {greeting}! <br/><span className="text-emerald-200">What do you need help with?</span>
                   </h1>
                   <p className="mt-4 text-emerald-50/90 text-lg max-w-md font-medium leading-relaxed">
-                    Book trusted help for home repairs, cleaning, moving, and more.
+                    Book trusted help for notes printing, food pickup, lab files, and more.
                   </p>
                   <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button 
                       onClick={() => setShowPostModal(true)} 
                       className="px-6 py-3 rounded-full bg-white text-emerald-700 font-extrabold hover:scale-105 active:scale-95 transition-all shadow-xl hover:shadow-white/20 flex items-center gap-2 cursor-pointer"
                     >
-                      Post a Task Now <ArrowRight className="h-4 w-4" />
+                      Post a Task <ArrowRight className="h-4 w-4" />
                     </button>
                     <div className="flex items-center gap-2 text-xs text-emerald-50 font-medium bg-white/10 backdrop-blur-sm rounded-full px-4 py-3 border border-white/20 shadow-inner">
                       <Shield className="h-4 w-4 text-emerald-200" />
@@ -1950,7 +1969,7 @@ export default function Home() {
           <div className="bg-emerald-600 text-white p-3.5 rounded-full shadow-lg shadow-emerald-600/30">
             <Plus className="w-6 h-6" />
           </div>
-          <span className="text-[10px] font-bold mt-1 text-slate-500">Post Task</span>
+          <span className="text-[10px] font-bold mt-1 text-slate-500">Post a Task</span>
         </button>
         <button onClick={() => setCurrentTab('profile')} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'profile' ? 'text-emerald-600' : 'text-slate-500'}`}>
           <User className="w-5 h-5" />

@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "QuickMate - Get help. Gain happiness.",
-  description: "Book trusted, background-checked help for home repairs, cleaning, moving, and more.",
+  description: "Book trusted, background-checked help for notes printing, food pickup, lab files, and more on campus.",
 };
 
 export default function RootLayout({

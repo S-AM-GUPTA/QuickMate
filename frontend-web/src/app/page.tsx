@@ -88,7 +88,7 @@ export default function LandingPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
-              Over 500 tasks completed in Campus
+              Over 500 tasks completed on campus
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter text-slate-900 mb-6 leading-[1.1] drop-shadow-sm">
@@ -115,7 +115,7 @@ export default function LandingPage() {
                   onClick={() => router.push("/login")}
                   className="rounded-full bg-emerald-600 px-6 sm:px-8 py-3.5 font-bold text-white hover:bg-emerald-500 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/30 whitespace-nowrap"
                 >
-                  Get Help
+                  Post a Task
                 </button>
                 <a 
                   href="https://wa.me/918604994330?text=Hi,%20I%20need%20help%20with%20a%20task%20on%20QuickMate%20Campus."
@@ -211,29 +211,29 @@ export default function LandingPage() {
       {/* Popular Projects Section */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-slate-900 mb-10 text-center">
-          Popular Projects in Your Area
+          Popular Projects on Campus
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
-              title: "Furniture Assembly",
-              price: "Avg. ₹400-800",
-              img: "/furniture-assembly.png",
+              title: "Notes Printing",
+              price: "Avg. ₹20-50",
+              img: "https://images.unsplash.com/photo-1512820790803-83ca734da794?q=80&w=600&auto=format&fit=crop",
             },
             {
-              title: "TV Mounting",
-              price: "Avg. ₹500-900",
-              img: "/tv-mounting.png",
+              title: "Lab File Completion",
+              price: "Avg. ₹100-300",
+              img: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600&auto=format&fit=crop",
             },
             {
-              title: "Help Moving",
-              price: "Avg. ₹1000-2500",
-              img: "/moving.png",
+              title: "Exam Prep Help",
+              price: "Avg. ₹200-500",
+              img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=600&auto=format&fit=crop",
             },
             {
-              title: "Deep Cleaning",
-              price: "Avg. ₹800-1500",
-              img: "/deep-cleaning.png",
+              title: "Dorm Moving",
+              price: "Avg. ₹300-800",
+              img: "https://images.unsplash.com/photo-1542223189-67a03fa0f0bd?q=80&w=600&auto=format&fit=crop",
             },
           ].map((project, idx) => (
             <div
