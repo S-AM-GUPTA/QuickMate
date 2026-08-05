@@ -168,9 +168,13 @@ export default function TaskCard({
           </span>
           <span className="flex items-center gap-1">
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
-            {task.address ? task.address : (task.distanceMeters !== undefined
-              ? `${task.distanceMeters}m away`
-              : `Delhi NCR`)}
+            {task.address 
+              ? (task.status === "OPEN" && viewMode === "helper" 
+                  ? "Exact address hidden until matched" 
+                  : task.address)
+              : (task.distanceMeters !== undefined
+                ? `${task.distanceMeters}m away`
+                : `Campus`)}
           </span>
         </div>
 

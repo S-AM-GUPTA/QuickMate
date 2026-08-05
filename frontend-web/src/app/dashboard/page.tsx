@@ -142,8 +142,8 @@ export default function Home() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    budget: 50,
-    category: "Food Pickup",
+    budget: "" as unknown as number,
+    category: "Notes & Printouts",
     urgency: "medium" as "low" | "medium" | "urgent",
     latitude: 28.6304,
     longitude: 77.2177,
@@ -158,32 +158,32 @@ export default function Home() {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          
-          setFormData((prev) => ({
-            ...prev,
-            latitude: lat,
-            longitude: lon,
-          }));
-
+          const lng = position.coords.longitude;
           try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`, {
-              headers: { 'User-Agent': 'QuickMate-Web' }
-            });
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+            );
             const data = await res.json();
-            if (data && data.display_name) {
-              setFormData((prev) => ({
-                ...prev,
-                address: data.display_name,
-              }));
-            }
+            setFormData((prev) => ({
+              ...prev,
+              latitude: lat,
+              longitude: lng,
+              address: data.display_name || "Location found",
+            }));
           } catch (err) {
-            console.error("Reverse geocoding failed", err);
+            setFormData((prev) => ({ ...prev, latitude: lat, longitude: lng, address: "Coordinates found" }));
           }
         },
-        (err) => {
-          console.error("Geolocation error", err);
-        }
+        (error) => {
+          console.warn("Geolocation failed or blocked, using fallback", error);
+          setFormData((prev) => ({
+            ...prev,
+            latitude: 28.7041,
+            longitude: 77.1025,
+            address: "Campus Center (Fallback)",
+          }));
+        },
+        { timeout: 5000, enableHighAccuracy: true }
       );
     }
   }, []);
@@ -375,11 +375,21 @@ export default function Home() {
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    if (formData.title.length < 5)
+    const titleTrimmed = formData.title.trim();
+    const descTrimmed = formData.description.trim();
+    
+    if (titleTrimmed.length < 5)
       errors.title = "Title must be at least 5 characters long.";
-    if (formData.description.length < 10)
+    else if (/(.)\1{4,}/.test(titleTrimmed))
+      errors.title = "Please enter a more descriptive title.";
+      
+    if (descTrimmed.length < 10)
       errors.description = "Description must be at least 10 characters long.";
-    if (formData.budget < 10) errors.budget = "Budget must be at least Rs. 10.";
+    else if (/(.)\1{4,}/.test(descTrimmed))
+      errors.description = "Please enter a meaningful description.";
+      
+    if (!formData.budget || formData.budget < 10) 
+      errors.budget = "Budget must be at least ₹10.";
     if (formData.latitude < -90 || formData.latitude > 90)
       errors.latitude = "Latitude must be between -90 and 90.";
     if (formData.longitude < -180 || formData.longitude > 180)
@@ -428,7 +438,7 @@ export default function Home() {
 
   const handlePlaceBid = (task: Task) => {
     showGlobalNotification(
-      `✔ Bid of Rs. ${task.budget} successfully submitted for "${task.title}"!`
+      `✔ Bid of ₹${task.budget} successfully submitted for "${task.title}"!`
     );
   };
 
@@ -924,7 +934,7 @@ export default function Home() {
                   <Wallet className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">Rs. 12,450</span>
+                  <span className="text-2xl font-bold">₹ 12,450</span>
                   <span className="text-xs font-semibold text-emerald-500 flex items-center gap-0.5">
                     <TrendingUp className="h-3 w-3" />
                     +12%
@@ -1523,14 +1533,14 @@ export default function Home() {
             <form onSubmit={handlePostTask} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Task Title
+                  Task Title <span className="text-rose-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="e.g. Fix leaking kitchen faucet"
+                  placeholder="e.g. Print 50 pages of physics notes"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                 />
                 {formErrors.title && (
@@ -1542,7 +1552,7 @@ export default function Home() {
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Detailed Description
+                  Detailed Description <span className="text-rose-500 ml-1">*</span>
                 </label>
                 <textarea
                   name="description"
@@ -1552,18 +1562,21 @@ export default function Home() {
                   placeholder="Describe what needs to be done. Minimum 10 characters."
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
                 ></textarea>
-                {formErrors.description && (
-                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
-                    {formErrors.description}
-                  </p>
-                )}
+                  <div className="flex justify-between items-center mt-1.5">
+                    {formErrors.description ? (
+                      <p className="text-xs text-rose-500 font-medium">
+                        {formErrors.description}
+                      </p>
+                    ) : <div></div>}
+                    <span className="text-xs text-slate-400 font-medium">{formData.description.length} chars</span>
+                  </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="block text-sm font-semibold text-slate-700">
-                      Budget (Rs.)
+                      Budget (₹) <span className="text-rose-500 ml-1">*</span>
                     </label>
                     <button
                       type="button"
@@ -1577,7 +1590,8 @@ export default function Home() {
                   <input
                     type="number"
                     name="budget"
-                    value={formData.budget}
+                    value={formData.budget || ""}
+                    placeholder="e.g. 150"
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                   />
@@ -1590,7 +1604,7 @@ export default function Home() {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Category
+                    Category <span className="text-rose-500 ml-1">*</span>
                   </label>
                   <select
                     name="category"
@@ -1598,12 +1612,10 @@ export default function Home() {
                     onChange={handleInputChange}
                     className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                   >
-                    <option>Delivery</option>
-                    <option>Repair</option>
-                    <option>Cleaning</option>
-                    <option>Moving</option>
-                    <option>Tech Help</option>
-                    <option>Errands</option>
+                    <option value="" disabled>Select a category</option>
+                    {categories.filter(c => c !== "All").map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -1628,7 +1640,7 @@ export default function Home() {
 
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Scheduled Date & Time
+                    Scheduled Date & Time <span className="text-rose-500 ml-1">*</span>
                   </label>
                   <input
                     type="datetime-local"
@@ -1642,14 +1654,14 @@ export default function Home() {
 
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Full Address / Landmark
+                  Full Address / Landmark <span className="text-rose-500 ml-1">*</span>
                 </label>
                 <input
                   type="text"
                   name="address"
                   value={(formData as any).address || ""}
                   onChange={handleInputChange}
-                  placeholder="e.g. House No. 42, Near Metro Station"
+                  placeholder="e.g. Hostel 4, Room 201"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
                 />
               </div>
@@ -1751,7 +1763,7 @@ export default function Home() {
                   </div>
                   <div className="text-right">
                     <span className="block text-base font-bold text-emerald-600">
-                      Rs. {activeTaskForBids.budget - 10}
+                      ₹ {activeTaskForBids.budget - 10}
                     </span>
                     <span className="text-[10px] text-slate-500">
                       Slightly below budget

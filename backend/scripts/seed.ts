@@ -5,6 +5,10 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting seed...');
 
+  console.log('Wiping old tasks and reviews...');
+  await prisma.review.deleteMany({});
+  await prisma.task.deleteMany({});
+
   // Create dummy users
   const dummyCustomer = await prisma.user.upsert({
     where: { email: 'student@campus.edu' },
@@ -48,7 +52,7 @@ async function main() {
       title: 'Need 100 pages printed urgently',
       description: 'I need my lab manual printed and spiral bound by tomorrow morning. I will email the PDF.',
       budget: 150,
-      category: 'Printing',
+      category: 'Notes & Printouts',
       urgency: 'urgent' as any,
       status: 'OPEN' as any,
       latitude: 28.7041,
@@ -61,7 +65,7 @@ async function main() {
       title: 'Pick up lunch from cafeteria',
       description: 'Can someone grab a Veg Thali from the main cafeteria and drop it at Library reading room? Im stuck studying.',
       budget: 80,
-      category: 'Delivery',
+      category: 'Food Pickup',
       urgency: 'medium' as any,
       status: 'OPEN' as any,
       latitude: 28.7045,
@@ -74,7 +78,7 @@ async function main() {
       title: 'Help moving mini fridge',
       description: 'Need help moving a mini fridge from 1st floor to 3rd floor in Girls Hostel 2.',
       budget: 200,
-      category: 'Moving',
+      category: 'Roommate Help',
       urgency: 'low' as any,
       status: 'OPEN' as any,
       latitude: 28.7035,
@@ -86,14 +90,8 @@ async function main() {
   ];
 
   for (const t of tasks) {
-    // Check if task exists to avoid duplicates
-    const existing = await prisma.task.findFirst({
-      where: { title: t.title }
-    });
-    if (!existing) {
-      await prisma.task.create({ data: t });
-      console.log(`Created task: ${t.title}`);
-    }
+    await prisma.task.create({ data: t });
+    console.log(`Created task: ${t.title}`);
   }
 
   console.log('Seeding completed successfully!');
