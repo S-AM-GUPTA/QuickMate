@@ -124,8 +124,6 @@ export default function Home() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showBidsModal, setShowBidsModal] = useState(false);
   const [activeTaskForBids, setActiveTaskForBids] = useState<Task | null>(null);
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [activeTaskForChat, setActiveTaskForChat] = useState<Task | null>(null);
   const [isSuggestingPrice, setIsSuggestingPrice] = useState(false);
   const [showEscrowModal, setShowEscrowModal] = useState(false);
   const [activeTaskForEscrow, setActiveTaskForEscrow] = useState<Task | null>(
