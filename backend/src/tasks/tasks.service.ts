@@ -50,6 +50,45 @@ export class TasksService {
       });
     } else {
       // Return open tasks for helpers, or tasks assigned to them
+      if (user.latitude && user.longitude) {
+        // Geospatial search: 20km radius
+        const radiusMeters = 20000;
+        const tasks: any = await this.prisma.$queryRaw`
+          SELECT t.*, 
+            json_build_object('id', u.id, 'name', u.name, 'rating', u.rating, 'isVerified', u.is_verified) as customer
+          FROM tasks t
+          JOIN users u ON t.customer_id = u.id
+          WHERE (t.status = 'OPEN' OR t.assigned_helper_id = ${user.id})
+          AND ST_DWithin(
+            t.coords, 
+            ST_SetSRID(ST_MakePoint(${user.longitude}, ${user.latitude}), 4326), 
+            ${radiusMeters}
+          )
+          ORDER BY t.created_at DESC
+        `;
+        
+        // Prisma $queryRaw returns snake_case for model fields if mapped in schema.
+        // Let's just return the fallback if mapping is complex, or map it.
+        // Actually, our schema maps to camelCase on the client side, but $queryRaw returns raw DB column names.
+        // A simpler way: Fetch the IDs and then findMany.
+        const taskIds = tasks.map((t: any) => t.id);
+        
+        if (taskIds.length > 0) {
+          return this.prisma.task.findMany({
+            where: { id: { in: taskIds } },
+            orderBy: { createdAt: 'desc' },
+            include: {
+              customer: {
+                select: { id: true, name: true, rating: true, isVerified: true }
+              }
+            }
+          });
+        } else {
+          return [];
+        }
+      }
+
+      // Fallback if no location
       return this.prisma.task.findMany({
         where: {
           OR: [

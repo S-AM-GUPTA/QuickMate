@@ -124,6 +124,9 @@ export default function Home() {
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [showBidsModal, setShowBidsModal] = useState(false);
   const [activeTaskForBids, setActiveTaskForBids] = useState<Task | null>(null);
+  const [showChatModal, setShowChatModal] = useState(false);
+  const [activeTaskForChat, setActiveTaskForChat] = useState<Task | null>(null);
+  const [isSuggestingPrice, setIsSuggestingPrice] = useState(false);
   const [showEscrowModal, setShowEscrowModal] = useState(false);
   const [activeTaskForEscrow, setActiveTaskForEscrow] = useState<Task | null>(
     null,
@@ -325,6 +328,35 @@ export default function Home() {
     "Tech Help",
     "Errands",
   ];
+
+  const handleSuggestPrice = async () => {
+    setIsSuggestingPrice(true);
+    try {
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+      const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const res = await fetch(`${url}/tasks/price-suggestion`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          category: formData.category,
+          urgency: formData.urgency
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData(prev => ({ ...prev, budget: data.suggestedPrice }));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSuggestingPrice(false);
+    }
+  };
 
 
 
@@ -1531,9 +1563,19 @@ export default function Home() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Budget (Rs.)
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-sm font-semibold text-slate-700">
+                      Budget (Rs.)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleSuggestPrice}
+                      disabled={isSuggestingPrice}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-500 disabled:opacity-50"
+                    >
+                      {isSuggestingPrice ? "Calculating..." : "AI Suggestion"}
+                    </button>
+                  </div>
                   <input
                     type="number"
                     name="budget"

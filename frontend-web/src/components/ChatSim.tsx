@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, User, Check, CheckCheck } from "lucide-react";
 
+import { io, Socket } from "socket.io-client";
+
 export interface ChatMessage {
   id: string;
   senderId: string;
@@ -24,19 +26,43 @@ export default function ChatSim({
   otherUser,
   onTaskStatusChange,
 }: ChatSimProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "1",
-      senderId: otherUser.id,
-      senderName: otherUser.name,
-      text: `Hello! I noticed your task. I am located nearby and can help with this. Let me know if my offer works for you.`,
-      // eslint-disable-next-line react-hooks/purity
-      timestamp: new Date(Date.now() - 60000),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
+
+  useEffect(() => {
+    // Connect to Socket.io server
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:3001';
+    socketRef.current = io(backendUrl);
+
+    socketRef.current.on('connect', () => {
+      console.log('Connected to socket server');
+      socketRef.current?.emit('joinTaskRoom', { taskId });
+    });
+
+    socketRef.current.on('newMessage', (msg: any) => {
+      // Avoid duplicating messages sent by ourselves
+      setMessages((prev) => {
+        if (prev.find((m) => m.id === msg.id)) return prev;
+        return [
+          ...prev,
+          {
+            id: msg.id,
+            senderId: msg.senderId,
+            senderName: msg.senderRole === currentUser.id ? currentUser.name : otherUser.name, // Approximate name logic based on ID if needed, but msg might not send name
+            text: msg.text,
+            timestamp: new Date(msg.createdAt),
+          },
+        ];
+      });
+    });
+
+    return () => {
+      socketRef.current?.disconnect();
+    };
+  }, [taskId, currentUser.id, currentUser.name, otherUser.name]);
 
   useEffect(() => {
     // Scroll to bottom
@@ -49,8 +75,9 @@ export default function ChatSim({
     e.preventDefault();
     if (!inputText.trim()) return;
 
+    const newMsgId = Date.now().toString();
     const newMsg: ChatMessage = {
-      id: Date.now().toString(),
+      id: newMsgId,
       senderId: currentUser.id,
       senderName: currentUser.name,
       text: inputText.trim(),
@@ -58,32 +85,16 @@ export default function ChatSim({
     };
 
     setMessages((prev) => [...prev, newMsg]);
+    
+    // Emit to backend
+    socketRef.current?.emit('sendMessage', {
+      taskId,
+      senderId: currentUser.id,
+      text: inputText.trim(),
+      senderRole: "user", // For mock purposes
+    });
+
     setInputText("");
-
-    // Trigger mock response
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      const responses = [
-        `Awesome, thanks! I am on my way to your location.`,
-        `Understood, I am gathering the necessary tools now.`,
-        `Perfect. I'll reach there in 15 minutes. Please make sure someone is available at the door.`,
-        `Sure, I will upload the progress pictures as soon as I start working!`,
-      ];
-      const randomResponse =
-        responses[Math.floor(Math.random() * responses.length)];
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          senderId: otherUser.id,
-          senderName: otherUser.name,
-          text: randomResponse,
-          timestamp: new Date(),
-        },
-      ]);
-    }, 1500);
   };
 
   return (
