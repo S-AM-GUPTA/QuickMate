@@ -11,7 +11,7 @@ export default function AdminPostTaskPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   
-  // Default QuickMate Campus coordinates (Delhi)
+  // Default QuickMate Hub coordinates (Delhi)
   const defaultLat = 28.6315;
   const defaultLng = 77.2167;
 
@@ -20,19 +20,19 @@ export default function AdminPostTaskPage() {
     title: "",
     description: "",
     budget: "",
-    category: "Notes & Printing",
+    category: "Data Entry",
     urgency: "medium",
     scheduledTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16),
   });
 
   const categories = [
-    "Notes & Printing",
-    "Food & Snacks",
-    "Lab Files & Assign",
-    "Stationery Run",
-    "Tech Help",
-    "Roommate Help",
-    "Campus Errands"
+    "Data Entry",
+    "Coffee & Lunch Runs",
+    "Pitch Deck Polish",
+    "Beta Testing",
+    "Tech & IT Help",
+    "Virtual Assistance",
+    "Office Errands"
   ];
 
   useEffect(() => {
@@ -135,7 +135,7 @@ export default function AdminPostTaskPage() {
             name="title" 
             value={formData.title} 
             onChange={handleChange}
-            placeholder="e.g. Need Notes Printed ASAP"
+            placeholder="e.g. Need Pitch Deck formatting"
             className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
             required
           />

@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "QuickMate - Get help. Gain happiness.",
-  description: "Book trusted, background-checked help for notes printing, food pickup, lab files, and more on campus.",
+  title: "QuickMate",
+  description: "Book trusted, background-checked help for data entry, beta testing, pitch deck polish, and more for your startup.",
 };
 
 export default function RootLayout({
@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className={`${inter.variable} font-sans min-h-full flex flex-col`}>
+      <body className={`${inter.variable} font-sans min-h-full flex flex-col bg-paper text-ink`}>
         <NotificationProvider>
           {children}
           <SupportChatbot />

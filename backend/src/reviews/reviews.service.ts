@@ -16,15 +16,15 @@ export class ReviewsService {
       data: {
         taskId: data.taskId,
         reviewerId: data.reviewerId,
-        revieweeId: data.revieweeId,
+        targetUserId: data.revieweeId,
         rating: data.rating,
-        comment: data.comment,
+        feedbackText: data.comment,
       },
     });
 
     // Update the average rating of the reviewee
     const allReviews = await this.prisma.review.findMany({
-      where: { revieweeId: data.revieweeId },
+      where: { targetUserId: data.revieweeId },
       select: { rating: true },
     });
 

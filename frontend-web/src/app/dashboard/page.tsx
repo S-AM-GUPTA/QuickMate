@@ -2015,7 +2015,9 @@ export default function Home() {
           }
         }} className={`flex flex-col items-center gap-1 p-2 ${activeRole === 'helper' ? 'text-emerald-600' : 'text-slate-500'}`}>
           <CheckCircle className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Mate</span>
+          <span className="text-[10px] font-bold mt-1">
+            {profileData.verificationStatus === "VERIFIED" || profileData.role === "helper" ? "Mate" : "Become Mate"}
+          </span>
         </button>
         <button onClick={() => { setActiveRole("customer"); setShowPostModal(true); }} className="flex flex-col items-center gap-1 p-2 text-emerald-600 -mt-6 relative z-50">
           <div className="bg-emerald-600 text-white p-3.5 rounded-full shadow-lg shadow-emerald-600/30">
