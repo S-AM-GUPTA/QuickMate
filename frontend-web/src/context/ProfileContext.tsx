@@ -53,14 +53,14 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
       if (stored) {
         try {
           const parsed = JSON.parse(stored);
-          setProfile((prev) => ({ ...prev, ...parsed }));
+          setProfile((prev) => ({ ...prev, ...parsed } as ProfileData));
         } catch (e) {}
       }
 
       // Fetch fresh
       try {
         const res = await api.get("/users/me");
-        setProfile((prev) => ({ ...prev, ...res.data }));
+        setProfile((prev) => ({ ...prev, ...res.data } as ProfileData));
         localStorage.setItem("userProfile", JSON.stringify(res.data));
       } catch (err: any) {
         if (err.response?.status !== 401) {
@@ -80,8 +80,8 @@ export const ProfileProvider = ({ children }: { children: React.ReactNode }) => 
 
   const toggleRole = () => {
     setProfile((prev) => {
-      const newRole = prev.role === "customer" ? "helper" : "customer";
-      const newProfile = { ...prev, role: newRole };
+      const newRole: "customer" | "helper" = prev.role === "customer" ? "helper" : "customer";
+      const newProfile: ProfileData = { ...prev, role: newRole };
       localStorage.setItem("userProfile", JSON.stringify(newProfile));
       return newProfile;
     });
