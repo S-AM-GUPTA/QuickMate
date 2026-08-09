@@ -35,6 +35,8 @@ export default function LoginPage() {
   const [postalCode, setPostalCode] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [otpStep, setOtpStep] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -73,48 +75,65 @@ export default function LoginPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Validate Phone Number
+    const phoneRegex = /^\d{10}$/; // Basic 10 digit validation
+    if (!phoneRegex.test(phone.replace(/\s+/g, ''))) {
+      setError("Please enter a valid 10-digit mobile number without spaces.");
+      return;
+    }
+
+    // Validate Password Strength
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(signupPassword)) {
+      setError("Password must be at least 8 characters, with 1 uppercase, 1 lowercase, 1 number, and 1 special character.");
+      return;
+    }
+
     setLoading(true);
     
     try {
-      const response = await api.post("/auth/register", {
+      await api.post("/auth/request-otp", {
         identifier: signupEmail,
-        password: signupPassword,
+      });
+      setOtpStep(true);
+    } catch (err: any) {
+      if (!err.response) {
+        setError("Network error: Server is offline or updating.");
+      } else {
+        setError(err.response?.data?.message || "Failed to send OTP.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    
+    try {
+      const response = await api.post("/auth/verify-otp", {
+        identifier: signupEmail,
+        otpCode: otpCode,
+        newPassword: signupPassword,
         name: `${firstName} ${lastName}`.trim(),
         phone: `${countryCode.split(" ")[1]} ${phone}`.trim(),
+        postalCode: postalCode
       });
       
       const { access_token, user } = response.data;
       localStorage.setItem("accessToken", access_token);
-      localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
+      localStorage.setItem("userProfile", JSON.stringify(user));
       document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
       
       router.push("/dashboard");
     } catch (err: any) {
-      if (err.response?.data?.message === "User already exists" || err.response?.data?.message?.includes("already exists")) {
-        // Fallback to login if user already exists
-        try {
-          const loginRes = await api.post("/auth/login", {
-            identifier: signupEmail,
-            password: signupPassword,
-          });
-          const { access_token, user } = loginRes.data;
-          localStorage.setItem("accessToken", access_token);
-          localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
-          document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
-          router.push("/dashboard");
-          return;
-        } catch (loginErr: any) {
-          setError("User exists, but password was incorrect. Please log in.");
-        }
-      } else if (!err.response) {
-        setError("Network error: Server is offline or updating. Please try again in 2-3 minutes.");
-      } else if (err.response.status >= 500) {
-        setError(`Server error (${err.response.status}): The backend is currently updating. Please wait a few minutes.`);
+      if (!err.response) {
+        setError("Network error: Server is offline or updating.");
       } else {
-        setError(
-          err.response?.data?.message || 
-          (err.response?.data?.message && Array.isArray(err.response.data.message) ? err.response.data.message[0] : "An error occurred during signup")
-        );
+        setError(err.response?.data?.message || "Invalid OTP.");
       }
     } finally {
       setLoading(false);
@@ -194,7 +213,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight text-black mb-10">
-            {isSignup ? "Create account" : "Log in"}
+            {isSignup ? (otpStep ? "Verify Email" : "Create account") : "Log in"}
           </h2>
 
           {error && (
@@ -292,6 +311,45 @@ export default function LoginPage() {
                   className="w-full rounded-full border border-[#d9d9d9] bg-white py-3 text-[15px] font-bold text-black hover:bg-[#eeeeee] transition-colors"
                 >
                   Create an account
+                </button>
+              </div>
+            </form>
+          ) : otpStep ? (
+            /* OTP VERIFICATION FORM */
+            <form onSubmit={handleVerifyOtp} className="space-y-6">
+              <div>
+                <label className="block text-[11px] font-bold tracking-widest uppercase text-[#595959] mb-2">
+                  Verification Code
+                </label>
+                <p className="text-[14px] text-gray-500 mb-4">
+                  We've sent a 6-digit code to <strong>{signupEmail}</strong>.
+                </p>
+                <input
+                  type="text"
+                  required
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="Enter 6-digit code"
+                  className="w-full rounded-full border border-[#d9d9d9] px-5 py-4 text-[24px] tracking-[0.5em] text-center font-bold text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080] placeholder:tracking-normal placeholder:font-normal placeholder:text-[16px]"
+                />
+              </div>
+
+              <div className="pt-6 space-y-4">
+                <button
+                  type="submit"
+                  disabled={loading || otpCode.length !== 6}
+                  className="w-full rounded-full bg-black py-4 text-[16px] font-bold text-white hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                >
+                  {loading ? "Verifying..." : "Verify & Create Account"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOtpStep(false)}
+                  disabled={loading}
+                  className="w-full rounded-full border border-[#d9d9d9] bg-white py-4 text-[16px] font-bold text-black hover:bg-[#eeeeee] transition-colors"
+                >
+                  Back to signup
                 </button>
               </div>
             </form>

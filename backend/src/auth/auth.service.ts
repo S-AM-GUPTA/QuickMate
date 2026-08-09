@@ -11,11 +11,21 @@ import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
+  private transporter: nodemailer.Transporter;
+
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
     private firebaseService: FirebaseService,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
 
   async checkUserExists(identifier: string) {
     const user = await this.prisma.user.findFirst({
@@ -55,7 +65,32 @@ export class AuthService {
     }
 
     // Simulate OTP in Console
-    console.log(`\n[FALLBACK SIMULATED OTP] ${otpCode} for ${identifier}\n`);
+    console.log(`\n[OTP GENERATED] ${otpCode} for ${identifier}\n`);
+
+    if (isEmail) {
+      try {
+        await this.transporter.sendMail({
+          from: `"QuickMate" <${process.env.SMTP_USER}>`,
+          to: identifier,
+          subject: 'Your QuickMate Verification Code',
+          html: `
+            <div style="font-family: sans-serif; text-align: center; padding: 40px; background: #f9f9f9;">
+              <img src="https://quickmate.vercel.app/logo.png" alt="QuickMate Logo" style="height: 60px; margin-bottom: 20px;" />
+              <h2 style="color: #333; margin-bottom: 20px;">Verify your email</h2>
+              <p style="color: #666; font-size: 16px; margin-bottom: 30px;">
+                Use the following OTP to complete your sign up. It expires in 10 minutes.
+              </p>
+              <div style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #509209; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; display: inline-block;">
+                ${otpCode}
+              </div>
+            </div>
+          `,
+        });
+        console.log(`Email sent successfully to ${identifier}`);
+      } catch (error) {
+        console.error('Failed to send email:', error);
+      }
+    }
 
     return { message: 'OTP sent successfully' };
   }
@@ -65,6 +100,8 @@ export class AuthService {
     otpCode: string,
     newPassword?: string,
     name?: string,
+    phone?: string,
+    postalCode?: string,
   ) {
     const user = await this.prisma.user.findFirst({
       where: { OR: [{ email: identifier }, { phone: identifier }] },
@@ -88,6 +125,8 @@ export class AuthService {
       isVerified: true,
     };
     if (name) updateData.name = name;
+    if (phone) updateData.phone = phone;
+    if (postalCode) updateData.postalCode = postalCode;
     if (newPassword) {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(newPassword, salt);

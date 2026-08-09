@@ -30,6 +30,8 @@ export class AuthController {
       verifyDto.otpCode,
       verifyDto.newPassword,
       verifyDto.name,
+      verifyDto.phone,
+      verifyDto.postalCode,
     );
   }
 
