@@ -1,15 +1,5 @@
-"use client";
-
 import React from "react";
-import {
-  Clock,
-  MapPin,
-  IndianRupee,
-  AlertCircle,
-  Image as ImageIcon,
-  Edit2,
-  Trash2,
-} from "lucide-react";
+import { Clock, MapPin, AlertCircle, CheckCircle } from "lucide-react";
 
 export interface Task {
   id: string;
@@ -18,39 +8,17 @@ export interface Task {
   budget: number;
   category: string;
   urgency: "low" | "medium" | "urgent";
-  status:
-    | "OPEN"
-    | "ASSIGNED"
-    | "IN_PROGRESS"
-    | "COMPLETED"
-    | "CANCELLED"
-    | "DISPUTED";
-  latitude: number;
-  longitude: number;
-  address?: string;
+  status: "OPEN" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "DISPUTED";
   scheduledTime: string;
-  attachmentUrls?: string[];
-  customerId: string;
-  assignedHelperId?: string | null;
-  distanceMeters?: number;
-  customer?: {
-    id: string;
-    name: string;
-    rating?: number;
-    isVerified?: boolean;
-  };
-  assignedHelper?: {
-    id: string;
-    name: string;
-    phone?: string;
-    rating?: number;
-    isVerified?: boolean;
-  };
+  address?: string;
+  distance?: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface TaskCardProps {
   task: Task;
-  viewMode: "customer" | "helper";
+  viewMode: "helper" | "customer";
   onPlaceBid?: (task: Task) => void;
   onViewBids?: (task: Task) => void;
   onReleasePayment?: (task: Task) => void;
@@ -68,18 +36,18 @@ export default function TaskCard({
   onDeleteTask,
 }: TaskCardProps) {
   const urgencyColors = {
-    low: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    medium: "bg-amber-50 text-amber-700 border-amber-200",
-    urgent: "bg-rose-50 text-rose-700 border-rose-200 animate-pulse",
+    low: "bg-sand text-smoke border-smoke",
+    medium: "bg-sand text-ink border-smoke",
+    urgent: "bg-charcoal text-paper border-charcoal animate-pulse",
   };
 
   const statusColors = {
-    OPEN: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    ASSIGNED: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    IN_PROGRESS: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    COMPLETED: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    CANCELLED: "bg-slate-50 text-slate-600 border-slate-200",
-    DISPUTED: "bg-red-50 text-red-700 border-red-200",
+    OPEN: "bg-paper text-ink border-ink border-2 font-medium",
+    ASSIGNED: "bg-sand text-smoke border-smoke",
+    IN_PROGRESS: "bg-charcoal text-paper border-charcoal",
+    COMPLETED: "bg-sand text-smoke border-smoke",
+    CANCELLED: "bg-sand text-smoke/50 border-smoke line-through",
+    DISPUTED: "bg-red-500/10 text-red-600 border-red-500/20",
   };
 
   const [isClient, setIsClient] = React.useState(false);
@@ -88,108 +56,82 @@ export default function TaskCard({
     setIsClient(true);
   }, []);
 
-  const formattedDate = isClient 
-    ? new Date(task.scheduledTime).toLocaleDateString("en-IN", {
-        day: "numeric",
+  const formattedDate = isClient
+    ? new Date(task.scheduledTime).toLocaleDateString("en-US", {
         month: "short",
-        year: "numeric",
-        hour: "2-digit",
+        day: "numeric",
+        hour: "numeric",
         minute: "2-digit",
       })
     : "Loading date...";
 
   return (
-    <div className="group overflow-hidden rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_15px_30px_-10px_rgba(13,127,100,0.2)]">
+    <div className="group bg-paper rounded-2xl p-6 border border-smoke transition-all duration-300 flex flex-col justify-between">
       <div className="flex items-start justify-between gap-4">
         {/* Category & Title */}
         <div>
-          <span className="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-600 uppercase tracking-wider">
+          <span className="inline-flex items-center rounded-full bg-sand px-3 py-1 text-[12px] font-medium text-smoke border border-smoke/50">
             {task.category}
           </span>
-          <h3 className="mt-2 text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
+          <h3 className="mt-4 text-[20px] font-serif tracking-tight text-ink group-hover:text-smoke transition-colors leading-tight line-clamp-2">
             {task.title}
           </h3>
         </div>
-
-        {/* Urgency and Status badges */}
-        <div className="flex flex-col gap-2 items-end">
-          <div className="flex gap-2">
-            {viewMode === "customer" && task.status === "OPEN" && onEditTask && (
-              <button onClick={() => onEditTask(task)} className="p-1 text-slate-400 hover:text-emerald-600 transition-colors">
-                <Edit2 className="w-4 h-4" />
-              </button>
-            )}
-            {viewMode === "customer" && task.status === "OPEN" && onDeleteTask && (
-              <button onClick={() => onDeleteTask(task)} className="p-1 text-slate-400 hover:text-rose-600 transition-colors">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            )}
-            <span
-              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider ${urgencyColors[task.urgency]}`}
-            >
-              {task.urgency}
+        
+        {/* Budget */}
+        <div className="flex flex-col items-end shrink-0">
+          <span className="text-[24px] font-serif text-ink tracking-tight">₹{task.budget}</span>
+          {viewMode === "customer" && task.status === "OPEN" && (
+            <span className="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-sand text-smoke border border-smoke/50">
+              2 Bids
             </span>
-          </div>
-          <span
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${statusColors[task.status]}`}
-          >
-            {task.status}
-          </span>
+          )}
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-slate-500 line-clamp-2">
+      <p className="mt-3 text-[14px] text-smoke line-clamp-2 leading-relaxed">
         {task.description}
       </p>
 
-      {/* Attachments preview */}
-      {task.attachmentUrls && task.attachmentUrls.length > 0 && (
-        <div className="mt-4 flex gap-2">
-          {task.attachmentUrls.map((url, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs font-semibold text-slate-500"
-            >
-              <ImageIcon className="h-3.5 w-3.5 text-slate-400" />
-              <span className="truncate max-w-[120px]">
-                Attachment {index + 1}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Meta Stats: Location, Distance, Time, Budget */}
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100 pt-4">
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-slate-500">
-          <span className="flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5 text-slate-400" />
-            {formattedDate}
-          </span>
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3.5 w-3.5 text-slate-400" />
-            {task.address 
-              ? (task.status === "OPEN" && viewMode === "helper" 
-                  ? "Exact address hidden until matched" 
-                  : task.address)
-              : (task.distanceMeters !== undefined
-                ? `${task.distanceMeters}m away`
-                : `Campus`)}
-          </span>
+      {/* Meta tags row */}
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        {/* Time */}
+        <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30">
+          <Clock className="w-3.5 h-3.5" />
+          <span>{formattedDate}</span>
         </div>
 
-        <div className="flex items-center gap-1 text-lg font-extrabold text-slate-900">
-          <IndianRupee className="h-4.5 w-4.5 text-slate-500" />
-          <span>{task.budget}</span>
+        {/* Location / Distance */}
+        {task.address && (
+          <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30 max-w-[150px] truncate">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{task.address}</span>
+          </div>
+        )}
+        
+        {viewMode === "helper" && task.distance !== undefined && (
+          <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30">
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span>{task.distance.toFixed(1)} km</span>
+          </div>
+        )}
+
+        {/* Status */}
+        <div
+          className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[13px] font-medium ${statusColors[task.status]}`}
+        >
+          {task.status === "OPEN" && <AlertCircle className="w-3.5 h-3.5" />}
+          {task.status === "COMPLETED" && <CheckCircle className="w-3.5 h-3.5" />}
+          <span>{task.status}</span>
         </div>
       </div>
 
       {/* Interactive CTA buttons based on role */}
-      <div className="mt-5 border-t border-slate-100 pt-4">
+      <div className="mt-6 pt-5 border-t border-smoke">
         {viewMode === "helper" && task.status === "OPEN" && onPlaceBid && (
           <button
             onClick={() => onPlaceBid(task)}
-            className="w-full flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center rounded-full bg-charcoal px-4 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition duration-200 cursor-pointer"
           >
             Place a Bid
           </button>
@@ -198,7 +140,7 @@ export default function TaskCard({
         {viewMode === "customer" && task.status === "OPEN" && onViewBids && (
           <button
             onClick={() => onViewBids(task)}
-            className="w-full flex items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:border-emerald-500 hover:text-emerald-700 transition duration-200 cursor-pointer"
+            className="w-full flex items-center justify-center rounded-full border border-smoke bg-paper px-4 py-2.5 text-[14px] font-medium text-ink hover:bg-sand transition duration-200 cursor-pointer"
           >
             Review Offers
           </button>
@@ -209,9 +151,9 @@ export default function TaskCard({
           onReleasePayment && (
             <button
               onClick={() => onReleasePayment(task)}
-              className="w-full flex items-center justify-center rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500 hover:shadow transition duration-200 cursor-pointer"
+              className="w-full flex items-center justify-center rounded-full bg-charcoal px-4 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition duration-200 cursor-pointer"
             >
-              Complete & Release Payment
+              Release Payment
             </button>
           )}
       </div>

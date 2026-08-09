@@ -2,65 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { api } from "@/lib/api";
-import {
-  Plus,
-  Search,
-  Sliders,
-  Shield,
-  Star,
-  CheckCircle,
-  MessageSquare,
-  AlertTriangle,
-  TrendingUp,
-  Wallet,
-  Map,
-  PlusCircle,
-  User,
-  Award,
-  ArrowRight,
-  X,
-  Play,
-  Upload,
-  FileText,
-  Loader2,
-  Save,
-  Mail,
-  Phone,
-  MapPin,
-  Briefcase,
-  Bell,
+import { 
+  ArrowRight, TrendingUp, CheckCircle, Wallet, ArrowUpRight, 
+  ShieldCheck, Activity, Star, Clock, AlertCircle, FileText, LayoutDashboard
 } from "lucide-react";
+import { useProfile } from "@/context/ProfileContext";
 
-import { useNotification } from "@/context/NotificationContext";
-
-import TaskCard, { Task } from "../../components/TaskCard";
-import HelperCard, { Helper } from "../../components/HelperCard";
-import ChatSim from "../../components/ChatSim";
-import PaymentEscrow from "../../components/PaymentEscrow";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-
-const LocationPickerMap = dynamic(
-  () => import("../../components/LocationPickerMap"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="h-[200px] w-full animate-pulse bg-slate-200 dark:bg-zinc-800 flex items-center justify-center text-slate-400 text-sm">
-        Loading map...
-      </div>
-    ),
-  },
-);
-
-// Helpers are fetched from backend
-
-// Tasks are fetched from backend
-
-export default function Home() {
-  const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+export default function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
+  const { profile } = useProfile();
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -69,1966 +19,273 @@ export default function Home() {
     else setGreeting("Good evening");
   }, []);
 
-  // Moved to below profileData
-
-  const [activeRole, setActiveRole] = useState<"customer" | "helper">(
-    "customer",
-  );
-  const [currentTab, setCurrentTab] = useState<
-    "dashboard" | "profile" | "settings"
-  >("dashboard");
-  const [accountTab, setAccountTab] = useState("Profile");
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [helpers, setHelpers] = useState<Helper[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [walletBalance, setWalletBalance] = useState<number>(0);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [notificationsData, setNotificationsData] = useState<any[]>([]);
-
-  const handleAddFunds = async () => {
-    try {
-      const res = await api.post('/wallet/add-funds', { amount: 1000 });
-      alert(res.data.message);
-      fetchDashboardData();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add funds");
-    }
-  };
-
-  const fetchDashboardData = async () => {
-    try {
-      const [tasksRes, helpersRes, walletRes, notifRes] = await Promise.all([
-        api.get('/tasks').catch(() => ({ data: [] })),
-        api.get('/users/helpers').catch(() => ({ data: [] })),
-        api.get('/wallet/balance').catch(() => ({ data: { balance: 0, transactions: [] }})),
-        api.get('/notifications').catch(() => ({ data: [] }))
-      ]);
-      setTasks(tasksRes.data);
-      setHelpers(helpersRes.data);
-      setWalletBalance(walletRes.data.balance || 0);
-      setTransactions(walletRes.data.transactions || []);
-      setNotificationsData(notifRes.data || []);
-    } catch (err) {
-      console.error('Failed to fetch dashboard data', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [activeRole]);
-
-  // Modals & Flows
-  const [showPostModal, setShowPostModal] = useState(false);
-  const [isAuthChecking, setIsAuthChecking] = useState(true);
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const [showBidsModal, setShowBidsModal] = useState(false);
-  const [activeTaskForBids, setActiveTaskForBids] = useState<Task | null>(null);
-  const [isSuggestingPrice, setIsSuggestingPrice] = useState(false);
-  const [showEscrowModal, setShowEscrowModal] = useState(false);
-  const [activeTaskForEscrow, setActiveTaskForEscrow] = useState<Task | null>(
-    null,
-  );
-  const [showChatModal, setShowChatModal] = useState(false);
-  const [activeChatTask, setActiveChatTask] = useState<Task | null>(null);
-
-  // Feedback
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [activeReviewTask, setActiveReviewTask] = useState<Task | null>(null);
-  const [reviewRating, setReviewRating] = useState(5);
-  const [reviewText, setReviewText] = useState("");
-
-  // Form states
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    budget: "" as unknown as number,
-    category: "Notes & Printouts",
-    urgency: "medium" as "low" | "medium" | "urgent",
-    latitude: 28.6304,
-    longitude: 77.2177,
-    scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
-    estimatedDuration: "1-2 hours",
-    address: "",
-  });
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-            );
-            const data = await res.json();
-            setFormData((prev) => ({
-              ...prev,
-              latitude: lat,
-              longitude: lng,
-              address: data.display_name || "Location found",
-            }));
-          } catch (err) {
-            setFormData((prev) => ({ ...prev, latitude: lat, longitude: lng, address: "Coordinates found" }));
-          }
-        },
-        (error) => {
-          console.warn("Geolocation failed or blocked, using fallback", error);
-          setFormData((prev) => ({
-            ...prev,
-            latitude: 28.7041,
-            longitude: 77.1025,
-            address: "Campus Center (Fallback)",
-          }));
-        },
-        { timeout: 5000, enableHighAccuracy: true }
-      );
-    }
-  }, []);
-  // Profile Modal State
-  const [selectedProfile, setSelectedProfile] = useState<Helper | null>(null);
-  
-  // Profile Image Upload State
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-
-  // Simulation notification
-  const [notification, setNotification] = useState<string | null>(null);
-  const { notifications, unreadCount, addNotification, markAllAsRead } = useNotification();
-  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  
-  const showGlobalNotification = (msg: string) => {
-    setNotification(msg);
-    addNotification(msg);
-    // Auto clear banner but keep in context history
-    setTimeout(() => setNotification(null), 4000);
-  };
-  
-  // Password Change state
-  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordError("");
-    if (newPassword !== confirmNewPassword) {
-      setPasswordError("New passwords do not match.");
-      return;
-    }
-    setIsChangingPassword(true);
-    try {
-      await api.patch('/users/password', {
-        currentPassword,
-        newPassword
-      });
-      setIsChangePasswordOpen(false);
-      showGlobalNotification("Password successfully updated.");
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      const errorText = Array.isArray(msg) ? msg[0] : (msg || "Failed to update password. Make sure backend is running.");
-      setPasswordError(errorText);
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
-
-  // Profile & Verification states
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileData, setProfileData] = useState({
-    id: "",
-    name: "QuickMate User",
-    email: "user@quickmate.local",
-    phone: "+91 9876543210",
-    bio: "I am a reliable local helper ready to assist with daily tasks.",
-    address: "New Delhi, India",
-    skills: ["Delivery", "Errands"],
-    postalCode: "110001",
-    role: "customer",
-    isVerified: false,
-    verificationStatus: "UNVERIFIED",
-  });
-
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-    } else {
-      setIsLoggedIn(true);
-      setIsAuthChecking(false);
-      const userProfileRaw = localStorage.getItem("userProfile");
-      if (userProfileRaw) {
-        try {
-          const up = JSON.parse(userProfileRaw);
-          setProfileData(prev => ({
-            ...prev,
-            name: up.name || prev.name,
-            email: up.email || prev.email,
-            phone: up.phone || prev.phone,
-            postalCode: up.postalCode || "110001",
-            role: up.role || "customer",
-            isVerified: up.isVerified || false,
-            verificationStatus: up.verificationStatus || "UNVERIFIED"
-          }));
-        } catch(e) {}
-      }
-      
-      // Always fetch fresh data from backend
-      api.get("/users/me").then(res => {
-        const freshUser = res.data;
-        setProfileData(prev => ({
-          ...prev,
-          name: freshUser.name || prev.name,
-          email: freshUser.email || prev.email,
-          phone: freshUser.phone || prev.phone,
-          role: freshUser.role || "customer",
-          isVerified: freshUser.isVerified || false,
-          verificationStatus: freshUser.verificationStatus || "UNVERIFIED"
-        }));
-        localStorage.setItem("userProfile", JSON.stringify(freshUser));
-      }).catch(err => console.error("Failed to fetch fresh profile", err));
-    }
-  }, [router]);
-
-  const [verificationState, setVerificationState] = useState({
-    status: "Pending Upload", // 'Pending Upload' | 'Uploading' | 'Pending Review' | 'Verified'
-    docType: "Aadhar Card",
-  });
-
-  const handleProfileChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setProfileData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleUploadKyc = () => {
-    setVerificationState((prev) => ({ ...prev, status: "Uploading" }));
-    setTimeout(() => {
-      setVerificationState((prev) => ({ ...prev, status: "Pending Review" }));
-      setNotification(
-        "✅ Document uploaded successfully! Pending admin review.",
-      );
-      setTimeout(() => setNotification(null), 4000);
-    }, 2000);
-  };
-
-  const categories = [
-    "All",
-    "Notes & Printouts",
-    "Food Pickup",
-    "Lab Files",
-    "Roommate Help",
-    "Tech Help",
-    "Errands",
-  ];
-
-  const handleSuggestPrice = async () => {
-    setIsSuggestingPrice(true);
-    try {
-      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
-      const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-      const res = await fetch(`${url}/tasks/price-suggestion`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          category: formData.category,
-          urgency: formData.urgency
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setFormData(prev => ({ ...prev, budget: data.suggestedPrice }));
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSuggestingPrice(false);
-    }
-  };
-
-
-
-  const handleInputChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "budget" || name === "latitude" || name === "longitude"
-          ? Number(value)
-          : value,
-    }));
-  };
-
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-    const titleTrimmed = formData.title.trim();
-    const descTrimmed = formData.description.trim();
-    
-    if (titleTrimmed.length < 5)
-      errors.title = "Title must be at least 5 characters long.";
-    else if (/(.)\1{4,}/.test(titleTrimmed))
-      errors.title = "Please enter a more descriptive title.";
-      
-    if (descTrimmed.length < 10)
-      errors.description = "Description must be at least 10 characters long.";
-    else if (/(.)\1{4,}/.test(descTrimmed))
-      errors.description = "Please enter a meaningful description.";
-      
-    if (!formData.budget || formData.budget < 10) 
-      errors.budget = "Budget must be at least ₹10.";
-    if (formData.latitude < -90 || formData.latitude > 90)
-      errors.latitude = "Latitude must be between -90 and 90.";
-    if (formData.longitude < -180 || formData.longitude > 180)
-      errors.longitude = "Longitude must be between -180 and 180.";
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handlePostTask = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      const payload = { ...formData };
-      delete (payload as any).estimatedDuration;
-      payload.scheduledTime = new Date(formData.scheduledTime).toISOString();
-
-      if (editingTaskId) {
-        await api.patch(`/tasks/${editingTaskId}`, payload);
-        showGlobalNotification(`Task "${formData.title}" updated successfully.`);
-      } else {
-        await api.post("/tasks", payload);
-        showGlobalNotification(`Task "${formData.title}" posted! We will notify nearby helpers.`);
-      }
-
-      await fetchDashboardData();
-      setShowPostModal(false);
-      setEditingTaskId(null);
-      
-      setFormData((prev) => ({
-        ...prev,
-        title: "",
-        description: "",
-        budget: 50,
-        category: "Food Pickup",
-        urgency: "medium",
-        scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
-        estimatedDuration: "1-2 hours",
-      }));
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to save task.");
-    }
-  };
-
-  const handlePlaceBid = (task: Task) => {
-    showGlobalNotification(
-      `✔ Bid of ₹${task.budget} successfully submitted for "${task.title}"!`
-    );
-  };
-
-  const handleAcceptBid = async (task: Task, helper: Helper) => {
-    setActiveTaskForBids(task);
-    try {
-      await api.patch(`/tasks/${task.id}/status`, { status: "ASSIGNED" });
-      showGlobalNotification(
-        `You have assigned ${helper.name} to "${task.title}".`
-      );
-      
-      setTasks((prev) => prev.map(t => t.id === task.id ? {...t, status: "IN_PROGRESS"} : t));
-      setShowBidsModal(false);
-      setShowEscrowModal(true);
-      setActiveTaskForEscrow(task);
-    } catch (err) {
-      console.error("Failed to assign helper", err);
-    }
-  };
-
-  const handlePaymentSuccess = () => {
-    if (!activeTaskForEscrow) return;
-
-    // Update task status to IN_PROGRESS and assign helper
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === activeTaskForEscrow.id
-          ? { ...t, status: "IN_PROGRESS", assignedHelperId: "helper_delhi_1" }
-          : t,
-      ),
-    );
-
-    const matchedHelper =
-      helpers.find((h) => h.id === "helper_delhi_1") || helpers[0];
-
-    setTimeout(() => {
-      setShowEscrowModal(false);
-      showGlobalNotification(
-        `🎉 Escrow locked! ${matchedHelper.name} has been assigned to your task.`
-      );
-    }, 2000);
-  };
-
-  const handleReleasePayment = (task: Task) => {
-    setActiveReviewTask(task);
-    setShowReviewModal(true);
-  };
-
-  const handleReviewSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeReviewTask) return;
-
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === activeReviewTask.id ? { ...t, status: "COMPLETED" } : t,
-      ),
-    );
-
-    // Update helper task count dynamically in local state
-    const helperId = "helper_delhi_1"; // Mock helper ID
-    const targetHelper = helpers.find((h) => h.id === helperId);
-    if (targetHelper) {
-      const updatedHelper = {
-        ...targetHelper,
-        completedTasksCount: targetHelper.completedTasksCount + 1,
-        rating: (targetHelper.rating * targetHelper.completedTasksCount + reviewRating) / (targetHelper.completedTasksCount + 1),
-      };
-      setHelpers((prev) => prev.map((h) => (h.id === helperId ? updatedHelper : h)));
-      showGlobalNotification(
-        `⭐ Thank you! Review submitted. Payment released to ${targetHelper.name}.`
-      );
-    }
-
-    setShowReviewModal(false);
-    setActiveReviewTask(null);
-    setReviewText("");
-    setReviewRating(5);
-  };
-
-  const filteredTasks =
-    selectedCategory === "All"
-      ? tasks
-      : tasks.filter(
-          (t) => t.category.toLowerCase() === selectedCategory.toLowerCase(),
-        );
-
-  const handleDeleteTask = async (task: Task) => {
-    if (confirm("Are you sure you want to delete this task?")) {
-      try {
-        await api.delete(`/tasks/${task.id}`);
-        fetchDashboardData();
-        showGlobalNotification("Task deleted successfully.");
-      } catch (err) {
-        console.error(err);
-        alert("Failed to delete task.");
-      }
-    }
-  };
-
-  const handleEditTask = (task: Task) => {
-    setFormData({
-      title: task.title,
-      description: task.description,
-      budget: task.budget,
-      category: task.category,
-      urgency: task.urgency,
-      latitude: task.latitude,
-      longitude: task.longitude,
-      scheduledTime: new Date(task.scheduledTime).toISOString().slice(0, 16),
-      estimatedDuration: "1-2 hours",
-      address: task.address || "",
-    });
-    setEditingTaskId(task.id);
-    setShowPostModal(true);
-  };
-
-  if (isAuthChecking) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-medium">Verifying access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return null; // Will redirect in useEffect
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-20 md:pb-0 relative">
-      {/* Simulation Alert banner */}
-      {notification && (
-        <div className="fixed top-4 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-4">
-          <div className="flex items-center justify-between rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-xl dark:bg-white dark:text-slate-900 border border-slate-800 dark:border-zinc-200 animate-bounce">
-            <span>{notification}</span>
-            <button
-              onClick={() => setNotification(null)}
-              className="ml-3 rounded p-0.5 hover:bg-slate-800 dark:hover:bg-zinc-100 cursor-pointer"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-sm transition-all">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-2">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setCurrentTab('dashboard')} className="flex items-center gap-2 cursor-pointer ml-4">
-              <img src="/logo.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto object-contain" />
-            </button>
-            <div className="flex items-center gap-1 ml-3 sm:ml-6 cursor-pointer group">
-              <div className="flex flex-col">
-                <span className="text-[14px] font-bold text-slate-800 flex items-center gap-1 group-hover:text-emerald-700 transition-colors">
-                  Location
-                </span>
-                <span className="text-[11px] sm:text-[13px] text-slate-500 truncate font-medium mt-0 sm:mt-0.5 flex items-center gap-1 group-hover:text-slate-700 transition-colors" title={formData.address || "Fetching location..."}>
-                  {formData.address || "Fetching location..."}
-                </span>
-              </div>
-              <svg className="w-3 h-3 text-slate-400 group-hover:text-slate-600 shrink-0 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-          </div>
-
-          <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => {
-                setActiveRole("customer");
-                setCurrentTab("dashboard");
-                setShowPostModal(true);
-              }}
-              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
-            >
-              Post a Task
-            </button>
-            <button
-              onClick={() => {
-                setActiveRole("customer");
-                setCurrentTab("dashboard");
-              }}
-              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
-            >
-              My Tasks
-            </button>
-            <button
-              onClick={() => {
-                if (profileData.verificationStatus !== "VERIFIED" && profileData.role !== "helper") {
-                  setCurrentTab("profile");
-                  setAccountTab("Verification");
-                  return;
-                }
-                setActiveRole("helper");
-                setCurrentTab("dashboard");
-              }}
-              className="text-[15px] font-bold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
-            >
-              {profileData.verificationStatus === "VERIFIED" || profileData.role === "helper" ? "Mate Dashboard" : "Become a Mate"}
-            </button>
-            {profileData.role === 'admin' && (
-              <button
-                onClick={() => router.push("/admin")}
-                className="text-[15px] font-bold text-white bg-emerald-600 px-4 py-2 rounded-xl shadow-md hover:bg-emerald-700 hover:shadow-lg transition-all cursor-pointer"
-              >
-                Admin Panel
-              </button>
-            )}
-            <button
-              onClick={() => setCurrentTab("profile")}
-              className="text-[15px] font-extrabold text-[#212529] hover:text-[#0D7F64] transition-colors cursor-pointer"
-            >
-              Account
-            </button>
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowNotifDropdown(!showNotifDropdown);
-                  if (unreadCount > 0) markAllAsRead();
-                }}
-                className="relative p-2 text-slate-600 hover:text-emerald-600 transition-colors cursor-pointer rounded-full hover:bg-emerald-50"
-              >
-                <Bell className="w-6 h-6" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-                )}
-              </button>
-              
-              {showNotifDropdown && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden">
-                  <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h3 className="font-bold text-slate-800">Notifications</h3>
-                  </div>
-                  <div className="max-h-80 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="p-6 text-center text-slate-500 text-sm">
-                        No notifications yet.
-                      </div>
-                    ) : (
-                      notifications.map((n) => (
-                        <div key={n.id} className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors">
-                          <p className="text-sm text-slate-700">{n.message}</p>
-                          <span className="text-xs text-slate-400 mt-1 block">
-                            {new Date(n.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
+    <div className="space-y-8 w-full max-w-7xl mx-auto">
+      
+      {/* Hero Section */}
+      <div className={`relative rounded-2xl p-8 sm:p-12 text-paper overflow-hidden shadow-xl animate-fade-in-up transition-all duration-500 bg-charcoal`}>
+        {/* Dynamic Gradient Mesh */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style={{
+          background: 'radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)'
+        }} />
+        
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="max-w-xl">
+            <span className="inline-flex items-center rounded-full bg-paper/10 px-3 py-1 text-[12px] font-medium text-paper mb-6 border border-paper/20 backdrop-blur-sm shadow-sm">
+              <LayoutDashboard className="w-3.5 h-3.5 mr-2" />
+              {profile.role === 'customer' ? 'OPERATIONS HQ' : 'MATE COMMAND'}
+            </span>
+            <h1 className="text-[44px] md:text-5xl font-serif tracking-tight leading-tight mb-4">
+              {greeting}. <br/>
+              <span className="text-paper/80">
+                {profile.role === 'customer' ? 'Ready to scale?' : 'Ready to earn?'}
+              </span>
+            </h1>
+            <p className="text-[16px] text-paper/80 leading-relaxed max-w-md mb-8">
+              {profile.role === 'customer' 
+                ? 'Delegate QA testing, pitch deck design, and data entry to verified mates instantly.'
+                : 'Browse nearby tasks, submit bids, and get paid directly to your wallet.'}
+            </p>
+            <div className="flex flex-wrap gap-4">
+              {profile.role === 'customer' ? (
+                <Link 
+                  href="/dashboard/tasks?post=true"
+                  className="rounded-full bg-moss text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-moss/90 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(80,146,9,0.3)] hover:shadow-[0_0_25px_rgba(80,146,9,0.5)] hover:-translate-y-0.5"
+                >
+                  Post a Task <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link 
+                  href="/dashboard/tasks"
+                  className="rounded-full bg-moss text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-moss/90 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(80,146,9,0.3)] hover:shadow-[0_0_25px_rgba(80,146,9,0.5)] hover:-translate-y-0.5"
+                >
+                  Find Work <ArrowRight className="h-4 w-4" />
+                </Link>
               )}
             </div>
           </div>
+
+          {/* Quick Stat inside Hero */}
+          <div className="hidden md:flex flex-col gap-2 bg-paper/10 backdrop-blur-md p-6 rounded-2xl border border-paper/20 shrink-0 min-w-[200px] shadow-lg hover:-translate-y-1 transition-transform duration-300">
+            <span className="text-[13px] font-medium text-paper/80 uppercase tracking-wider">
+              {profile.role === 'customer' ? 'Hours Saved' : 'Total Earnings'}
+            </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-[44px] font-serif tracking-tight">
+                {profile.role === 'customer' ? '142' : '₹12k'}
+              </span>
+              <span className="text-lime text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
+            </div>
+          </div>
         </div>
-      </header>
+      </div>
 
-      {/* Main Body */}
-      <main className="mx-auto max-w-7xl px-4 pt-4 pb-8 sm:px-6 lg:px-8 relative">
-        {/* Animated Background decorative elements */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-          <div className="absolute top-10 -right-20 w-[600px] h-[600px] rounded-full bg-emerald-100/40 blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
-          <div className="absolute top-40 -left-20 w-[500px] h-[500px] rounded-full bg-teal-50/40 blur-[80px] animate-pulse" style={{ animationDuration: '6s' }} />
-        </div>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+        
+        {profile.role === 'customer' ? (
+          <>
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Wallet className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Active Escrow</span>
+                <Wallet className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">₹4,500</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">Locked safely in escrow</span>
+            </div>
 
-        {/* Category Filters */}
-        {currentTab === "dashboard" && (
-          <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-4 mt-1">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all cursor-pointer ${
-                  selectedCategory === cat
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20"
-                    : "bg-white border border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><CheckCircle className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Tasks Completed</span>
+                <CheckCircle className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">12</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">This month</span>
+            </div>
+
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><ShieldCheck className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Verified Mates</span>
+                <ShieldCheck className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">4</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">Ready to hire instantly</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Wallet className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Wallet Balance</span>
+                <Wallet className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">₹1,250</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">Available to withdraw</span>
+            </div>
+
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><CheckCircle className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Jobs Completed</span>
+                <CheckCircle className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">34</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">All time</span>
+            </div>
+
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Star className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Current Rating</span>
+                <Star className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">4.9</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">Top Rated Mate</span>
+            </div>
+          </>
         )}
 
-        {/* ==================== CUSTOMER MODE VIEW ==================== */}
-        {activeRole === "customer" && currentTab === "dashboard" && (
-          <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Left side: Hero & Post Task */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Engaging Hero Banner */}
-              <div className="rounded-[2rem] bg-gradient-to-br from-emerald-600 to-teal-800 p-8 sm:p-12 min-h-[460px] text-white shadow-xl shadow-emerald-900/10 relative overflow-hidden flex flex-col md:flex-row items-center justify-between group">
-                <div className="absolute top-0 right-0 w-full h-full bg-[url('/furniture-assembly.png')] bg-cover bg-center opacity-[0.15] mix-blend-overlay pointer-events-none" />
-                
-                {/* Glow effects */}
-                <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-[60px]" />
-                <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-emerald-400/20 rounded-full blur-[50px]" />
-                
-                <div className="flex-1 relative z-10 pr-0 md:pr-8">
-                  <span className="inline-block py-1.5 px-4 rounded-full bg-white/20 backdrop-blur-md text-emerald-50 text-[11px] font-bold tracking-wider mb-5 border border-white/20 shadow-sm uppercase">
-                    ✨ Your Personal Helpers
-                  </span>
-                  <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-md leading-tight">
-                    {greeting}! <br/><span className="text-emerald-200">What do you need help with?</span>
-                  </h1>
-                  <p className="mt-4 text-emerald-50/90 text-lg max-w-md font-medium leading-relaxed">
-                    Book trusted help for notes printing, food pickup, lab files, and more.
-                  </p>
-                  <div className="mt-8 flex flex-wrap items-center gap-4">
-                    <button 
-                      onClick={() => setShowPostModal(true)} 
-                      className="px-6 py-3 rounded-full bg-white text-emerald-700 font-extrabold hover:scale-105 active:scale-95 transition-all shadow-xl hover:shadow-white/20 flex items-center gap-2 cursor-pointer"
-                    >
-                      Post a Task <ArrowRight className="h-4 w-4" />
-                    </button>
-                    <div className="flex items-center gap-2 text-xs text-emerald-50 font-medium bg-white/10 backdrop-blur-sm rounded-full px-4 py-3 border border-white/20 shadow-inner">
-                      <Shield className="h-4 w-4 text-emerald-200" />
-                      Secure Escrow
-                    </div>
-                  </div>
-                </div>
+      </div>
 
-                {/* Right side beautifully constrained graphic */}
-                <div className="hidden md:block w-[40%] relative z-10 h-64 mt-8 md:mt-0">
-                  <div className="absolute inset-0 right-4 transform rotate-3 group-hover:rotate-0 transition-transform duration-500">
-                    <img src="/deep-cleaning.png" className="w-full h-full object-cover rounded-2xl shadow-2xl border-4 border-white/20" alt="Cleaning" />
-                  </div>
-                  <div className="absolute -bottom-6 -left-8 w-32 h-32 transform -rotate-6 group-hover:-rotate-12 transition-transform duration-500 shadow-xl rounded-2xl border-4 border-white/20 overflow-hidden">
-                    <img src="/tv-mounting.png" className="w-full h-full object-cover opacity-90" alt="Mounting" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Tasks Feed */}
-              <div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-zinc-50 flex items-center gap-2">
-                  My Posted Tasks
-                </h3>
-                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {filteredTasks
-                    .filter((task) => task.customerId === profileData?.id)
-                    .map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        viewMode="customer"
-                        onViewBids={(t) => {
-                          setActiveTaskForBids(t);
-                          setShowBidsModal(true);
-                        }}
-                        onReleasePayment={(t) => {
-                          setActiveTaskForEscrow(t);
-                          setShowEscrowModal(true);
-                        }}
-                        onEditTask={handleEditTask}
-                        onDeleteTask={handleDeleteTask}
-                      />
-                    ))}
-                  {filteredTasks.length === 0 && (
-                    <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-12 dark:border-zinc-800 dark:bg-zinc-900/10">
-                      <AlertTriangle className="h-8 w-8 text-slate-300" />
-                      <p className="mt-2 text-sm text-slate-400">
-                        No tasks posted in this category yet.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right side: Nearby Helpers */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-slate-900 drop-shadow-sm">
-                  Available Mates {selectedCategory !== "All" && `for ${selectedCategory}`}
-                </h3>
-                <span className="rounded-full bg-emerald-100/50 backdrop-blur-sm border border-emerald-200 px-3 py-1 text-xs font-bold text-emerald-800 shadow-sm">
-                  Online
-                </span>
-              </div>
-              <div className="space-y-4">
-                {helpers
-                  .filter(h => selectedCategory === "All" || h.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase())))
-                  .map((helper) => (
-                  <HelperCard
-                    key={helper.id}
-                    helper={helper}
-                    onViewProfile={setSelectedProfile}
-                    onHire={(h) => {
-                      const matchedTask =
-                        tasks.find(
-                          (t) => t.status === "OPEN",
-                        ) || tasks[0];
-                      setActiveChatTask(matchedTask);
-                      setShowChatModal(true);
-                    }}
-                  />
-                ))}
-                
-                {helpers.filter(h => selectedCategory === "All" || h.skills.some(skill => skill.toLowerCase().includes(selectedCategory.toLowerCase()))).length === 0 && (
-                  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 py-10">
-                    <p className="text-sm text-slate-500 font-medium">No mates available for this category right now.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Active Tasks Section (2/3 width) */}
+        <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
+              <FileText className="w-5 h-5" /> Active Operations
+            </h3>
+            <button className="text-[14px] font-medium text-ink/60 hover:text-ink transition-colors">View All →</button>
           </div>
-        )}
-
-        {/* ==================== HELPER MODE VIEW ==================== */}
-        {activeRole === "helper" && currentTab === "dashboard" && (
-          <div className="mt-8 space-y-8">
-            {profileData.verificationStatus !== "VERIFIED" && profileData.role !== "helper" ? (
-              <div className="rounded-2xl border border-[#ced4da] bg-white p-8 shadow-sm text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600 mb-6">
-                  <AlertTriangle className="h-8 w-8" />
-                </div>
-                <h2 className="text-2xl font-extrabold text-[#212529] mb-2">
-                  Verify Your Identity to Become a Mate
-                </h2>
-                <p className="text-[#6c757d] mb-8 max-w-lg mx-auto">
-                  To ensure the safety of our community, all Mates must undergo a quick KYC verification before they can start accepting tasks.
-                </p>
-                <div className="max-w-md mx-auto space-y-4">
-                  <div className="text-left">
-                    <label className="block text-sm font-bold text-[#212529] mb-2">Select Document Type</label>
-                    <select
-                      value={verificationState.docType}
-                      onChange={(e) => setVerificationState(prev => ({ ...prev, docType: e.target.value }))}
-                      disabled={profileData.verificationStatus !== "UNVERIFIED" && verificationState.status !== "Pending Upload"}
-                      className="w-full rounded-md border border-[#ced4da] bg-white px-4 py-3 outline-none focus:border-[#0D7F64] disabled:opacity-50"
-                    >
-                      <option>Aadhar Card</option>
-                      <option>PAN Card</option>
-                      <option>Driving License</option>
-                    </select>
+          
+          <div className="space-y-4">
+            {/* Task Card 1 */}
+            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Design</span>
+                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Due in 2 days</span>
                   </div>
-                  
-                  {profileData.verificationStatus === "UNVERIFIED" && verificationState.status === "Pending Upload" && (
-                    <label className="w-full rounded-md border-2 border-dashed border-[#ced4da] bg-slate-50 py-10 font-bold text-[#0D7F64] hover:bg-[#e9ecef] transition-colors cursor-pointer flex flex-col items-center justify-center gap-2">
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*,.pdf"
-                        onChange={async (e) => {
-                          if (e.target.files && e.target.files.length > 0) {
-                            setVerificationState(prev => ({ ...prev, status: "Uploading" }));
-                            try {
-                              // Send dummy document URL to backend
-                              await api.patch('/users/me/verification', { docUrl: "https://placehold.co/600x400/png?text=KYC+Document" });
-                              setProfileData(prev => ({ ...prev, verificationStatus: "PENDING_REVIEW" }));
-                              setVerificationState(prev => ({ ...prev, status: "Pending Review" }));
-                            } catch (err) {
-                              console.error("Failed to submit verification", err);
-                              setVerificationState(prev => ({ ...prev, status: "Pending Upload" }));
-                              alert("Failed to submit document. Try again.");
-                            }
-                          }
-                        }}
-                      />
-                      <Upload className="h-6 w-6" />
-                      Click to browse and upload {verificationState.docType}
-                    </label>
-                  )}
-
-                  {verificationState.status === "Uploading" && (
-                    <div className="w-full rounded-md border border-[#ced4da] bg-slate-50 py-10 flex flex-col items-center justify-center gap-3">
-                      <Loader2 className="h-6 w-6 text-[#0D7F64] animate-spin" />
-                      <p className="font-bold text-[#212529]">Uploading securely...</p>
-                    </div>
-                  )}
-
-                  {(profileData.verificationStatus === "PENDING_REVIEW" || verificationState.status === "Pending Review") && (
-                    <div className="w-full rounded-md border border-amber-200 bg-amber-50 py-6 px-4 flex items-center justify-center gap-3 text-left">
-                      <FileText className="h-6 w-6 text-amber-600 shrink-0" />
-                      <div>
-                        <p className="font-bold text-amber-800">Document under review</p>
-                        <p className="text-sm text-amber-700 mt-1">We will notify you once an admin verifies your document.</p>
-                      </div>
-                    </div>
-                  )}
+                  <h4 className="text-lg font-bold text-ink">Pitch Deck Polish - Seed Round</h4>
                 </div>
-              </div>
-            ) : (
-              <div className="w-full">
-            {/* Dashboard Stats */}
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    Total Earnings
-                  </span>
-                  <Wallet className="h-5 w-5 text-emerald-600" />
+                <div className="text-right">
+                  <span className="block text-[18px] font-serif text-ink">₹1,500</span>
+                  <span className="text-[12px] font-medium text-moss bg-moss/10 px-2 py-0.5 rounded-full inline-block mt-1">In Progress</span>
                 </div>
-                <div className="mt-2 flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">₹ 12,450</span>
-                  <span className="text-xs font-semibold text-emerald-500 flex items-center gap-0.5">
-                    <TrendingUp className="h-3 w-3" />
-                    +12%
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    Average Rating
-                  </span>
-                  <Star className="h-5 w-5 text-amber-500 fill-current" />
-                </div>
-                <div className="mt-2">
-                  <span className="text-2xl font-bold">4.9</span>
-                  <span className="text-xs text-slate-400 ml-1.5">
-                    (34 reviews)
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    Active Bids
-                  </span>
-                  <Sliders className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div className="mt-2">
-                  <span className="text-2xl font-bold">3</span>
-                  <span className="text-xs text-slate-400 ml-1.5">
-                    Pending accept
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex items-center justify-between text-slate-500">
-                  <span className="text-xs font-bold uppercase tracking-wider">
-                    Jobs Done
-                  </span>
-                  <CheckCircle className="h-5 w-5 text-emerald-600" />
-                </div>
-                <div className="mt-2">
-                  <span className="text-2xl font-bold">
-                    {helpers.find((h) => h.id === "helper_delhi_1")
-                      ?.completedTasksCount || 34}
-                  </span>
-                  <span className="text-xs text-slate-400 ml-1.5">
-                    Lifetime
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Proximity Feed / Job Discovery */}
-            <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-              {/* Tasks Map / List Feed */}
-              <div className="lg:col-span-2 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    Available Jobs Nearby
-                  </h3>
-                  <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold bg-slate-100 px-3 py-1.5 rounded-full">
-                    <Map className="h-4 w-4 text-emerald-600" />
-                    Sorted by distance
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {filteredTasks
-                    .filter((task) => task.customerId !== profileData?.id && task.status === "OPEN")
-                    .map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      viewMode="helper"
-                      onPlaceBid={handlePlaceBid}
-                    />
-                  ))}
-                  {filteredTasks.length === 0 && (
-                    <div className="col-span-2 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-12 dark:border-zinc-800 dark:bg-zinc-900/10">
-                      <AlertTriangle className="h-8 w-8 text-slate-300" />
-                      <p className="mt-2 text-sm text-slate-400">
-                        No open tasks nearby matching selection.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Helper Verification Status Panel */}
-              <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm space-y-4">
-                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
-                  Verification & Profile
-                </h4>
-                <div className="flex items-center gap-3 rounded-xl bg-blue-50/50 p-4">
-                  <Award className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h5 className="font-semibold text-zinc-900">
-                      Profile Rating Score
-                    </h5>
-                    <p className="text-xs text-zinc-500">
-                      You are in the top 5% of local helpers.
-                    </p>
-                  </div>
-                </div>
-                <div className="rounded-xl border border-emerald-100 bg-emerald-50/20 p-4 text-xs">
-                  <span className="font-bold text-emerald-700 flex items-center gap-1">
-                    <CheckCircle className="h-3.5 w-3.5 fill-current" />
-                    Verified Partner
-                  </span>
-                  <p className="mt-1 text-slate-500">
-                    Your KYC document verification and address proofs are
-                    completed successfully.
-                  </p>
-                </div>
-              </div>
-            </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ==================== UNIFIED ACCOUNT VIEW ==================== */}
-        {currentTab === "profile" && (
-          <div className="mt-8 max-w-[1000px] mx-auto space-y-6">
-            <h1 className="text-[32px] font-extrabold text-[#212529] mb-6">Your Account</h1>
-            
-            <div className="flex flex-col md:flex-row border border-[#ced4da] rounded-sm bg-white overflow-hidden">
-              {/* Left Sidebar */}
-              <div className="w-full md:w-[280px] bg-[#f8f9fa] border-r border-[#ced4da] flex flex-col shrink-0">
-                {[
-                  "Profile",
-                  "Password",
-                  "Account Security",
-                  "Notifications",
-                  "Billing Info",
-                  "Cancel a Task",
-                  "Business Information",
-                  "Account Balance",
-                  "Transactions",
-                  "Delete Account"
-                ].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setAccountTab(tab)}
-                    className={`px-6 py-4 text-left text-[15px] font-bold transition-colors cursor-pointer ${
-                      accountTab === tab
-                        ? "text-[#212529] border-l-4 border-[#0D7F64] bg-white"
-                        : "text-[#0D7F64] border-l-4 border-transparent hover:bg-white hover:text-[#0a6650]"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
               </div>
               
-              {/* Main Content Box */}
-              <div className="flex-1 p-8">
-                {accountTab === "Profile" && (
-                  <>
-                    <div className="flex justify-between items-center border-b border-[#ced4da] pb-3 mb-6">
-                      <h2 className="text-[22px] font-extrabold text-[#212529]">Account</h2>
-                      <button className="rounded-md border border-[#ced4da] bg-white px-5 py-1.5 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors cursor-pointer">
-                        Edit
-                      </button>
-                    </div>
-                    <div className="flex flex-col sm:flex-row gap-8 items-start">
-                      <div className="relative h-[160px] w-[160px] shrink-0 group">
-                        <div className="h-full w-full rounded-full bg-[#e9ecef] flex items-center justify-center overflow-hidden border border-[#ced4da]">
-                          {profileImage ? (
-                            <img src={profileImage} alt="Profile" className="h-full w-full object-cover" />
-                          ) : (
-                            <User className="h-[100px] w-[100px] text-[#ced4da]" />
-                          )}
-                        </div>
-                        <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                          <span className="text-sm font-semibold">Change Photo</span>
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
-                            onChange={(e) => {
-                              if (e.target.files && e.target.files[0]) {
-                                const url = URL.createObjectURL(e.target.files[0]);
-                                setProfileImage(url);
-                              }
-                            }}
-                          />
-                        </label>
-                      </div>
-                      <div className="space-y-4 pt-2">
-                        <div className="flex items-center gap-3 text-[#212529]">
-                          <User className="h-[18px] w-[18px] text-[#495057]" />
-                          <span className="text-[17px] font-bold">{profileData.name}</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#212529]">
-                          <Mail className="h-[18px] w-[18px] text-[#495057]" />
-                          <span className="text-[17px] font-bold">{profileData.email}</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#212529]">
-                          <Phone className="h-[18px] w-[18px] text-[#495057]" />
-                          <span className="text-[17px] font-bold">{profileData.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#212529]">
-                          <MapPin className="h-[18px] w-[18px] text-[#495057]" />
-                          <span className="text-[17px] font-bold">{profileData.postalCode || '110001'}</span>
-                        </div>
-                        <div className="pt-4">
-                          <button 
-                            onClick={() => {
-                              localStorage.removeItem("accessToken");
-                              localStorage.removeItem("token");
-                              router.push("/login");
-                            }}
-                            className="rounded-md border border-[#ced4da] bg-white px-5 py-2 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors cursor-pointer"
-                          >
-                            Log Out
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {accountTab === "Password" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Password</h2>
-                    <div className="space-y-4 max-w-sm">
-                      <button 
-                        onClick={() => setIsChangePasswordOpen(true)}
-                        className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors"
-                      >
-                        Change Password
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Account Security" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Account Security</h2>
-                    <div className="p-6 border border-[#ced4da] rounded-md flex justify-between items-center bg-[#f8f9fa]">
-                      <div>
-                        <p className="font-bold text-[#212529]">Two-Factor Authentication (2FA)</p>
-                        <p className="text-sm text-[#6c757d]">Add an extra layer of security to your account.</p>
-                      </div>
-                      <button className="rounded-full bg-white border border-[#ced4da] text-[#212529] px-6 py-2 font-semibold hover:bg-gray-50 transition-colors">Enable 2FA</button>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Notifications" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Notifications</h2>
-                    <div className="space-y-4">
-                      <label className="flex items-center gap-3">
-                        <input type="checkbox" defaultChecked className="w-5 h-5 accent-[#0D7F64]" />
-                        <span className="font-semibold text-[#212529]">Email Notifications (Task Updates, Promotions)</span>
-                      </label>
-                      <label className="flex items-center gap-3">
-                        <input type="checkbox" defaultChecked className="w-5 h-5 accent-[#0D7F64]" />
-                        <span className="font-semibold text-[#212529]">SMS Notifications (Urgent Alerts)</span>
-                      </label>
-                      <label className="flex items-center gap-3">
-                        <input type="checkbox" className="w-5 h-5 accent-[#0D7F64]" />
-                        <span className="font-semibold text-[#212529]">Push Notifications</span>
-                      </label>
-                      <div className="pt-4">
-                        <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Preferences</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Billing Info" && (
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center border-b border-[#ced4da] pb-3 mb-6">
-                      <h2 className="text-[22px] font-extrabold text-[#212529]">Billing Info</h2>
-                      <button className="rounded-md border border-[#ced4da] bg-white px-5 py-1.5 text-[14px] font-semibold text-[#212529] hover:bg-[#f8f9fa] transition-colors">
-                        Add New Card
-                      </button>
-                    </div>
-                    <div className="p-4 border border-[#ced4da] rounded-md flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-[#e9ecef] w-12 h-8 rounded flex items-center justify-center text-xs font-bold text-[#495057]">VISA</div>
-                        <div>
-                          <p className="font-bold text-[#212529]">Visa ending in 4242</p>
-                          <p className="text-sm text-[#6c757d]">Expires 12/2028 (Default)</p>
-                        </div>
-                      </div>
-                      <button className="text-red-600 text-sm font-bold hover:underline">Remove</button>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Cancel a Task" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Cancel a Task</h2>
-                    {tasks.filter(t => t.status === "OPEN").length === 0 ? (
-                      <p className="text-[#6c757d]">You have no open tasks to cancel.</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {tasks.filter(t => t.status === "OPEN").map(task => (
-                          <div key={task.id} className="p-4 border border-[#ced4da] rounded-md flex justify-between items-center">
-                            <div>
-                              <p className="font-bold text-[#212529]">{task.title}</p>
-                              <p className="text-sm text-[#6c757d]">Scheduled: {new Date(task.scheduledTime).toLocaleDateString()}</p>
-                            </div>
-                            <button className="rounded-full bg-white border border-red-200 text-red-600 px-4 py-1.5 text-sm font-bold hover:bg-red-50 transition-colors">Cancel Task</button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {accountTab === "Business Information" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Business Information</h2>
-                    <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-6 text-sm text-yellow-800">
-                      If you provide services as a registered business, please fill in your details below for tax and invoicing purposes.
-                    </div>
-                    <div className="space-y-4 max-w-sm">
-                      <div>
-                        <label className="block text-xs font-bold text-[#212529] mb-1.5">Business Name</label>
-                        <input type="text" placeholder="e.g. Acme Services" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-[#212529] mb-1.5">GST/Tax ID</label>
-                        <input type="text" placeholder="Tax Number" className="w-full rounded-md border border-[#ced4da] px-4 py-2 outline-none focus:border-[#0D7F64]" />
-                      </div>
-                      <button className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Save Details</button>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Account Balance" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Account Balance</h2>
-                    <div className="p-8 border border-[#ced4da] rounded-md text-center bg-[#f8f9fa]">
-                      <p className="text-sm font-bold text-[#6c757d] uppercase tracking-wider mb-2">Available Wallet Balance</p>
-                      <p className="text-4xl font-extrabold text-[#212529] mb-6">₹ {walletBalance.toFixed(2)}</p>
-                      <div className="flex gap-4 justify-center">
-                        <button onClick={handleAddFunds} className="rounded-full bg-[#0D7F64] text-white px-6 py-2.5 font-bold hover:bg-[#0a6650] transition-colors">Add ₹1000 (Demo)</button>
-                        <button className="rounded-full bg-white border border-[#ced4da] text-[#212529] px-6 py-2.5 font-bold hover:bg-gray-50 transition-colors">Withdraw</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Transactions" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Transactions</h2>
-                    <div className="border border-[#ced4da] rounded-md overflow-hidden">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-[#f8f9fa] border-b border-[#ced4da]">
-                          <tr>
-                            <th className="p-3 font-bold text-[#495057]">Date</th>
-                            <th className="p-3 font-bold text-[#495057]">Description</th>
-                            <th className="p-3 font-bold text-[#495057]">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#e9ecef]">
-                          {transactions.length === 0 ? (
-                            <tr>
-                              <td colSpan={3} className="p-4 text-center text-[#6c757d]">No transactions found</td>
-                            </tr>
-                          ) : transactions.map(tx => (
-                            <tr key={tx.id}>
-                              <td className="p-3 text-[#212529]">{new Date(tx.createdAt).toLocaleDateString()}</td>
-                              <td className="p-3 text-[#212529]">{tx.description}</td>
-                              <td className={`p-3 font-bold ${tx.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}>
-                                {tx.type === 'CREDIT' ? '+' : '-'} ₹ {tx.amount.toFixed(2)}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {accountTab === "Delete Account" && (
-                  <div className="space-y-6">
-                    <h2 className="text-[22px] font-extrabold text-[#212529] border-b border-[#ced4da] pb-3 mb-6">Delete Account</h2>
-                    <div className="p-6 border border-red-200 bg-red-50 rounded-md">
-                      <h3 className="font-bold text-red-700 text-lg mb-2">Warning: Permanent Action</h3>
-                      <p className="text-red-700 text-sm mb-6">
-                        Deleting your account will permanently erase your profile, wallet balance, active tasks, and transaction history. This action cannot be undone.
-                      </p>
-                      <button className="rounded-full bg-red-600 text-white px-6 py-2.5 font-bold hover:bg-red-700 transition-colors">
-                        Permanently Delete My Account
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-        {/* ==================== SETTINGS VIEW ==================== */}
-        {currentTab === "settings" && (
-          <div className="mt-8 max-w-4xl mx-auto space-y-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-zinc-50">
-              Account Settings
-            </h2>
-
-            <div className="space-y-6">
-              {/* Notification Preferences */}
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50 mb-4">
-                  Notifications
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-800 dark:text-zinc-200">
-                        Email Notifications
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400">
-                        Receive updates on tasks and bids.
-                      </p>
-                    </div>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 cursor-pointer">
-                      <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-zinc-800">
-                    <div>
-                      <p className="font-semibold text-slate-800 dark:text-zinc-200">
-                        SMS Alerts
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400">
-                        For urgent task updates and OTPs.
-                      </p>
-                    </div>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-blue-600 cursor-pointer">
-                      <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-                    </div>
-                  </div>
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between text-[13px] font-medium text-ink">
+                  <span>Progress</span>
+                  <span>75%</span>
                 </div>
-              </div>
-
-              {/* Security */}
-              <div className="rounded-3xl border border-slate-100 bg-white p-6 sm:p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-zinc-50 mb-4">
-                  Security
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-slate-800 dark:text-zinc-200">
-                        Two-Factor Authentication
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400">
-                        Add an extra layer of security.
-                      </p>
-                    </div>
-                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 dark:bg-zinc-700 cursor-pointer">
-                      <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white transition" />
-                    </div>
-                  </div>
-                  <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
-                    <button 
-                      onClick={() => setIsChangePasswordOpen(true)}
-                      className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition cursor-pointer"
-                    >
-                      Change Password
-                    </button>
-                  </div>
+                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
+                  <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
                 </div>
-              </div>
-
-              {/* Danger Zone */}
-              <div className="rounded-3xl border border-rose-100 bg-rose-50/30 p-6 sm:p-8 dark:border-rose-900/30 dark:bg-rose-950/10">
-                <h3 className="text-lg font-bold text-rose-600 dark:text-rose-400 mb-4">
-                  Danger Zone
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                  Once you delete your account, there is no going back. Please
-                  be certain.
+                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-ink" /> {profile.role === 'customer' ? 'Mate Alex M. is finalizing the slides.' : 'You are finalizing the slides.'}
                 </p>
-                <button className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500 transition cursor-pointer">
-                  Delete Account
-                </button>
               </div>
             </div>
-          </div>
-        )}
-      </main>
 
-      {/* ==================== DIALOG MODALS & OVERLAYS ==================== */}
-
-      {/* Change Password Modal */}
-      {isChangePasswordOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[24px] bg-white p-6 sm:p-8 shadow-2xl dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800">
-            <h3 className="mb-6 text-xl font-bold text-slate-900 dark:text-zinc-50">Change Password</h3>
-            
-            {passwordError && (
-              <div className="mb-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
-                {passwordError}
-              </div>
-            )}
-
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  required
-                />
+            {/* Task Card 2 */}
+            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">QA Testing</span>
+                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5 text-coral" /> Action Required</span>
+                  </div>
+                  <h4 className="text-lg font-bold text-ink">Beta testing for new iOS app</h4>
+                </div>
+                <div className="text-right">
+                  <span className="block text-[18px] font-serif text-ink">₹800</span>
+                  <span className="text-[12px] font-medium text-coral bg-coral/10 px-2 py-0.5 rounded-full inline-block mt-1">Review Pending</span>
+                </div>
               </div>
               
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-zinc-300">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsChangePasswordOpen(false)}
-                  className="flex-1 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition"
-                  disabled={isChangingPassword}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white hover:bg-emerald-500 transition disabled:opacity-50"
-                  disabled={isChangingPassword}
-                >
-                  {isChangingPassword ? "Updating..." : "Update Password"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 1. Post Task Modal */}
-      {showPostModal && (
-        <div className="fixed inset-0 z-[60] overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="w-full max-w-xl rounded-[1.5rem] bg-white p-5 sm:p-6 shadow-2xl border border-slate-100 text-left">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
-              <div>
-                <h3 className="text-xl font-extrabold text-slate-800">
-                  {editingTaskId ? "Edit Task" : "Post a New Task"}
-                </h3>
-                <p className="text-sm text-slate-500 mt-1">Fill in the details to find the best helper.</p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowPostModal(false);
-                  setEditingTaskId(null);
-                }}
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handlePostTask} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Task Title <span className="text-rose-500 ml-1">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Print 50 pages of physics notes"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                />
-                {formErrors.title && (
-                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
-                    {formErrors.title}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Detailed Description <span className="text-rose-500 ml-1">*</span>
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  rows={3}
-                  placeholder="Describe what needs to be done. Minimum 10 characters."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
-                ></textarea>
-                  <div className="flex justify-between items-center mt-1.5">
-                    {formErrors.description ? (
-                      <p className="text-xs text-rose-500 font-medium">
-                        {formErrors.description}
-                      </p>
-                    ) : <div></div>}
-                    <span className="text-xs text-slate-400 font-medium">{formData.description.length} chars</span>
-                  </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-semibold text-slate-700">
-                      Budget (₹) <span className="text-rose-500 ml-1">*</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleSuggestPrice}
-                      disabled={isSuggestingPrice}
-                      className="text-xs font-bold text-emerald-600 hover:text-emerald-500 disabled:opacity-50"
-                    >
-                      {isSuggestingPrice ? "Calculating..." : "AI Suggestion"}
-                    </button>
-                  </div>
-                  <input
-                    type="number"
-                    name="budget"
-                    value={formData.budget || ""}
-                    placeholder="e.g. 150"
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                  />
-                  {formErrors.budget && (
-                    <p className="mt-1.5 text-xs text-rose-500 font-medium">
-                      {formErrors.budget}
-                    </p>
-                  )}
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between text-[13px] font-medium text-ink">
+                  <span>Progress</span>
+                  <span>90%</span>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Category <span className="text-rose-500 ml-1">*</span>
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                  >
-                    <option value="" disabled>Select a category</option>
-                    {categories.filter(c => c !== "All").map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
+                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
+                  <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Estimated Duration
-                  </label>
-                  <select
-                    name="estimatedDuration"
-                    value={(formData as any).estimatedDuration || "1-2 hours"}
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                  >
-                    <option>Under 1 hour</option>
-                    <option>1-2 hours</option>
-                    <option>2-4 hours</option>
-                    <option>Half day (4+ hours)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Scheduled Date & Time <span className="text-rose-500 ml-1">*</span>
-                  </label>
-                  <input
-                    type="datetime-local"
-                    name="scheduledTime"
-                    value={formData.scheduledTime}
-                    onChange={handleInputChange}
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Full Address / Landmark <span className="text-rose-500 ml-1">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={(formData as any).address || ""}
-                  onChange={handleInputChange}
-                  placeholder="e.g. Hostel 4, Room 201"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Pin Location on Map
-                </label>
-                <div className="rounded-xl overflow-hidden border-2 border-slate-200">
-                  <LocationPickerMap
-                    initialLocation={{
-                      lat: formData.latitude,
-                      lng: formData.longitude,
-                    }}
-                    onLocationSelect={(loc) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        latitude: loc.lat,
-                        longitude: loc.lng,
-                      }));
-                      setFormErrors((prev) => ({
-                        ...prev,
-                        latitude: "",
-                        longitude: "",
-                      }));
-                    }}
-                    height="200px"
-                  />
-                </div>
-                {(formErrors.latitude || formErrors.longitude) && (
-                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
-                    Please select a valid location.
-                  </p>
-                )}
-              </div>
-
-              <div className="pt-6 flex justify-end gap-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPostModal(false);
-                    setEditingTaskId(null);
-                  }}
-                  className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="rounded-xl bg-emerald-600 px-8 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700"
-                >
-                  {editingTaskId ? "Save Changes" : "Post Task"}
-                </button>
-              </div>
-            </form>
-          </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2. Review Bids placed on Task Modal */}
-      {showBidsModal && activeTaskForBids && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-lg font-bold text-slate-800">
-                  Review Bids
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Offers placed by nearby helpers for "{activeTaskForBids.title}"
+                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-ink" /> {profile.role === 'customer' ? 'Review submitted bugs and approve payment.' : 'Waiting for customer approval.'}
                 </p>
               </div>
-              <button
-                onClick={() => setShowBidsModal(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="mt-4 space-y-4">
-              {/* Bid 1 */}
-              <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700">
-                      R
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-slate-800">
-                        Rahul Sharma
-                      </h4>
-                      <div className="flex items-center gap-1 text-xs text-amber-500">
-                        <Star className="h-3 w-3 fill-current" />
-                        <span>4.9 (34 completed tasks)</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="block text-base font-bold text-emerald-600">
-                      ₹ {activeTaskForBids.budget - 10}
-                    </span>
-                    <span className="text-[10px] text-slate-500">
-                      Slightly below budget
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <p className="text-xs text-slate-600 bg-white p-2.5 rounded-lg border border-slate-100">
-                    "Hi! I am available right now and can bring my own tools. Let's get this done!"
-                  </p>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={() => {
-                      // Navigate to Chat
-                      setShowBidsModal(false);
-                      setActiveChatTask(activeTaskForBids);
-                      setShowChatModal(true);
-                    }}
-                    className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 transition cursor-pointer"
-                  >
-                    Chat First
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* 3. Razorpay Escrow payment popup */}
-      {showEscrowModal && activeTaskForEscrow && (
-        <PaymentEscrow
-          taskTitle={activeTaskForEscrow.title}
-          amount={activeTaskForEscrow.budget - 10}
-          helperName="Rahul Sharma"
-          onPaymentSuccess={handlePaymentSuccess}
-          onClose={() => setShowEscrowModal(false)}
-        />
-      )}
-
-      {/* 4. Chat modal overlay */}
-      {showChatModal && activeChatTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
-              <div>
-                <h3 className="text-lg font-bold text-slate-800">
-                  Task Chat Hub
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Related Task: "{activeChatTask.title}"
+        {/* Activity Feed Section (1/3 width) */}
+        <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <h3 className="text-2xl font-serif text-ink mb-6 flex items-center gap-2">
+            <Activity className="w-5 h-5" /> Activity Log
+          </h3>
+          <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
+            
+            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+                <CheckCircle className="w-5 h-5" />
+              </div>
+              <div className="flex-1 pt-1">
+                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Onboarding Flow UX Audit</p>
+                <p className="text-[13px] text-ink/60 leading-snug">
+                  {profile.role === 'customer' 
+                    ? 'Payment of ₹2,000 released from escrow to Sarah J.' 
+                    : 'Payment of ₹2,000 released from escrow to your wallet.'}
                 </p>
+                <span className="text-[11px] font-medium text-ink/40 mt-2 block">2h ago</span>
               </div>
-              <button
-                onClick={() => setShowChatModal(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="mt-4">
-              <ChatSim
-                taskId={activeChatTask.id}
-                currentUser={{
-                  id: profileData?.id || "user_123",
-                  name: profileData?.name || "You",
-                }}
-                otherUser={
-                  activeRole === "customer"
-                    ? { id: activeChatTask.assignedHelper?.id || "support", name: activeChatTask.assignedHelper?.name || "QuickMate Support" }
-                    : { id: activeChatTask.customer?.id || "customer", name: activeChatTask.customer?.name || "Customer" }
-                }
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. Review & Rating Modal */}
-      {showReviewModal && activeReviewTask && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
-              <h3 className="text-lg font-bold text-slate-800">
-                Complete Task & Review
-              </h3>
-              <button
-                onClick={() => setShowReviewModal(false)}
-                className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
             </div>
 
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div className="text-center">
-                <p className="text-sm font-medium text-slate-500">
-                  Please rate your helper, Rahul Sharma
+            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <div className="flex-1 pt-1">
+                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Funds Processed</p>
+                <p className="text-[13px] text-ink/60 leading-snug">
+                  {profile.role === 'customer'
+                    ? '₹10,000 successfully added to your secure escrow wallet via UPI.'
+                    : '₹1,250 withdrawal successfully transferred to your bank account.'}
                 </p>
-                <div className="mt-3 flex justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setReviewRating(star)}
-                      className="cursor-pointer hover:scale-110 transition-transform"
-                    >
-                      <Star
-                        className={`h-9 w-9 ${star <= reviewRating ? "text-amber-500 fill-current" : "text-slate-200"}`}
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Feedback comments
-                </label>
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  rows={3}
-                  placeholder="Share details about their punctuality, speed, and helpfulness..."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
-                  required
-                ></textarea>
-              </div>
-
-              <div className="rounded-xl bg-amber-50/80 p-4 border border-amber-100 text-xs text-amber-700 font-medium">
-                ⭐ Submitting this form releases the escrowed funds directly to
-                the helper's wallet.
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/20 transition-all cursor-pointer"
-              >
-                Submit & Release Funds
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-      {/* 6. Helper Profile Modal */}
-      {selectedProfile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
-              <h3 className="text-lg font-bold text-slate-800">
-                Mate Profile
-              </h3>
-              <button
-                onClick={() => setSelectedProfile(null)}
-                className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 text-4xl font-extrabold text-emerald-600 mb-4 shadow-sm border border-emerald-100">
-                {selectedProfile.name.charAt(0)}
-                {selectedProfile.isVerified && (
-                  <span className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white border-4 border-white" title="Verified Background Check">
-                    <Shield className="h-4 w-4" />
-                  </span>
-                )}
-              </div>
-              <h2 className="text-2xl font-bold text-slate-900">{selectedProfile.name}</h2>
-              <div className="mt-2 flex items-center justify-center gap-4 text-sm font-medium text-slate-600">
-                <div className="flex items-center gap-1 text-amber-500">
-                  <Star className="h-4 w-4 fill-current" />
-                  <span className="font-bold text-slate-700">{selectedProfile.rating.toFixed(1)}</span>
-                </div>
-                <span className="text-slate-300">•</span>
-                <div className="flex items-center gap-1">
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
-                  <span>{selectedProfile.completedTasksCount} jobs done</span>
-                </div>
+                <span className="text-[11px] font-medium text-ink/40 mt-2 block">5h ago</span>
               </div>
             </div>
-
-            <div className="mt-8 space-y-5">
-              <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">About</h4>
-                <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  "Hi! I am {selectedProfile.name}, an experienced professional ready to help you with your tasks. I take pride in my work and guarantee 100% satisfaction."
+            
+            <div className="flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+                <ArrowUpRight className="w-5 h-5" />
+              </div>
+              <div className="flex-1 pt-1">
+                <p className="text-[14px] font-bold text-ink leading-tight mb-1">
+                  {profile.role === 'customer' ? 'Task Live' : 'Bid Submitted'}
                 </p>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Skills</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedProfile.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-700"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-[13px] text-ink/60 leading-snug">
+                  {profile.role === 'customer'
+                    ? 'Your request "Beta testing for new iOS app" is live and receiving bids.'
+                    : 'You successfully placed a bid of ₹800 on "Beta testing".'}
+                </p>
+                <span className="text-[11px] font-medium text-ink/40 mt-2 block">1d ago</span>
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
-              <button
-                onClick={() => {
-                  setSelectedProfile(null);
-                  // Just open chat directly for demo purposes
-                  const matchedTask = tasks.find((t) => t.status === "OPEN") || tasks[0];
-                  setActiveChatTask(matchedTask);
-                  setShowChatModal(true);
-                }}
-                className="w-full flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
-              >
-                Send Message
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedProfile(null);
-                  const matchedTask = tasks.find((t) => t.status === "OPEN") || tasks[0];
-                  setActiveChatTask(matchedTask);
-                  setShowChatModal(true);
-                }}
-                className="w-full flex items-center justify-center rounded-xl bg-emerald-600 py-3.5 text-sm font-bold text-white hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
-              >
-                Hire Mate
-              </button>
+            <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
+              <button className="text-[13px] font-medium text-ink hover:underline">View All History</button>
             </div>
           </div>
         </div>
-      )}
-      {/* Mobile Bottom Navigation Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40 flex justify-around items-center px-2 py-2 pb-safe shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)]">
-        <button onClick={() => { setActiveRole("customer"); setCurrentTab('dashboard'); }} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'dashboard' && activeRole === 'customer' ? 'text-emerald-600' : 'text-slate-500'}`}>
-          <Briefcase className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Tasks</span>
-        </button>
-        <button onClick={() => {
-          if (profileData.isVerified || profileData.role === "helper") {
-            setActiveRole("helper");
-            setCurrentTab('dashboard');
-          } else {
-            setCurrentTab("profile");
-            setAccountTab("Verification");
-          }
-        }} className={`flex flex-col items-center gap-1 p-2 ${activeRole === 'helper' ? 'text-emerald-600' : 'text-slate-500'}`}>
-          <CheckCircle className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">
-            {profileData.verificationStatus === "VERIFIED" || profileData.role === "helper" ? "Mate" : "Become Mate"}
-          </span>
-        </button>
-        <button onClick={() => { setActiveRole("customer"); setShowPostModal(true); }} className="flex flex-col items-center gap-1 p-2 text-emerald-600 -mt-6 relative z-50">
-          <div className="bg-emerald-600 text-white p-3.5 rounded-full shadow-lg shadow-emerald-600/30">
-            <Plus className="w-6 h-6" />
-          </div>
-          <span className="text-[10px] font-bold mt-1 text-slate-500">Post a Task</span>
-        </button>
-        <button onClick={() => setCurrentTab('profile')} className={`flex flex-col items-center gap-1 p-2 ${currentTab === 'profile' ? 'text-emerald-600' : 'text-slate-500'}`}>
-          <User className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Profile</span>
-        </button>
+
       </div>
 
     </div>

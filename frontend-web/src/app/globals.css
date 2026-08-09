@@ -11,22 +11,28 @@
   --font-sans: var(--font-inter);
   
   /* Contra Colors */
-  --color-ink: #14171f;
+  --color-ink: #000000;
   --color-paper: #ffffff;
   --color-mist: #f5f6f9;
   --color-hairline: #e5e7eb;
   --color-slate: #677084;
   --color-fog: #9ba2b0;
   --color-graphite: #373f51;
-  --color-charcoal: #222834;
+  --color-charcoal: #0a0a0a;
   
-  --color-iris: #6a57e3;
+  --color-iris: #509209;
   --color-lilac: #ddd8ff;
-  --color-orchid: #cd74dd;
+  --color-orchid: #509209;
   --color-wine: #45192f;
   --color-coral: #ff5a5e;
   --color-lime: #f0fb96;
   
+  /* Midday Dashboard Colors -> Minimal High Contrast */
+  --color-parchment: #fafafa;
+  --color-sand: #ffffff;
+  --color-smoke: #878787;
+  --color-moss: #509209;
+
   /* Background gradient */
   --color-hero-wash-start: rgb(205, 243, 253);
   --color-hero-wash-mid: rgb(157, 222, 249);
@@ -44,6 +50,20 @@
   --color-emerald-700: #222834;
   --color-emerald-800: #14171f;
   --color-emerald-900: #050505;
+
+  /* Custom Animations */
+  --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @media (prefers-color-scheme: dark) {

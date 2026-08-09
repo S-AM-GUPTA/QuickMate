@@ -5,16 +5,12 @@ import Link from "next/link";
 import {
   ShieldCheck,
   Search,
-  Wrench,
-  Package,
-  Truck,
-  Paintbrush,
-  Home,
   CheckCircle,
   Star,
-  MapPin,
-  Clock,
   ThumbsUp,
+  ArrowRight,
+  Sparkles,
+  Zap
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -24,15 +20,13 @@ export default function LandingPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (token) {
-      setIsLoggedIn(true);
-    }
+    if (token) setIsLoggedIn(true);
   }, []);
 
   return (
-    <div className="min-h-screen bg-paper font-sans text-ink selection:bg-iris/20 overflow-x-hidden">
+    <div className="min-h-screen bg-paper font-sans text-ink selection:bg-moss/20 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-paper border-b border-hairline transition-all">
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-paper/80 backdrop-blur-md border-b border-hairline transition-all shadow-sm">
         <div className="flex items-center gap-3">
           <Link href="/">
             <img src="/logo.png" alt="QuickMate" className="h-10 sm:h-12 w-auto object-contain cursor-pointer" />
@@ -42,7 +36,7 @@ export default function LandingPage() {
           {isLoggedIn ? (
             <button
               onClick={() => router.push("/dashboard")}
-              className="rounded-[24px] bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+              className="rounded-md bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
             >
               Go to Dashboard
             </button>
@@ -50,19 +44,19 @@ export default function LandingPage() {
             <>
               <button
                 onClick={() => router.push("/login")}
-                className="text-[14px] font-medium text-ink hover:underline transition-all cursor-pointer"
+                className="text-[14px] font-medium text-ink hover:text-moss transition-colors cursor-pointer hidden md:block"
               >
                 Become a Helper
               </button>
               <button
                 onClick={() => router.push("/login")}
-                className="text-[14px] font-medium text-ink hover:underline transition-colors cursor-pointer mr-2"
+                className="text-[14px] font-medium text-ink hover:text-moss transition-colors cursor-pointer mr-2"
               >
                 Log in
               </button>
               <button
                 onClick={() => router.push("/login?mode=signup")}
-                className="rounded-[24px] bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:opacity-90 transition-opacity cursor-pointer"
+                className="rounded-md bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:bg-ink hover:-translate-y-0.5 transition-all duration-300"
               >
                 Sign up
               </button>
@@ -72,43 +66,39 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative px-6 pt-16 pb-20 md:pt-24 md:pb-32 overflow-hidden max-w-[1200px] mx-auto">
-        {/* Contra Hero Gradient Wash */}
-        <div 
-          className="absolute inset-0 w-full h-[600px] pointer-events-none -z-10 opacity-30" 
-          style={{ background: 'linear-gradient(90deg, rgb(205, 243, 253), rgb(157, 222, 249) 42.88%, rgb(151, 157, 241) 94.62%)' }} 
-        />
+      <main className="relative px-6 pt-10 pb-24 md:pt-16 md:pb-32 overflow-hidden max-w-[1200px] mx-auto animate-fade-in-up">
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-8 items-center justify-between">
           {/* Left Text Content */}
-          <div className="text-left max-w-2xl z-10 lg:-translate-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[16px] bg-mist text-ink text-[12px] font-medium mb-6 border border-hairline">
-              <Star className="h-3.5 w-3.5" />
-              Over 500 tasks completed for startups
+          <div className="text-left max-w-2xl z-10 w-full">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-mist text-ink text-[13px] font-medium mb-8 border border-hairline shadow-sm hover:shadow-md transition-shadow">
+              <Sparkles className="h-4 w-4 text-moss" />
+              Over 15,000 tasks completed for busy people everywhere
             </div>
             
-            <h1 className="text-[50px] md:text-[58px] lg:text-[64px] font-medium tracking-[-0.02em] text-ink mb-6 leading-[1.05]">
-              Get help. <br/>
-              Gain happiness.
+            <h1 className="text-[52px] md:text-[64px] lg:text-[72px] font-bold tracking-tight text-ink mb-6 leading-[1.1]">
+              Delegate work.<br/>
+              Scale faster.
             </h1>
             
-            <p className="text-[16px] text-slate mb-10 leading-[1.6] max-w-[580px] tracking-[-0.01em]">
-              Book trusted help for data entry, beta testing, pitch deck polish, and everyday startup operations, handled instantly.
+            <p className="text-[18px] text-slate mb-10 leading-[1.6] max-w-[580px]">
+              The premium marketplace for your everyday needs. Book trusted, vetted talent for cleaning, handyman services, deliveries, and more—instantly.
             </p>
+            
             {/* Search Bar */}
-            <div className="flex items-center w-full max-w-[580px] mb-10 bg-mist border border-hairline rounded-[16px] p-2 focus-within:border-ink transition-all">
+            <div className="flex items-center w-full max-w-[580px] mb-8 bg-paper border border-hairline shadow-lg shadow-slate/5 rounded-md p-2 focus-within:border-moss focus-within:ring-2 focus-within:ring-moss/20 transition-all duration-300">
               <div className="pl-4 pr-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-slate" />
               </div>
               <input 
                 type="text" 
                 placeholder="What do you need help with?" 
-                className="flex-1 bg-transparent text-[15px] placeholder:text-fog text-ink focus:outline-none min-w-0 py-2 font-sans"
+                className="flex-1 bg-transparent text-[16px] placeholder:text-fog text-ink focus:outline-none min-w-0 py-3 font-sans"
               />
               <div className="flex items-center gap-2 pl-2">
                 <button 
                   onClick={() => router.push("/login")}
-                  className="rounded-[24px] bg-charcoal px-6 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition-opacity shadow-md flex items-center whitespace-nowrap"
+                  className="rounded-md bg-charcoal px-6 py-3 text-[15px] font-medium text-paper hover:bg-ink shadow-md hover:shadow-lg transition-all duration-300 flex items-center whitespace-nowrap"
                 >
                   Post a Task
                 </button>
@@ -117,159 +107,139 @@ export default function LandingPage() {
 
             {/* Quick Links */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[12px] font-sans font-medium text-slate mr-2">Popular Categories:</span>
-              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-[16px] bg-mist px-3 py-1.5 text-[14px] font-medium text-ink hover:bg-hairline transition-all">
-                 Pitch Deck Design
-              </button>
-              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-[16px] bg-mist px-3 py-1.5 text-[14px] font-medium text-ink hover:bg-hairline transition-all">
-                 Beta Testing
-              </button>
-              <button onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-[16px] bg-mist px-3 py-1.5 text-[14px] font-medium text-ink hover:bg-hairline transition-all">
-                 Data Entry
-              </button>
+              <span className="text-[13px] font-medium text-slate mr-2">Popular:</span>
+              {["Handyman", "Cleaning", "Delivery", "Tech Help"].map((cat) => (
+                <button key={cat} onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-md bg-mist border border-hairline px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-paper hover:border-slate hover:shadow-sm transition-all">
+                   {cat}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Right Graphics - Image Collage */}
-          <div className="relative hidden lg:block h-[500px] w-full">
-            {/* Top Right Image */}
-            <div className="absolute top-[0%] right-[0%] w-[60%] h-[60%] rounded-[4px] overflow-hidden border border-hairline z-20 transition-all duration-500">
-              <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=600&auto=format&fit=crop" alt="Startup Team" className="w-full h-full object-cover" />
+          {/* Right Graphics - Enhanced Collage */}
+          <div className="relative hidden lg:block h-[560px] w-full max-w-[500px]">
+            {/* Main Image */}
+            <div className="absolute top-[5%] right-[0%] w-[80%] h-[75%] rounded-lg overflow-hidden border border-hairline z-20 shadow-2xl shadow-charcoal/10 hover:-translate-y-2 transition-transform duration-500">
+              <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1200&auto=format&fit=crop" alt="Local Taskers at Work" className="w-full h-full object-cover" />
             </div>
             
-            {/* Bottom Left Image */}
-            <div className="absolute bottom-[5%] left-[5%] w-[55%] h-[55%] rounded-[4px] overflow-hidden border border-hairline z-30 transition-all duration-500">
-              <img src="https://images.unsplash.com/photo-1556761175-5972d9314bf1?q=80&w=600&auto=format&fit=crop" alt="Coworking Space" className="w-full h-full object-cover" />
+            {/* Floating Graphic 1 */}
+            <div className="absolute bottom-[10%] left-[-10%] w-[60%] h-[40%] rounded-lg overflow-hidden border border-hairline z-30 shadow-xl shadow-charcoal/10 hover:-translate-y-2 transition-transform duration-500 delay-100 bg-sand">
+              <img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop" alt="Tools" className="w-full h-full object-cover" />
             </div>
 
-            {/* Middle decorative graphic */}
-            <div className="absolute bottom-[20%] right-[10%] bg-paper p-4 rounded-[4px] border border-hairline z-40 shadow-lg">
+            {/* Decorative Badge */}
+            <div className="absolute top-[15%] left-[-5%] bg-paper/90 backdrop-blur-md p-4 rounded-md border border-hairline z-40 shadow-xl animate-fade-in-up" style={{ animationDelay: '300ms' }}>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-[4px] bg-mist border border-hairline flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-ink" />
+                <div className="h-12 w-12 rounded-md bg-mist border border-hairline flex items-center justify-center">
+                  <ShieldCheck className="h-6 w-6 text-moss" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-medium text-ink">Verified Mates</p>
-                  <p className="text-[12px] text-slate">Identity checked</p>
+                  <p className="text-[15px] font-bold text-ink">Verified Mates</p>
+                  <p className="text-[13px] text-slate font-medium">100% Identity checked</p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Live Activity Stats */}
-        <div className="max-w-[1200px] mx-auto mt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-paper border border-hairline rounded-[4px] p-5 flex flex-col items-center justify-center text-center">
-              <p className="text-[32px] font-medium text-ink mb-1 leading-none">18</p>
-              <p className="text-[14px] font-medium text-slate">Mates Online</p>
-            </div>
-            
-            <div className="bg-paper border border-hairline rounded-[4px] p-5 flex flex-col items-center justify-center text-center">
-              <p className="text-[32px] font-medium text-ink mb-1 leading-none">6m</p>
-              <p className="text-[14px] font-medium text-slate">Avg. Response Time</p>
-            </div>
-
-            <div className="bg-paper border border-hairline rounded-[4px] p-5 flex flex-col items-center justify-center text-center">
-              <p className="text-[32px] font-medium text-ink mb-1 leading-none">12</p>
-              <p className="text-[14px] font-medium text-slate">Tasks Posted Today</p>
-            </div>
-
-            <div className="bg-paper border border-hairline rounded-[4px] p-5 flex flex-col items-center justify-center text-center">
-              <p className="text-[32px] font-medium text-ink mb-1 leading-none">99%</p>
-              <p className="text-[14px] font-medium text-slate">Happy Founders</p>
             </div>
           </div>
         </div>
       </main>
 
-      {/* Popular Projects Section */}
-      <section className="py-24 px-6 max-w-[1200px] mx-auto">
-        <h2 className="text-[32px] md:text-[40px] font-medium text-ink mb-10 text-center tracking-[-0.01em]">
-          Popular Projects for Startups
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              title: "Pitch Deck Design",
-              price: "Avg. ₹500-1500",
-              img: "https://images.unsplash.com/photo-1553877522-43269d4ea984?q=80&w=600&auto=format&fit=crop",
-            },
-            {
-              title: "Beta Testing",
-              price: "Avg. ₹300-800",
-              img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop",
-            },
-            {
-              title: "Data Entry",
-              price: "Avg. ₹200-500",
-              img: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=600&auto=format&fit=crop",
-            },
-            {
-              title: "Virtual Assistance",
-              price: "Avg. ₹400-1000",
-              img: "https://images.unsplash.com/photo-1573164713988-8665fc963095?q=80&w=600&auto=format&fit=crop",
-            },
-          ].map((project, idx) => (
-            <div
-              key={idx}
-              className="group cursor-pointer rounded-[4px] border border-hairline bg-paper hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
-            >
-              <div className="h-40 overflow-hidden bg-mist">
-                <img
-                  src={project.img}
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+      {/* Trusted By Logos */}
+      <section className="py-10 border-y border-hairline bg-mist/50 overflow-hidden">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <p className="text-center text-[13px] font-bold tracking-widest text-slate uppercase mb-8">Trusted by thousands of busy individuals</p>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
+            {['Acme Corp', 'GlobalBank', 'NexusFlow', 'Quantum', 'StarkTech'].map((company) => (
+              <div key={company} className="text-[20px] font-black tracking-tighter text-charcoal">
+                {company}
               </div>
-              <div className="p-4 flex-1 flex flex-col">
-                <h3 className="text-[16px] font-medium text-ink">
-                  {project.title}
-                </h3>
-                <p className="text-[14px] text-slate mt-1 mb-4">
-                  {project.price}
-                </p>
-                <button className="mt-auto text-left text-[14px] font-medium text-graphite group-hover:underline">
-                  View task →
-                </button>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="bg-transparent py-24 px-6">
+      <section id="how-it-works" className="bg-paper py-24 px-6 relative">
         <div className="max-w-[1200px] mx-auto">
-          <h2 className="text-[32px] md:text-[40px] font-medium text-ink mb-16 text-center tracking-[-0.01em]">
-            How QuickMate Works
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-[36px] md:text-[44px] font-bold text-ink mb-4 tracking-tight">
+              Seamless hiring. Guaranteed results.
+            </h2>
+            <p className="text-[18px] text-slate max-w-2xl mx-auto leading-relaxed">
+              We've stripped away the friction of traditional freelancing platforms. Hire top-tier talent in three simple steps.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
             {[
               {
                 icon: Search,
-                title: "1. Describe your task",
-                desc: "Choose from a variety of startup services and select the day and time you'd like a qualified mate to show up.",
+                title: "1. Post Your Request",
+                desc: "Describe what you need in plain English. Choose your budget, timeline, and required skills instantly.",
               },
               {
-                icon: Star,
-                title: "2. Choose a Mate",
-                desc: "Browse a list of background-checked freelancers, view their prices, and read verified reviews from founders.",
+                icon: Zap,
+                title: "2. Match & Hire",
+                desc: "Get matched with rigorously vetted professionals. Review their portfolios, read reviews, and hire with one click.",
               },
               {
                 icon: CheckCircle,
-                title: "3. Get it done",
-                desc: "Chat securely, manage your booking, pay directly through escrow, and leave a review all within the platform.",
+                title: "3. Approve & Pay",
+                desc: "Review the completed work. We hold your payment securely in escrow until you're 100% satisfied.",
               },
             ].map((step, idx) => (
-              <div key={idx} className="text-center group">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[16px] bg-mist text-ink mb-6 border border-hairline group-hover:border-ink transition-all duration-300">
-                  <step.icon className="h-6 w-6" />
+              <div key={idx} className="bg-paper border border-hairline rounded-md p-8 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group flex flex-col h-full animate-fade-in-up" style={{ animationDelay: `${idx * 150}ms` }}>
+                <div className="h-14 w-14 rounded-md bg-mist flex items-center justify-center mb-6 group-hover:bg-moss/10 transition-colors border border-hairline">
+                  <step.icon className="h-7 w-7 text-ink group-hover:text-moss transition-colors" />
                 </div>
-                <h3 className="text-[20px] font-medium text-ink mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-[15px] text-slate leading-[1.6]">{step.desc}</p>
+                <h3 className="text-[22px] font-bold text-ink mb-3">{step.title}</h3>
+                <p className="text-[16px] text-slate leading-relaxed flex-1">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Popular Projects Section */}
+      <section className="py-24 px-6 bg-mist/30 border-y border-hairline">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 animate-fade-in-up">
+            <div>
+              <h2 className="text-[36px] md:text-[44px] font-bold text-ink mb-4 tracking-tight">
+                Popular everyday tasks
+              </h2>
+              <p className="text-[18px] text-slate max-w-xl leading-relaxed">
+                Browse pre-scoped projects with transparent pricing. No back-and-forth negotiation required.
+              </p>
+            </div>
+            <button className="hidden md:flex items-center gap-2 text-[15px] font-bold text-moss hover:text-ink transition-colors">
+              View all projects <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Furniture Assembly", price: "₹499", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=600&auto=format&fit=crop" },
+              { title: "Deep Cleaning", price: "₹899", img: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=600&auto=format&fit=crop" },
+              { title: "Appliance Repair", price: "₹349", img: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?q=80&w=600&auto=format&fit=crop" },
+              { title: "Moving Help", price: "₹799", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop" },
+            ].map((project, idx) => (
+              <div
+                key={idx}
+                className="group cursor-pointer rounded-md border border-hairline bg-paper shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 overflow-hidden flex flex-col animate-fade-in-up"
+                style={{ animationDelay: `${idx * 100}ms` }}
+              >
+                <div className="h-48 overflow-hidden bg-mist relative">
+                  <div className="absolute inset-0 bg-charcoal/10 group-hover:bg-transparent transition-colors z-10" />
+                  <img src={project.img} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="text-[18px] font-bold text-ink mb-1">{project.title}</h3>
+                  <p className="text-[15px] font-medium text-slate mb-6">Starting at {project.price}</p>
+                  <button className="mt-auto w-full py-2.5 rounded-md border border-hairline font-bold text-[14px] text-ink group-hover:bg-ink group-hover:text-paper group-hover:border-ink transition-all">
+                    View Details
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -277,72 +247,170 @@ export default function LandingPage() {
       </section>
 
       {/* Trust & Safety Section */}
-      <section className="py-24 px-6 max-w-[900px] mx-auto text-center">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-[16px] bg-mist mb-8 border border-hairline">
-          <ShieldCheck className="h-8 w-8 text-ink" />
+      <section className="py-24 px-6 max-w-[1000px] mx-auto text-center animate-fade-in-up">
+        <div className="inline-flex h-20 w-20 items-center justify-center rounded-md bg-mist mb-8 border border-hairline shadow-sm">
+          <ShieldCheck className="h-10 w-10 text-moss" />
         </div>
-        <h2 className="text-[32px] md:text-[40px] font-medium text-ink mb-6 tracking-[-0.01em]">
+        <h2 className="text-[36px] md:text-[44px] font-bold text-ink mb-6 tracking-tight">
           The QuickMate Pledge
         </h2>
-        <p className="text-[16px] text-slate leading-[1.6] mb-12 max-w-2xl mx-auto">
-          Your safety and satisfaction are our top priorities. Every mate
-          undergoes strict identity verification and background checks. With our
-          secure escrow payments, your money is held safely until the job is
-          completed to your satisfaction.
+        <p className="text-[18px] text-slate leading-[1.7] mb-16 max-w-3xl mx-auto">
+          Your peace of mind is our product. We enforce strict identity verification, rigorous portfolio reviews, and a secure escrow system. You only pay when the work meets your exact standards.
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-          <div className="p-6 rounded-[4px] bg-paper border border-hairline hover:border-ink transition-colors flex flex-col items-center text-center">
-            <CheckCircle className="h-6 w-6 text-ink mb-3" />
-            <h4 className="font-medium text-ink mb-1">Vetted Mates</h4>
-            <p className="text-[14px] text-slate">
-              Rigorous background and identity checks.
+        
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
+          <div className="p-8 rounded-md bg-paper border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start">
+            <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+              <CheckCircle className="h-6 w-6 text-ink" />
+            </div>
+            <h4 className="text-[18px] font-bold text-ink mb-3">Top 3% Talent</h4>
+            <p className="text-[15px] text-slate leading-relaxed">
+              We accept only the top echelon of applicants through our rigorous screening process.
             </p>
           </div>
-          <div className="p-6 rounded-[4px] bg-paper border border-hairline hover:border-ink transition-colors flex flex-col items-center text-center">
-            <ShieldCheck className="h-6 w-6 text-ink mb-3" />
-            <h4 className="font-medium text-ink mb-1">Secure Escrow</h4>
-            <p className="text-[14px] text-slate">
-              Payments are protected until job completion.
+          <div className="p-8 rounded-md bg-paper border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-moss to-orchid" />
+            <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+              <ShieldCheck className="h-6 w-6 text-ink" />
+            </div>
+            <h4 className="text-[18px] font-bold text-ink mb-3">Secure Escrow</h4>
+            <p className="text-[15px] text-slate leading-relaxed">
+              Funds are held securely. You release payment only when you approve the final delivery.
             </p>
           </div>
-          <div className="p-6 rounded-[4px] bg-paper border border-hairline hover:border-ink transition-colors flex flex-col items-center text-center">
-            <ThumbsUp className="h-6 w-6 text-ink mb-3" />
-            <h4 className="font-medium text-ink mb-1">
-              Happiness Guarantee
-            </h4>
-            <p className="text-[14px] text-slate">
-              We'll make it right if things go wrong.
+          <div className="p-8 rounded-md bg-paper border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start">
+            <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+              <ThumbsUp className="h-6 w-6 text-ink" />
+            </div>
+            <h4 className="text-[18px] font-bold text-ink mb-3">Money-Back Guarantee</h4>
+            <p className="text-[15px] text-slate leading-relaxed">
+              Not satisfied? Our support team will mediate, replace the mate, or refund you entirely.
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-24 px-6 text-center">
-        <h3 className="mb-4 text-[40px] md:text-[48px] font-medium text-ink tracking-[-0.02em]">
-          Ready to tackle your to-do list?
-        </h3>
-        <p className="mx-auto mb-8 max-w-2xl text-[16px] text-slate leading-[1.6]">
-          Don&apos;t let chores and errands pile up. Find a trusted Mate today and
-          enjoy your free time again.
-        </p>
-        <button
-          onClick={() => router.push("/login")}
-          className="rounded-[24px] bg-charcoal px-8 py-3 text-[15px] font-medium text-paper shadow-md hover:opacity-90 transition-opacity"
-        >
-          Get Started
-        </button>
+      {/* Testimonials Section */}
+      <section className="bg-ink py-24 px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <h2 className="text-[36px] md:text-[44px] font-bold text-paper mb-4 tracking-tight">
+              Trusted by operators everywhere
+            </h2>
+            <p className="text-[18px] text-fog max-w-2xl mx-auto">
+              Don't just take our word for it. Here's what busy people are saying about scaling their output with QuickMate.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "QuickMate saved me this weekend. The mate I hired was professional, fast, and assembled all my IKEA furniture perfectly. Worth every penny.",
+                author: "Priya Sharma",
+                role: "Homeowner",
+              },
+              {
+                quote: "I needed my entire apartment deep cleaned before moving out. My mate delivered stunning results overnight. Incredible service.",
+                author: "Rahul Verma",
+                role: "Tenant",
+              },
+              {
+                quote: "I use QuickMate every time I have a plumbing issue or need an errand run. The vetting process makes me feel totally safe.",
+                author: "Ananya Desai",
+                role: "Busy Parent",
+              },
+            ].map((testimonial, idx) => (
+              <div key={idx} className="bg-charcoal p-8 rounded-md border border-graphite shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col h-full animate-fade-in-up" style={{ animationDelay: `${idx * 150}ms` }}>
+                <div className="flex gap-1 mb-6">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
+                  ))}
+                </div>
+                <p className="text-[16px] text-paper leading-relaxed mb-8 flex-1 italic">
+                  "{testimonial.quote}"
+                </p>
+                <div className="flex items-center gap-4 pt-6 border-t border-graphite">
+                  <div className="h-12 w-12 rounded-md bg-moss text-paper flex items-center justify-center font-bold text-[18px]">
+                    {testimonial.author.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-bold text-paper">{testimonial.author}</p>
+                    <p className="text-[13px] text-fog">{testimonial.role}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-32 px-6 text-center relative overflow-hidden">
+        {/* Decorative background */}
+        <div className="absolute inset-0 bg-mist opacity-50 -z-10" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-moss/10 blur-[100px] rounded-full -z-10" />
+        
+        <div className="max-w-3xl mx-auto animate-fade-in-up">
+          <h3 className="mb-6 text-[44px] md:text-[56px] font-bold text-ink tracking-tight leading-tight">
+            Ready to scale your output?
+          </h3>
+          <p className="mb-10 text-[20px] text-slate leading-relaxed">
+            Stop letting operations slow you down. Find a trusted Mate today and get back to building the future.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full sm:w-auto rounded-md bg-charcoal px-10 py-4 text-[16px] font-bold text-paper shadow-xl hover:bg-ink hover:-translate-y-1 transition-all duration-300"
+            >
+              Start Hiring Now
+            </button>
+            <button
+              onClick={() => router.push("/login")}
+              className="w-full sm:w-auto rounded-md bg-paper border border-hairline px-10 py-4 text-[16px] font-bold text-ink shadow-sm hover:bg-mist hover:-translate-y-1 transition-all duration-300"
+            >
+              Become a Mate
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-hairline bg-paper py-12 text-center text-slate">
-        <div className="flex items-center justify-center mb-6">
-          <Link href="/" className="flex items-center justify-center">
-            <img src="/logo.png" alt="QuickMate" className="h-10 w-auto object-contain" />
-          </Link>
+      <footer className="border-t border-hairline bg-paper py-16 px-6">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="col-span-1 md:col-span-2">
+            <Link href="/" className="inline-block mb-6">
+              <img src="/logo.png" alt="QuickMate" className="h-10 w-auto object-contain" />
+            </Link>
+            <p className="text-[15px] text-slate max-w-sm leading-relaxed">
+              QuickMate is the premium marketplace to book trusted, vetted talent for your everyday needs and projects.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-ink mb-6">Product</h4>
+            <ul className="space-y-4">
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">How it works</Link></li>
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Pricing</Link></li>
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Enterprise</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-ink mb-6">Company</h4>
+            <ul className="space-y-4">
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">About Us</Link></li>
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Trust & Safety</Link></li>
+              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Contact</Link></li>
+            </ul>
+          </div>
         </div>
-        <p className="text-[14px]">
-          © 2026 QuickMate. All rights reserved.
-        </p>
+        <div className="max-w-[1200px] mx-auto pt-8 border-t border-hairline flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[14px] text-slate">
+            © 2026 QuickMate. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link href="#" className="text-[14px] text-slate hover:text-ink transition-colors">Privacy Policy</Link>
+            <Link href="#" className="text-[14px] text-slate hover:text-ink transition-colors">Terms of Service</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );

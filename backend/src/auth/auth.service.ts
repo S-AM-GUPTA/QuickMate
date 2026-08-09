@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { FirebaseService } from '../firebase/firebase.service';
 import * as bcrypt from 'bcrypt';
 import * as nodemailer from 'nodemailer';
 
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private firebaseService: FirebaseService,
   ) {}
 
   async checkUserExists(identifier: string) {
@@ -159,4 +161,40 @@ export class AuthService {
       user: { id: user.id, email: user.email, name: user.name, role: user.role },
     };
   }
+
+  async loginWithOAuth(idToken: string) {
+    try {
+      const decodedToken = await this.firebaseService.getAuth().verifyIdToken(idToken);
+      const email = decodedToken.email;
+      const name = decodedToken.name || 'OAuth User';
+      
+      if (!email) {
+        throw new BadRequestException('OAuth token did not contain an email');
+      }
+
+      let user = await this.prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        user = await this.prisma.user.create({
+          data: {
+            id: 'user_' + Math.random().toString(36).substr(2, 9),
+            email,
+            name,
+            isVerified: true,
+          },
+        });
+      }
+
+      const payload = { sub: user.id, role: user.role };
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid OAuth token');
+    }
+  }
 }
+

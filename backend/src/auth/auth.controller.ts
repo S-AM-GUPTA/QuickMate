@@ -51,4 +51,11 @@ export class AuthController {
       dto.phone
     );
   }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('oauth')
+  oauth(@Body('idToken') idToken: string) {
+    return this.authService.loginWithOAuth(idToken);
+  }
 }

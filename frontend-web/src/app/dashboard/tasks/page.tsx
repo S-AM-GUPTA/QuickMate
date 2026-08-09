@@ -1,0 +1,277 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { api } from "@/lib/api";
+import { AlertTriangle, Plus, X, MapPin } from "lucide-react";
+import TaskCard, { Task } from "@/components/TaskCard";
+import { useNotification } from "@/context/NotificationContext";
+import { useProfile } from "@/context/ProfileContext";
+import dynamic from 'next/dynamic';
+
+// Dynamically import map to avoid SSR issues
+const MapPicker = dynamic(() => import('@/components/MapPicker'), { ssr: false });
+
+export default function TasksPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { addNotification } = useNotification();
+  const { profile } = useProfile();
+  
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [showPostModal, setShowPostModal] = useState(false);
+
+  const categories = [
+    "All",
+    "Handyman",
+    "Cleaning",
+    "Tech Support",
+    "Delivery",
+    "Errands",
+  ];
+
+  const fetchTasks = async () => {
+    try {
+      const res = await api.get('/tasks');
+      setTasks(res.data);
+    } catch (err: any) {
+      if (err.response?.status !== 401) {
+        console.warn('Failed to fetch tasks', err.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  useEffect(() => {
+    if (searchParams.get("post") === "true") {
+      setShowPostModal(true);
+    }
+  }, [searchParams]);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    budget: "" as unknown as number,
+    category: "Handyman",
+    urgency: "medium" as "low" | "medium" | "urgent",
+    latitude: 28.6304,
+    longitude: 77.2177,
+    scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
+    address: "",
+  });
+
+  const handlePostTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const payload = { ...formData };
+      payload.scheduledTime = new Date(formData.scheduledTime).toISOString();
+      await api.post("/tasks", payload);
+      addNotification(`Task "${formData.title}" posted successfully!`);
+      
+      setShowPostModal(false);
+      router.push("/dashboard/tasks"); // remove query param
+      fetchTasks();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to post task.");
+    }
+  };
+
+  // Filter by category selected in UI
+  let filteredTasks = selectedCategory === "All" 
+    ? tasks 
+    : tasks.filter(t => t.category.toLowerCase() === selectedCategory.toLowerCase());
+    
+  // Filter for Pro Mates (Specialists) to only see relevant tasks
+  if (profile.role === "helper" && profile.mateTier === "specialist" && profile.profession) {
+    const profString = profile.profession.toLowerCase();
+    filteredTasks = filteredTasks.filter(t => {
+      const catString = t.category.toLowerCase();
+      return profString.includes(catString) || catString.includes(profString);
+    });
+  }
+
+  return (
+    <div className="space-y-6 animate-fade-in-up">
+      
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink">Tasks Market</h1>
+          <p className="text-smoke font-medium text-[16px] mt-1">
+            {profile.role === "customer" 
+              ? "Browse active operations or post your own."
+              : "Find tasks matching your skills and place bids."}
+          </p>
+        </div>
+        {profile.role === "customer" && (
+          <button 
+            onClick={() => setShowPostModal(true)}
+            className="bg-charcoal text-paper px-6 py-2.5 rounded-full font-medium text-[14px] hover:opacity-90 transition-opacity flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> New Task
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 border-b border-smoke/30 pb-6">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`rounded-full px-4 py-2 text-[14px] font-medium transition-all border ${
+              selectedCategory === cat
+                ? "bg-charcoal text-paper border-charcoal"
+                : "bg-sand border-smoke/30 text-smoke hover:border-ink hover:text-ink"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredTasks.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-smoke/40 bg-sand py-16">
+            <AlertTriangle className="h-8 w-8 text-smoke/50 mb-2" />
+            <p className="text-[14px] font-medium text-smoke">No Tasks Found</p>
+          </div>
+        ) : (
+          filteredTasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              viewMode={profile.role}
+              onPlaceBid={() => addNotification(`Placed bid on ${task.title}`)}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Post Task Modal with Map */}
+      {showPostModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-paper rounded-2xl border border-smoke/30 w-full max-w-4xl max-h-[90vh] overflow-y-auto relative animate-fade-in-up shadow-2xl">
+            <button 
+              onClick={() => {
+                setShowPostModal(false);
+                router.push("/dashboard/tasks");
+              }}
+              className="absolute top-6 right-6 p-2 bg-sand rounded-full hover:bg-smoke/20 transition-colors z-10"
+            >
+              <X className="w-5 h-5 text-ink" />
+            </button>
+
+            <div className="p-8">
+              <h2 className="text-[28px] font-serif tracking-tight text-ink mb-6">Create New Operation</h2>
+              
+              <form onSubmit={handlePostTask}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  
+                  {/* Left Column: Form Fields */}
+                  <div className="space-y-5">
+                    <div>
+                      <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Title</label>
+                      <input 
+                        type="text" required
+                        className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                        placeholder="e.g. Need help assembling IKEA furniture"
+                        value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Category</label>
+                        <select 
+                          className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all appearance-none"
+                          value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}
+                        >
+                          {categories.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Budget (₹)</label>
+                        <input 
+                          type="number" required min="10"
+                          className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                          placeholder="500"
+                          value={formData.budget} onChange={e => setFormData({...formData, budget: Number(e.target.value)})}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Urgency</label>
+                        <select 
+                          className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all appearance-none"
+                          value={formData.urgency} onChange={e => setFormData({...formData, urgency: e.target.value as any})}
+                        >
+                          <option value="low">Low Priority</option>
+                          <option value="medium">Standard</option>
+                          <option value="urgent">Urgent</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Deadline</label>
+                        <input 
+                          type="datetime-local" required
+                          className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                          value={formData.scheduledTime} onChange={e => setFormData({...formData, scheduledTime: e.target.value})}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Description</label>
+                      <textarea 
+                        required rows={5}
+                        className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all resize-none"
+                        placeholder="Detail the specific requirements..."
+                        value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Right Column: Location Map */}
+                  <div className="flex flex-col h-[400px] md:h-auto">
+                    <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Task Location</label>
+                    <p className="text-[12px] text-smoke mb-3">Click on the map to set the exact coordinates for this task.</p>
+                    
+                    <div className="flex-1 bg-sand border border-smoke/30 rounded-xl overflow-hidden relative min-h-[300px]">
+                      <MapPicker 
+                        defaultLat={formData.latitude} 
+                        defaultLng={formData.longitude}
+                        onLocationSelect={(lat, lng, address) => setFormData({ ...formData, latitude: lat, longitude: lng, address })} 
+                      />
+                    </div>
+
+                    {formData.address && (
+                      <div className="mt-4 flex items-start gap-2 bg-mist p-3 rounded-xl border border-smoke/10">
+                        <MapPin className="w-4 h-4 text-ink mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-[12px] font-semibold text-ink uppercase tracking-wider">Selected Address</p>
+                          <p className="text-[13px] text-smoke mt-0.5 leading-snug">{formData.address}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+
+                <div className="pt-6 mt-6 border-t border-smoke/20 flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowPostModal(false)} className="px-6 py-3 rounded-full font-medium text-[14px] text-ink bg-sand hover:bg-smoke/20 transition-colors">Cancel</button>
+                  <button type="submit" className="px-8 py-3 rounded-full font-medium text-[14px] text-paper bg-charcoal hover:opacity-90 transition-opacity">Post Task Now</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

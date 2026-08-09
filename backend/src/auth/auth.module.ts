@@ -5,6 +5,7 @@ import { AuthGuard } from './auth.guard';
 import { PrismaModule } from '../prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { AuthService } from './auth.service';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    FirebaseService,
   ],
   exports: [AuthService],
 })

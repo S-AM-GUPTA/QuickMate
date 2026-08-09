@@ -54,6 +54,7 @@ export default function LoginPage() {
       const { access_token, user } = response.data;
       localStorage.setItem("accessToken", access_token);
       localStorage.setItem("userProfile", JSON.stringify(user));
+      document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
       
       router.push("/dashboard");
     } catch (err: any) {
@@ -85,6 +86,7 @@ export default function LoginPage() {
       const { access_token, user } = response.data;
       localStorage.setItem("accessToken", access_token);
       localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
+      document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
       
       router.push("/dashboard");
     } catch (err: any) {
@@ -98,6 +100,7 @@ export default function LoginPage() {
           const { access_token, user } = loginRes.data;
           localStorage.setItem("accessToken", access_token);
           localStorage.setItem("userProfile", JSON.stringify({ ...user, postalCode }));
+          document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
           router.push("/dashboard");
           return;
         } catch (loginErr: any) {
@@ -118,6 +121,42 @@ export default function LoginPage() {
     }
   };
 
+  const handleOAuth = async (providerName: "google" | "github") => {
+    setError("");
+    setLoading(true);
+    try {
+      // Dynamically import Firebase to avoid Turbopack compiler issues
+      const { signInWithPopup, GoogleAuthProvider, GithubAuthProvider } = await import("firebase/auth");
+      const { auth } = await import("@/lib/firebase");
+      
+      const provider = providerName === "google" ? new GoogleAuthProvider() : new GithubAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const idToken = await result.user.getIdToken();
+      
+      const response = await api.post("/auth/oauth", { idToken });
+      
+      const { access_token, user } = response.data;
+      localStorage.setItem("accessToken", access_token);
+      localStorage.setItem("userProfile", JSON.stringify(user));
+      document.cookie = `accessToken=${access_token}; path=/; max-age=86400;`;
+      
+      router.push("/dashboard");
+    } catch (err: any) {
+      if (err.code === 'auth/cancelled-popup-request' || err.code === 'auth/popup-closed-by-user') {
+        // User closed the popup or clicked twice, ignore it gracefully
+        return;
+      }
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        setError("An account already exists with the same email address. Please sign in using the original provider (e.g., Google or Email) you used to create the account.");
+        return;
+      }
+      console.error(err);
+      setError(err.message || `Failed to log in with ${providerName}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row font-sans">
       {/* Branding / Visual Side */}
@@ -125,24 +164,20 @@ export default function LoginPage() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=1920&auto=format&fit=crop"
-            alt="Campus Background"
+            src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1920&auto=format&fit=crop"
+            alt="Local Service Professional Background"
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-black/60" />
         </div>
 
-        <div className="relative z-10">
-          <Link href="/">
-            <img src="/logo.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto" />
-          </Link>
-        </div>
-        <div className="py-12 lg:py-0 relative z-10">
-          <h1 className="text-[56px] sm:text-[72px] lg:text-[88px] font-black leading-[0.9] tracking-[-0.04em] uppercase">
+
+        <div className="py-12 lg:py-0 relative z-10 mt-auto mb-8 lg:mb-16">
+          <h1 className="text-[40px] sm:text-[48px] lg:text-[56px] font-black leading-[1] tracking-[-0.02em] uppercase">
             Get It<br />Done.<br />Now.
           </h1>
           <p className="mt-6 text-[16px] sm:text-[18px] text-[#cccccc] max-w-sm font-medium">
-            Book a trusted mate. No hassle, no wait. Pure efficiency for your startup.
+            Book a trusted mate. No hassle, no wait. Pure efficiency for your everyday needs.
           </p>
         </div>
         <div className="text-[11px] font-bold tracking-widest text-[#cccccc] uppercase hidden lg:block relative z-10">
@@ -153,6 +188,11 @@ export default function LoginPage() {
       {/* Form Side */}
       <div className="lg:w-1/2 bg-white flex items-center justify-center p-8 sm:p-12 lg:p-16 relative">
         <div className="w-full max-w-[440px]">
+          <div className="mb-8">
+            <Link href="/">
+              <img src="/logo.png" alt="QuickMate Logo" className="h-10 sm:h-12 w-auto" />
+            </Link>
+          </div>
           <h2 className="text-[32px] sm:text-[40px] font-bold tracking-tight text-black mb-10">
             {isSignup ? "Create account" : "Log in"}
           </h2>
@@ -165,9 +205,9 @@ export default function LoginPage() {
 
           {!isSignup ? (
             /* LOGIN FORM */
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold tracking-widest uppercase text-[#595959] mb-2">
+                <label className="block text-[11px] font-bold tracking-widest uppercase text-[#595959] mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -175,15 +215,20 @@ export default function LoginPage() {
                   required
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="founder@startup.co"
-                  className="w-full rounded-full border border-[#d9d9d9] px-5 py-4 text-[16px] font-medium text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080]"
+                  placeholder="user@example.com"
+                  className="w-full rounded-full border border-[#d9d9d9] px-4 py-3 text-[15px] font-medium text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080]"
                 />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold tracking-widest uppercase text-[#595959] mb-2">
-                  Password
-                </label>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="block text-[11px] font-bold tracking-widest uppercase text-[#595959]">
+                    Password
+                  </label>
+                  <Link href="#" className="text-[12px] font-bold text-black hover:underline underline-offset-4">
+                    Forgot password?
+                  </Link>
+                </div>
                 <div className="relative">
                   <input
                     type={showPassword ? "text" : "password"}
@@ -191,34 +236,28 @@ export default function LoginPage() {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full rounded-full border border-[#d9d9d9] pl-5 pr-12 py-4 text-[16px] font-medium text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080]"
+                    className="w-full rounded-full border border-[#d9d9d9] pl-4 pr-10 py-3 text-[15px] font-medium text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-[#808080] hover:text-black transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#808080] hover:text-black transition-colors"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
 
-              <div className="pt-2">
-                <Link href="#" className="text-[14px] font-bold text-black hover:underline underline-offset-4">
-                  Forgot password?
-                </Link>
-              </div>
-
-              <div className="pt-6 space-y-4">
+              <div className="pt-4 space-y-3">
                 <button
                   type="submit"
                   disabled={loading || !loginEmail || !loginPassword}
-                  className="w-full rounded-full bg-black py-4 text-[16px] font-bold text-white hover:bg-[#333333] disabled:opacity-50 transition-colors"
+                  className="w-full rounded-full bg-black py-3 text-[15px] font-bold text-white hover:bg-[#333333] disabled:opacity-50 transition-colors"
                 >
                   {loading ? "Loading..." : "Log In"}
                 </button>
 
-                <div className="relative flex items-center justify-center py-2">
+                <div className="relative flex items-center justify-center py-1">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-[#eeeeee]"></div>
                   </div>
@@ -227,10 +266,30 @@ export default function LoginPage() {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleOAuth('google')}
+                    disabled={loading}
+                    className="w-full rounded-full border border-[#d9d9d9] bg-white py-2.5 text-[14px] font-bold text-black hover:bg-[#eeeeee] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z"/></svg>
+                    Google
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleOAuth('github')}
+                    disabled={loading}
+                    className="w-full rounded-full border border-[#d9d9d9] bg-white py-2.5 text-[14px] font-bold text-black hover:bg-[#eeeeee] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/></svg>
+                    GitHub
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsSignup(true)}
-                  className="w-full rounded-full border border-[#d9d9d9] bg-white py-4 text-[16px] font-bold text-black hover:bg-[#eeeeee] transition-colors"
+                  className="w-full rounded-full border border-[#d9d9d9] bg-white py-3 text-[15px] font-bold text-black hover:bg-[#eeeeee] transition-colors"
                 >
                   Create an account
                 </button>
@@ -248,7 +307,7 @@ export default function LoginPage() {
                   required
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
-                  placeholder="founder@startup.co"
+                  placeholder="user@example.com"
                   className="w-full rounded-full border border-[#d9d9d9] px-5 py-4 text-[16px] font-medium text-black outline-none focus:border-black focus:ring-1 focus:ring-black transition-all placeholder:text-[#808080]"
                 />
               </div>
@@ -372,6 +431,33 @@ export default function LoginPage() {
                   Create Account
                 </button>
 
+                <div className="relative flex items-center justify-center py-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-[#eeeeee]"></div>
+                  </div>
+                  <div className="relative bg-white px-4 text-[11px] font-bold tracking-widest text-[#808080] uppercase">
+                    OR
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleOAuth('google')}
+                  disabled={loading}
+                  className="w-full rounded-full border border-[#d9d9d9] bg-white py-4 text-[16px] font-bold text-black hover:bg-[#eeeeee] transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27c3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10c5.35 0 9.25-3.67 9.25-9.09c0-1.15-.15-1.81-.15-1.81Z"/></svg>
+                  Continue with Google
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleOAuth('github')}
+                  disabled={loading}
+                  className="w-full rounded-full border border-[#d9d9d9] bg-white py-4 text-[16px] font-bold text-black hover:bg-[#eeeeee] transition-colors flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5c.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34c-.46-1.16-1.11-1.47-1.11-1.47c-.91-.62.07-.6.07-.6c1 .07 1.53 1.03 1.53 1.03c.87 1.52 2.34 1.07 2.91.83c.09-.65.35-1.09.63-1.34c-2.22-.25-4.55-1.11-4.55-4.92c0-1.11.38-2 1.03-2.71c-.1-.25-.45-1.29.1-2.64c0 0 .84-.27 2.75 1.02c.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02c.55 1.35.2 2.39.1 2.64c.65.71 1.03 1.6 1.03 2.71c0 3.82-2.34 4.66-4.57 4.91c.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2Z"/></svg>
+                  Continue with GitHub
+                </button>
                 <button
                   type="button"
                   onClick={() => setIsSignup(false)}

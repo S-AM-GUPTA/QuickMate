@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
       model: "gemini-flash-latest",
-      systemInstruction: "You are QuickMate AI, a helpful assistant for QuickMate, a platform connecting founders and startup teams who need operational tasks done (like data entry, pitch deck polish, market research, or errands) with reliable freelancers (Mates) who can do them. Be concise, friendly, and professional. Use emojis occasionally.",
+      systemInstruction: "You are QuickMate AI, a helpful assistant for QuickMate, a platform connecting busy individuals with reliable freelancers (Mates) who can do everyday tasks (like cleaning, handyman work, delivery, or tech support). Be concise, friendly, and professional. Use emojis occasionally.",
     });
 
     // Convert chat history for Gemini
