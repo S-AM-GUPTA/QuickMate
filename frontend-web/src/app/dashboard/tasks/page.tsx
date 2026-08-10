@@ -282,10 +282,10 @@ export default function TasksPage() {
                         type="button" 
                         onClick={fetchCurrentLocation}
                         disabled={isFetchingLocation}
-                        className="text-[12px] font-medium text-moss hover:underline flex items-center gap-1 disabled:opacity-50"
+                        className="text-[12px] font-bold text-ink bg-sand hover:bg-smoke/20 px-3 py-1.5 rounded-lg flex items-center gap-1.5 disabled:opacity-50 transition-colors border border-smoke/30"
                       >
-                        <MapPin className="w-3 h-3" />
-                        {isFetchingLocation ? "Fetching..." : "Use My Current Location"}
+                        <MapPin className="w-3.5 h-3.5" />
+                        {isFetchingLocation ? "Fetching location..." : "Use My Current Location"}
                       </button>
                     </div>
                     <p className="text-[12px] text-smoke mb-3">Click on the map to set the exact coordinates for this task.</p>

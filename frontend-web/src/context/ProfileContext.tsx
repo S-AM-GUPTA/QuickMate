@@ -28,8 +28,8 @@ const defaultProfile: ProfileData = {
   phone: "",
   address: "",
   role: "customer",
-  isVerified: true,
-  verificationStatus: "VERIFIED",
+  isVerified: false,
+  verificationStatus: "UNVERIFIED",
   mateTier: "generalist",
   profession: ""
 };
