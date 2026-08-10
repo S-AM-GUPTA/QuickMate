@@ -12,11 +12,101 @@ export default function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
   const { profile } = useProfile();
 
+  const [openGigs, setOpenGigs] = useState([
+    {
+      id: 1,
+      tag: 'Plumbing',
+      tagColor: 'text-moss bg-moss/10',
+      dist: '2.4 km away',
+      price: '₹1,200',
+      title: 'Fix Leaking Kitchen Sink Faucet',
+      desc: 'Looking for a professional plumber to fix a persistent leak under the kitchen sink. Parts will be provided.',
+      isNew: false
+    },
+    {
+      id: 2,
+      tag: 'Tech Help',
+      tagColor: 'text-charcoal bg-[#FACC15]/20',
+      dist: '5.1 km away',
+      price: '₹2,500',
+      title: 'Setup Home Wi-Fi Mesh Network',
+      desc: 'Need help setting up a 3-node TP-Link mesh network in a 3BHK apartment. Dead zones in master bedroom.',
+      isNew: false
+    }
+  ]);
+
+  const [activityLog, setActivityLog] = useState([
+    {
+      id: 1,
+      icon: <CheckCircle className="w-5 h-5" />,
+      title: 'Onboarding Flow UX Audit',
+      desc: 'Payment of ₹2,000 released from escrow to Sarah J.',
+      time: '2h ago',
+      isNew: false
+    },
+    {
+      id: 2,
+      icon: <Wallet className="w-5 h-5" />,
+      title: 'Funds Processed',
+      desc: '₹10,000 successfully added to your secure escrow wallet via UPI.',
+      time: '5h ago',
+      isNew: false
+    },
+    {
+      id: 3,
+      icon: <ArrowUpRight className="w-5 h-5" />,
+      title: 'Task Live',
+      desc: 'Your request "Beta testing for new iOS app" is live and receiving bids.',
+      time: '1d ago',
+      isNew: false
+    }
+  ]);
+
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting("Good morning");
     else if (hour < 17) setGreeting("Good afternoon");
     else setGreeting("Good evening");
+
+    // Simulate real-time gigs coming in for Mates
+    const gigInterval = setInterval(() => {
+      setOpenGigs(prev => {
+        if (prev.length > 4) return prev; // Limit mock items
+        
+        const newGig = {
+          id: Date.now(),
+          tag: 'Delivery',
+          tagColor: 'text-blue-600 bg-blue-100',
+          dist: '1.2 km away',
+          price: '₹400',
+          title: 'Deliver Documents to Cyber City',
+          desc: 'Urgent document delivery from Sector 44 to Cyber City. Need it done within next 2 hours.',
+          isNew: true
+        };
+        return [newGig, ...prev.slice(0, 3)];
+      });
+    }, 12000);
+
+    // Simulate real-time activity for Customers
+    const activityInterval = setInterval(() => {
+      setActivityLog(prev => {
+        if (prev.length > 5) return prev; // Limit mock items
+        const newLog = {
+          id: Date.now(),
+          icon: <Activity className="w-5 h-5" />,
+          title: 'New Bid Received',
+          desc: 'Alex M. applied to "Pitch Deck Polish - Seed Round".',
+          time: 'Just now',
+          isNew: true
+        };
+        return [newLog, ...prev.slice(0, 4)];
+      });
+    }, 18000);
+
+    return () => {
+      clearInterval(gigInterval);
+      clearInterval(activityInterval);
+    };
   }, []);
   if (profile.role !== 'customer') {
     return (
@@ -84,39 +174,35 @@ export default function DashboardOverview() {
               </div>
               
               <div className="space-y-4">
-                {/* Job Card 1 */}
-                <div className="group border border-smoke/40 rounded-xl p-5 hover:border-moss/50 hover:shadow-md transition-all cursor-pointer bg-white">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex gap-2 items-center">
-                      <span className="bg-moss/10 text-moss px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider">Plumbing</span>
-                      <span className="flex items-center gap-1 text-[11px] font-medium text-ink/50"><MapPin className="w-3 h-3"/> 2.4 km away</span>
+                {openGigs.map(gig => (
+                  <div 
+                    key={gig.id} 
+                    className={`group border rounded-xl p-5 hover:border-moss/50 hover:shadow-md transition-all cursor-pointer bg-white relative overflow-hidden ${gig.isNew ? 'animate-fade-in border-moss/40 shadow-sm' : 'border-smoke/40'}`}
+                  >
+                    {gig.isNew && (
+                      <div className="absolute top-0 right-0 bg-moss text-paper text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider animate-pulse">
+                        New Match
+                      </div>
+                    )}
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex gap-2 items-center mt-1">
+                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${gig.tagColor}`}>
+                          {gig.tag}
+                        </span>
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-ink/50">
+                          <MapPin className="w-3 h-3"/> {gig.dist}
+                        </span>
+                      </div>
+                      <span className="text-[18px] font-serif font-bold text-ink">{gig.price}</span>
                     </div>
-                    <span className="text-[18px] font-serif font-bold text-ink">₹1,200</span>
-                  </div>
-                  <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">Fix Leaking Kitchen Sink Faucet</h4>
-                  <p className="text-[13px] text-ink/70 mb-4">Looking for a professional plumber to fix a persistent leak under the kitchen sink. Parts will be provided.</p>
-                  <div className="flex gap-3">
-                    <button className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
-                    <button className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
-                  </div>
-                </div>
-
-                {/* Job Card 2 */}
-                <div className="group border border-smoke/40 rounded-xl p-5 hover:border-moss/50 hover:shadow-md transition-all cursor-pointer bg-white">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex gap-2 items-center">
-                      <span className="bg-[#FACC15]/20 text-charcoal px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider">Tech Help</span>
-                      <span className="flex items-center gap-1 text-[11px] font-medium text-ink/50"><MapPin className="w-3 h-3"/> 5.1 km away</span>
+                    <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">{gig.title}</h4>
+                    <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
+                    <div className="flex gap-3">
+                      <button className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
+                      <button className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
                     </div>
-                    <span className="text-[18px] font-serif font-bold text-ink">₹2,500</span>
                   </div>
-                  <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">Setup Home Wi-Fi Mesh Network</h4>
-                  <p className="text-[13px] text-ink/70 mb-4">Need help setting up a 3-node TP-Link mesh network in a 3BHK apartment. Dead zones in master bedroom.</p>
-                  <div className="flex gap-3">
-                    <button className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
-                    <button className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -228,7 +314,11 @@ export default function DashboardOverview() {
         <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
-              <FileText className="w-5 h-5" /> Active Operations
+              <span className="relative flex h-3 w-3 mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-coral"></span>
+              </span>
+              Active Operations
             </h3>
             <button className="text-[14px] font-medium text-ink/60 hover:text-moss transition-colors">View All →</button>
           </div>
@@ -303,44 +393,23 @@ export default function DashboardOverview() {
           </h3>
           <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
             
-            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <CheckCircle className="w-5 h-5" />
+            {activityLog.map((log, index) => (
+              <div key={log.id} className={`flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group ${index !== activityLog.length -1 ? 'border-b border-smoke/60' : ''} ${log.isNew ? 'bg-moss/5 animate-fade-in' : ''}`}>
+                <div className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all ${log.isNew ? 'bg-moss text-paper border-moss shadow-[0_0_10px_rgba(80,146,9,0.3)]' : 'bg-sand border-smoke/60 text-ink'}`}>
+                  {log.icon}
+                </div>
+                <div className="flex-1 pt-1">
+                  <div className="flex justify-between items-start">
+                    <p className="text-[14px] font-bold text-ink leading-tight mb-1">{log.title}</p>
+                    {log.isNew && <span className="text-[10px] font-bold text-moss bg-moss/10 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">New</span>}
+                  </div>
+                  <p className="text-[13px] text-ink/60 leading-snug">
+                    {log.desc}
+                  </p>
+                  <span className="text-[11px] font-medium text-ink/40 mt-2 block">{log.time}</span>
+                </div>
               </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Onboarding Flow UX Audit</p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  Payment of ₹2,000 released from escrow to Sarah J.
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">2h ago</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <Wallet className="w-5 h-5" />
-              </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Funds Processed</p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  ₹10,000 successfully added to your secure escrow wallet via UPI.
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">5h ago</span>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <ArrowUpRight className="w-5 h-5" />
-              </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Task Live</p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  Your request "Beta testing for new iOS app" is live and receiving bids.
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">1d ago</span>
-              </div>
-            </div>
+            ))}
 
             <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
               <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">View All History</button>
