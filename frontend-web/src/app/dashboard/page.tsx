@@ -149,145 +149,211 @@ export default function DashboardOverview() {
           </>
         )}
 
-      </div>
+      </      {/* Main Content Grid */}
+      {profile.role === 'customer' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Active Tasks Section (2/3 width) */}
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
+                <FileText className="w-5 h-5" /> Active Operations
+              </h3>
+              <button className="text-[14px] font-medium text-ink/60 hover:text-moss transition-colors">View All →</button>
+            </div>
+            
+            <div className="space-y-4">
+              {/* Task Card 1 */}
+              <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Design</span>
+                      <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Due in 2 days</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-ink">Pitch Deck Polish - Seed Round</h4>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-[18px] font-serif text-ink">₹1,500</span>
+                    <span className="text-[12px] font-medium text-moss bg-moss/10 px-2 py-0.5 rounded-full inline-block mt-1">In Progress</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between text-[13px] font-medium text-ink">
+                    <span>Progress</span>
+                    <span>75%</span>
+                  </div>
+                  <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
+                    <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
+                  </div>
+                  <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-ink" /> Mate Alex M. is finalizing the slides.
+                  </p>
+                </div>
+              </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Active Tasks Section (2/3 width) */}
-        <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
-              <FileText className="w-5 h-5" /> Active Operations
+              {/* Task Card 2 */}
+              <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">QA Testing</span>
+                      <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5 text-coral" /> Action Required</span>
+                    </div>
+                    <h4 className="text-lg font-bold text-ink">Beta testing for new iOS app</h4>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-[18px] font-serif text-ink">₹800</span>
+                    <span className="text-[12px] font-medium text-coral bg-coral/10 px-2 py-0.5 rounded-full inline-block mt-1">Review Pending</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between text-[13px] font-medium text-ink">
+                    <span>Progress</span>
+                    <span>90%</span>
+                  </div>
+                  <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
+                    <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
+                  </div>
+                  <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-ink" /> Review submitted bugs and approve payment.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Activity Feed Section (1/3 width) */}
+          <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+            <h3 className="text-2xl font-serif text-ink mb-6 flex items-center gap-2">
+              <Activity className="w-5 h-5" /> Activity Log
             </h3>
-            <button className="text-[14px] font-medium text-ink/60 hover:text-moss transition-colors">View All →</button>
-          </div>
-          
-          <div className="space-y-4">
-            {/* Task Card 1 */}
-            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Design</span>
-                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Due in 2 days</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-ink">Pitch Deck Polish - Seed Round</h4>
-                </div>
-                <div className="text-right">
-                  <span className="block text-[18px] font-serif text-ink">₹1,500</span>
-                  <span className="text-[12px] font-medium text-moss bg-moss/10 px-2 py-0.5 rounded-full inline-block mt-1">In Progress</span>
-                </div>
-              </div>
+            <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
               
-              <div className="space-y-2 mt-4">
-                <div className="flex justify-between text-[13px] font-medium text-ink">
-                  <span>Progress</span>
-                  <span>75%</span>
+              <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
+                <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
+                  <CheckCircle className="w-5 h-5" />
                 </div>
-                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
-                  <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
+                <div className="flex-1 pt-1">
+                  <p className="text-[14px] font-bold text-ink leading-tight mb-1">Onboarding Flow UX Audit</p>
+                  <p className="text-[13px] text-ink/60 leading-snug">
+                    Payment of ₹2,000 released from escrow to Sarah J.
+                  </p>
+                  <span className="text-[11px] font-medium text-ink/40 mt-2 block">2h ago</span>
                 </div>
-                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <Star className="w-4 h-4 text-ink" /> {profile.role === 'customer' ? 'Mate Alex M. is finalizing the slides.' : 'You are finalizing the slides.'}
-                </p>
               </div>
-            </div>
 
-            {/* Task Card 2 */}
-            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">QA Testing</span>
-                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5 text-coral" /> Action Required</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-ink">Beta testing for new iOS app</h4>
+              <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
+                <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
+                  <Wallet className="w-5 h-5" />
                 </div>
-                <div className="text-right">
-                  <span className="block text-[18px] font-serif text-ink">₹800</span>
-                  <span className="text-[12px] font-medium text-coral bg-coral/10 px-2 py-0.5 rounded-full inline-block mt-1">Review Pending</span>
+                <div className="flex-1 pt-1">
+                  <p className="text-[14px] font-bold text-ink leading-tight mb-1">Funds Processed</p>
+                  <p className="text-[13px] text-ink/60 leading-snug">
+                    ₹10,000 successfully added to your secure escrow wallet via UPI.
+                  </p>
+                  <span className="text-[11px] font-medium text-ink/40 mt-2 block">5h ago</span>
                 </div>
               </div>
               
-              <div className="space-y-2 mt-4">
-                <div className="flex justify-between text-[13px] font-medium text-ink">
-                  <span>Progress</span>
-                  <span>90%</span>
+              <div className="flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group">
+                <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
+                  <ArrowUpRight className="w-5 h-5" />
                 </div>
-                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
-                  <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
+                <div className="flex-1 pt-1">
+                  <p className="text-[14px] font-bold text-ink leading-tight mb-1">Task Live</p>
+                  <p className="text-[13px] text-ink/60 leading-snug">
+                    Your request "Beta testing for new iOS app" is live and receiving bids.
+                  </p>
+                  <span className="text-[11px] font-medium text-ink/40 mt-2 block">1d ago</span>
                 </div>
-                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-ink" /> {profile.role === 'customer' ? 'Review submitted bugs and approve payment.' : 'Waiting for customer approval.'}
-                </p>
+              </div>
+
+              <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
+                <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">View All History</button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Activity Feed Section (1/3 width) */}
-        <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <h3 className="text-2xl font-serif text-ink mb-6 flex items-center gap-2">
-            <Activity className="w-5 h-5" /> Activity Log
-          </h3>
-          <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
-            
-            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <CheckCircle className="w-5 h-5" />
-              </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Onboarding Flow UX Audit</p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  {profile.role === 'customer' 
-                    ? 'Payment of ₹2,000 released from escrow to Sarah J.' 
-                    : 'Payment of ₹2,000 released from escrow to your wallet.'}
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">2h ago</span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <Wallet className="w-5 h-5" />
-              </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">Funds Processed</p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  {profile.role === 'customer'
-                    ? '₹10,000 successfully added to your secure escrow wallet via UPI.'
-                    : '₹1,250 withdrawal successfully transferred to your bank account.'}
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">5h ago</span>
-              </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Recommended Tasks Section (2/3 width) */}
+          <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
+                <LayoutDashboard className="w-5 h-5" /> Recommended Tasks
+              </h3>
+              <button className="text-[14px] font-medium text-ink/60 hover:text-moss transition-colors">Find More Work →</button>
             </div>
             
-            <div className="flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
-                <ArrowUpRight className="w-5 h-5" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Job Card 1 */}
+              <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow group flex flex-col cursor-pointer">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="bg-moss/10 text-moss px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase">Plumbing</span>
+                  <span className="text-[16px] font-serif text-ink font-bold">₹1,200</span>
+                </div>
+                <h4 className="text-[17px] font-bold text-ink mb-2 group-hover:text-moss transition-colors">Fix Leaking Kitchen Sink Faucet</h4>
+                <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">Looking for a professional plumber to fix a persistent leak under the kitchen sink. Parts will be provided.</p>
+                <div className="mt-auto flex items-center justify-between text-[12px] font-medium text-ink/60 border-t border-smoke/30 pt-4">
+                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> 2.4 km away</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Today, 4:00 PM</span>
+                </div>
               </div>
-              <div className="flex-1 pt-1">
-                <p className="text-[14px] font-bold text-ink leading-tight mb-1">
-                  {profile.role === 'customer' ? 'Task Live' : 'Bid Submitted'}
-                </p>
-                <p className="text-[13px] text-ink/60 leading-snug">
-                  {profile.role === 'customer'
-                    ? 'Your request "Beta testing for new iOS app" is live and receiving bids.'
-                    : 'You successfully placed a bid of ₹800 on "Beta testing".'}
-                </p>
-                <span className="text-[11px] font-medium text-ink/40 mt-2 block">1d ago</span>
+
+              {/* Job Card 2 */}
+              <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow group flex flex-col cursor-pointer">
+                <div className="flex justify-between items-start mb-3">
+                  <span className="bg-[#FACC15]/20 text-charcoal px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase">Tech Help</span>
+                  <span className="text-[16px] font-serif text-ink font-bold">₹2,500</span>
+                </div>
+                <h4 className="text-[17px] font-bold text-ink mb-2 group-hover:text-moss transition-colors">Setup Home Wi-Fi Mesh Network</h4>
+                <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">Need help setting up a 3-node TP-Link mesh network in a 3BHK apartment. Dead zones in the master bedroom.</p>
+                <div className="mt-auto flex items-center justify-between text-[12px] font-medium text-ink/60 border-t border-smoke/30 pt-4">
+                  <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> 5.1 km away</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Tomorrow, 10:00 AM</span>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
-              <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">View All History</button>
+          {/* Active Bids Section (1/3 width) */}
+          <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+            <h3 className="text-2xl font-serif text-ink mb-6 flex items-center gap-2">
+              <Star className="w-5 h-5" /> Active Bids
+            </h3>
+            <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
+              
+              <div className="p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="text-[14px] font-bold text-ink">Deep Cleaning 2BHK</h4>
+                  <span className="text-[11px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded">PENDING</span>
+                </div>
+                <div className="flex justify-between text-[13px] text-ink/60">
+                  <span>Your Bid: ₹1,500</span>
+                  <span>14 bids total</span>
+                </div>
+              </div>
+
+              <div className="p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="text-[14px] font-bold text-ink">Assemble IKEA Wardrobe</h4>
+                  <span className="text-[11px] font-bold bg-moss/20 text-moss px-2 py-0.5 rounded">ACCEPTED</span>
+                </div>
+                <div className="flex justify-between text-[13px] text-ink/60">
+                  <span>Your Bid: ₹900</span>
+                  <span className="text-moss font-medium">Starts in 3h</span>
+                </div>
+              </div>
+
+              <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
+                <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">Manage Bids</button>
+              </div>
             </div>
           </div>
         </div>
-
-      </div>
-
+      )}
     </div>
   );
 }
