@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   ArrowRight, TrendingUp, CheckCircle, Wallet, ArrowUpRight, 
-  ShieldCheck, Activity, Star, Clock, AlertCircle, FileText, LayoutDashboard
+  ShieldCheck, Activity, Star, Clock, AlertCircle, FileText, LayoutDashboard, MapPin
 } from "lucide-react";
 import { useProfile } from "@/context/ProfileContext";
 
@@ -148,8 +148,9 @@ export default function DashboardOverview() {
             </div>
           </>
         )}
+      </div>
 
-      </      {/* Main Content Grid */}
+      {/* Main Content Grid */}
       {profile.role === 'customer' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Active Tasks Section (2/3 width) */}
