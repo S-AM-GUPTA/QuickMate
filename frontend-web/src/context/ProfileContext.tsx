@@ -8,7 +8,7 @@ interface ProfileData {
   email: string;
   phone: string;
   address: string;
-  role: "customer" | "helper";
+  role: "customer" | "helper" | "admin";
   isVerified: boolean;
   verificationStatus: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
   mateTier?: "generalist" | "specialist";
