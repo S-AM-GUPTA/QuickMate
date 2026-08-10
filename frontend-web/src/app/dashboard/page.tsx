@@ -23,7 +23,7 @@ export default function DashboardOverview() {
     <div className="space-y-8 w-full max-w-7xl mx-auto">
       
       {/* Hero Section */}
-      <div className={`relative rounded-2xl p-8 sm:p-12 text-paper overflow-hidden shadow-xl animate-fade-in-up transition-all duration-500 bg-charcoal`}>
+      <div className={`relative rounded-2xl p-8 sm:p-12 text-paper overflow-hidden shadow-xl animate-fade-in-up transition-all duration-500 ${profile.role === 'customer' ? 'bg-charcoal' : 'bg-moss'}`}>
         {/* Dynamic Gradient Mesh */}
         <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style={{
           background: 'radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)'
@@ -57,7 +57,7 @@ export default function DashboardOverview() {
               ) : (
                 <Link 
                   href="/dashboard/tasks"
-                  className="rounded-full bg-moss text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-moss/90 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(80,146,9,0.3)] hover:shadow-[0_0_25px_rgba(80,146,9,0.5)] hover:-translate-y-0.5"
+                  className="rounded-full bg-charcoal text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-ink transition-all flex items-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
                 >
                   Find Work <ArrowRight className="h-4 w-4" />
                 </Link>
