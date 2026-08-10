@@ -36,7 +36,7 @@ export default function LandingPage() {
           {isLoggedIn ? (
             <button
               onClick={() => router.push("/dashboard")}
-              className="rounded-md bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+              className="rounded-md bg-moss px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
             >
               Go to Dashboard
             </button>
@@ -56,7 +56,7 @@ export default function LandingPage() {
               </button>
               <button
                 onClick={() => router.push("/login?mode=signup")}
-                className="rounded-md bg-charcoal px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:bg-ink hover:-translate-y-0.5 transition-all duration-300"
+                className="rounded-md bg-moss px-5 py-2 text-[14px] font-medium text-paper shadow-md hover:shadow-lg hover:bg-moss/90 hover:-translate-y-0.5 transition-all duration-300"
               >
                 Sign up
               </button>
@@ -98,7 +98,7 @@ export default function LandingPage() {
               <div className="flex items-center gap-2 pl-2">
                 <button 
                   onClick={() => router.push("/login")}
-                  className="rounded-md bg-charcoal px-6 py-3 text-[15px] font-medium text-paper hover:bg-ink shadow-md hover:shadow-lg transition-all duration-300 flex items-center whitespace-nowrap"
+                  className="rounded-md bg-moss px-6 py-3 text-[15px] font-medium text-paper hover:bg-moss/90 shadow-md hover:shadow-lg transition-all duration-300 flex items-center whitespace-nowrap"
                 >
                   Post a Task
                 </button>
@@ -360,13 +360,13 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={() => router.push("/login")}
-              className="w-full sm:w-auto rounded-md bg-charcoal px-10 py-4 text-[16px] font-bold text-paper shadow-xl hover:bg-ink hover:-translate-y-1 transition-all duration-300"
+              className="w-full sm:w-auto rounded-md bg-moss px-10 py-4 text-[16px] font-bold text-paper shadow-[0_0_20px_rgba(80,146,9,0.3)] hover:shadow-[0_0_25px_rgba(80,146,9,0.5)] hover:-translate-y-1 transition-all duration-300"
             >
               Start Hiring Now
             </button>
             <button
               onClick={() => router.push("/login")}
-              className="w-full sm:w-auto rounded-md bg-paper border border-hairline px-10 py-4 text-[16px] font-bold text-ink shadow-sm hover:bg-mist hover:-translate-y-1 transition-all duration-300"
+              className="w-full sm:w-auto rounded-md bg-paper border border-moss text-moss px-10 py-4 text-[16px] font-bold shadow-sm hover:bg-moss/10 hover:-translate-y-1 transition-all duration-300"
             >
               Become a Mate
             </button>

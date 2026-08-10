@@ -278,12 +278,25 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div>
-              <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-moss" /> Identity Verified
-              </h2>
-              <p className="text-[14px] text-smoke">
-                Your Aadhar KYC is complete. You are a trusted mate on the platform!
-              </p>
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-moss" /> Identity Verified
+                  </h2>
+                  <p className="text-[14px] text-smoke">
+                    Your Aadhar KYC is complete. You are a trusted mate on the platform!
+                  </p>
+                </div>
+                
+                {profile.role === 'helper' && profile.mateTier !== 'specialist' && (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-2 bg-[#FACC15] text-charcoal px-5 py-2.5 rounded-full text-[13px] font-bold shadow-md hover:opacity-90 transition-opacity"
+                  >
+                    <Star className="w-4 h-4 fill-current" /> Upgrade to PRO Mate
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
