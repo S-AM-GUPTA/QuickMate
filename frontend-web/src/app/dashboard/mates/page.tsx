@@ -109,8 +109,8 @@ export default function MatesPage() {
         </div>
       </div>
 
-      {/* Become a Mate KYC Section */}
-      {profile.verificationStatus !== "VERIFIED" && (
+      {/* Become a Mate KYC Section (Only for Helpers) */}
+      {profile.role === "helper" && profile.verificationStatus !== "VERIFIED" && (
         <div className="bg-sand border border-smoke/30 rounded-2xl p-8 shadow-sm">
           <div className="flex items-start gap-6 flex-col md:flex-row">
             

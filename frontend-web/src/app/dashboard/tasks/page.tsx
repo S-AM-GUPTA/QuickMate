@@ -21,6 +21,7 @@ export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [showPostModal, setShowPostModal] = useState(false);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
 
   const categories = [
     "All",
@@ -63,6 +64,42 @@ export default function TasksPage() {
     scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
     address: "",
   });
+
+  const fetchCurrentLocation = () => {
+    setIsFetchingLocation(true);
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+            const data = await res.json();
+            const locationName = data.address?.city || data.address?.town || data.address?.neighbourhood || data.display_name.split(",")[0] || "Location found";
+            
+            setFormData(prev => ({
+              ...prev,
+              latitude: lat,
+              longitude: lng,
+              address: locationName
+            }));
+          } catch (err) {
+            console.error(err);
+            setFormData(prev => ({ ...prev, latitude: lat, longitude: lng, address: "Current Location" }));
+          } finally {
+            setIsFetchingLocation(false);
+          }
+        },
+        (error) => {
+          console.warn("Geolocation failed", error);
+          alert("Could not fetch location. Please ensure location services are enabled for your browser.");
+          setIsFetchingLocation(false);
+        }
+      );
+    } else {
+      setIsFetchingLocation(false);
+    }
+  };
 
   const handlePostTask = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -239,7 +276,18 @@ export default function TasksPage() {
 
                   {/* Right Column: Location Map */}
                   <div className="flex flex-col h-[400px] md:h-auto">
-                    <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Task Location</label>
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider">Task Location</label>
+                      <button 
+                        type="button" 
+                        onClick={fetchCurrentLocation}
+                        disabled={isFetchingLocation}
+                        className="text-[12px] font-medium text-moss hover:underline flex items-center gap-1 disabled:opacity-50"
+                      >
+                        <MapPin className="w-3 h-3" />
+                        {isFetchingLocation ? "Fetching..." : "Use My Current Location"}
+                      </button>
+                    </div>
                     <p className="text-[12px] text-smoke mb-3">Click on the map to set the exact coordinates for this task.</p>
                     
                     <div className="flex-1 bg-sand border border-smoke/30 rounded-xl overflow-hidden relative min-h-[300px]">
