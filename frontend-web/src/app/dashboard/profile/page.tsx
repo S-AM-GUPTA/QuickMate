@@ -230,6 +230,65 @@ export default function ProfilePage() {
         )}
       </div>
 
+      {/* KYC / BECOME A MATE SECTION */}
+      {!isEditing && (
+        <div className="bg-paper rounded-2xl p-8 border border-smoke/50 shadow-sm">
+          {profile.role === 'customer' ? (
+            <div>
+              <h2 className="text-[20px] font-serif text-ink mb-2">Want to Earn Money?</h2>
+              <p className="text-[14px] text-smoke mb-6 max-w-xl">
+                Switch to a Mate account to start bidding on tasks and offering your professional services to customers.
+              </p>
+              <button 
+                onClick={() => {
+                  setProfile(prev => ({ ...prev, role: 'helper' }));
+                  localStorage.setItem("userProfile", JSON.stringify({ ...profile, role: 'helper' }));
+                }}
+                className="bg-charcoal text-paper px-6 py-3 rounded-full text-[14px] font-bold shadow-md hover:opacity-90 transition-opacity"
+              >
+                Become a Mate
+              </button>
+            </div>
+          ) : profile.verificationStatus !== 'VERIFIED' ? (
+            <div>
+              <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
+                <Shield className="w-5 h-5" /> Mate Identity Verification
+              </h2>
+              <p className="text-[14px] text-smoke mb-6 max-w-xl">
+                Upload your Aadhar/PAN to complete your KYC. You cannot bid on tasks until your identity is verified.
+              </p>
+              
+              {profile.verificationStatus === 'PENDING' ? (
+                <div className="inline-flex items-center gap-2 bg-moss/10 text-moss px-4 py-3 rounded-xl border border-moss/30 text-[14px] font-medium">
+                  Your documents are currently under review.
+                </div>
+              ) : (
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setProfile(prev => ({...prev, verificationStatus: "PENDING"}));
+                  localStorage.setItem("userProfile", JSON.stringify({ ...profile, verificationStatus: "PENDING" }));
+                  addNotification("Aadhar uploaded successfully! Pending review.");
+                }} className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                  <input type="file" required accept="image/*,.pdf" className="text-[13px] bg-sand p-2 rounded-lg border border-smoke/30" />
+                  <button type="submit" className="px-6 py-2.5 bg-charcoal text-paper rounded-full text-[14px] font-bold hover:opacity-90 shadow-md">
+                    Upload Aadhar
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-moss" /> Identity Verified
+              </h2>
+              <p className="text-[14px] text-smoke">
+                Your Aadhar KYC is complete. You are a trusted mate on the platform!
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="pt-8">
         <button 
           onClick={handleLogout}
