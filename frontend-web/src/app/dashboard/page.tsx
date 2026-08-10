@@ -23,7 +23,7 @@ export default function DashboardOverview() {
     <div className="space-y-8 w-full max-w-7xl mx-auto">
       
       {/* Hero Section */}
-      <div className={`relative rounded-2xl p-8 sm:p-12 text-paper overflow-hidden shadow-xl animate-fade-in-up transition-all duration-500 ${profile.role === 'customer' ? 'bg-charcoal' : 'bg-moss'}`}>
+      <div className={`relative rounded-2xl p-8 sm:p-12 text-ink overflow-hidden border border-smoke/30 animate-fade-in-up transition-all duration-500 ${profile.role === 'customer' ? 'bg-[#f0f9ff]' : 'bg-[#f0fdf4]'}`}>
         {/* Dynamic Gradient Mesh */}
         <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" style={{
           background: 'radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)'
@@ -31,17 +31,17 @@ export default function DashboardOverview() {
         
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="max-w-xl">
-            <span className="inline-flex items-center rounded-full bg-paper/10 px-3 py-1 text-[12px] font-medium text-paper mb-6 border border-paper/20 backdrop-blur-sm shadow-sm">
+            <span className="inline-flex items-center rounded-full bg-ink/5 px-3 py-1 text-[12px] font-medium text-ink mb-6 border border-ink/10 backdrop-blur-sm shadow-sm">
               <LayoutDashboard className="w-3.5 h-3.5 mr-2" />
               {profile.role === 'customer' ? 'OPERATIONS HQ' : 'MATE COMMAND'}
             </span>
             <h1 className="text-[44px] md:text-5xl font-serif tracking-tight leading-tight mb-4">
               {greeting}. <br/>
-              <span className="text-paper/80">
+              <span className="text-ink/60">
                 {profile.role === 'customer' ? 'Ready to scale?' : 'Ready to earn?'}
               </span>
             </h1>
-            <p className="text-[16px] text-paper/80 leading-relaxed max-w-md mb-8">
+            <p className="text-[16px] text-ink/70 leading-relaxed max-w-md mb-8">
               {profile.role === 'customer' 
                 ? 'Delegate QA testing, pitch deck design, and data entry to verified mates instantly.'
                 : 'Browse nearby tasks, submit bids, and get paid directly to your wallet.'}
@@ -57,7 +57,7 @@ export default function DashboardOverview() {
               ) : (
                 <Link 
                   href="/dashboard/tasks"
-                  className="rounded-full bg-charcoal text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-ink transition-all flex items-center gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
+                  className="rounded-full bg-charcoal text-paper px-7 py-3.5 text-[15px] font-medium hover:bg-ink transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
                   Find Work <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -66,15 +66,15 @@ export default function DashboardOverview() {
           </div>
 
           {/* Quick Stat inside Hero */}
-          <div className="hidden md:flex flex-col gap-2 bg-paper/10 backdrop-blur-md p-6 rounded-2xl border border-paper/20 shrink-0 min-w-[200px] shadow-lg hover:-translate-y-1 transition-transform duration-300">
-            <span className="text-[13px] font-medium text-paper/80 uppercase tracking-wider">
+          <div className="hidden md:flex flex-col gap-2 bg-paper/60 backdrop-blur-md p-6 rounded-2xl border border-ink/5 shrink-0 min-w-[200px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+            <span className="text-[13px] font-medium text-ink/60 uppercase tracking-wider">
               {profile.role === 'customer' ? 'Hours Saved' : 'Total Earnings'}
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-[44px] font-serif tracking-tight">
+              <span className="text-[44px] font-serif tracking-tight text-ink">
                 {profile.role === 'customer' ? '142' : '₹12k'}
               </span>
-              <span className="text-lime text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
+              <span className="text-moss text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
             </div>
           </div>
         </div>
