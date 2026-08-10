@@ -160,7 +160,7 @@ export default function DashboardOverview() {
             <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
               <FileText className="w-5 h-5" /> Active Operations
             </h3>
-            <button className="text-[14px] font-medium text-ink/60 hover:text-ink transition-colors">View All →</button>
+            <button className="text-[14px] font-medium text-ink/60 hover:text-moss transition-colors">View All →</button>
           </div>
           
           <div className="space-y-4">
@@ -234,7 +234,7 @@ export default function DashboardOverview() {
           <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
             
             <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
                 <CheckCircle className="w-5 h-5" />
               </div>
               <div className="flex-1 pt-1">
@@ -249,7 +249,7 @@ export default function DashboardOverview() {
             </div>
 
             <div className="flex items-start gap-4 p-5 border-b border-smoke/60 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
                 <Wallet className="w-5 h-5" />
               </div>
               <div className="flex-1 pt-1">
@@ -264,7 +264,7 @@ export default function DashboardOverview() {
             </div>
             
             <div className="flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group">
-              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-ink group-hover:text-paper transition-all">
+              <div className="w-10 h-10 rounded-full bg-sand border border-smoke/60 flex items-center justify-center text-ink shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all">
                 <ArrowUpRight className="w-5 h-5" />
               </div>
               <div className="flex-1 pt-1">
@@ -281,7 +281,7 @@ export default function DashboardOverview() {
             </div>
 
             <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
-              <button className="text-[13px] font-medium text-ink hover:underline">View All History</button>
+              <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">View All History</button>
             </div>
           </div>
         </div>

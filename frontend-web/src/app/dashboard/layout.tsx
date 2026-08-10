@@ -180,35 +180,35 @@ function DashboardLayoutContent({
           <div className="hidden md:flex items-center gap-6">
             <Link
               href="/dashboard/tasks"
-              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/tasks') ? 'text-ink font-semibold' : 'text-smoke hover:text-ink hover:underline'}`}
+              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/tasks') ? 'text-ink font-semibold' : 'text-smoke hover:text-moss hover:underline'}`}
             >
               Tasks
             </Link>
             
             <Link
               href="/dashboard/mates"
-              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/mates') ? 'text-ink font-semibold' : 'text-smoke hover:text-ink hover:underline'}`}
+              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/mates') ? 'text-ink font-semibold' : 'text-smoke hover:text-moss hover:underline'}`}
             >
               Mates
             </Link>
 
             <Link
               href="/dashboard/analytics"
-              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/analytics') ? 'text-ink font-semibold' : 'text-smoke hover:text-ink hover:underline'}`}
+              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/analytics') ? 'text-ink font-semibold' : 'text-smoke hover:text-moss hover:underline'}`}
             >
               Analytics
             </Link>
 
             <Link
               href="/dashboard/wallet"
-              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/wallet') ? 'text-ink font-semibold' : 'text-smoke hover:text-ink hover:underline'}`}
+              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/wallet') ? 'text-ink font-semibold' : 'text-smoke hover:text-moss hover:underline'}`}
             >
               Wallet
             </Link>
 
             <Link
               href="/dashboard/profile"
-              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/profile') ? 'text-ink font-semibold' : 'text-smoke hover:text-ink hover:underline'}`}
+              className={`text-[14px] font-medium transition-all cursor-pointer ${isActive('/dashboard/profile') ? 'text-ink font-semibold' : 'text-smoke hover:text-moss hover:underline'}`}
             >
               Account
             </Link>
@@ -256,7 +256,7 @@ function DashboardLayoutContent({
 
             <button 
               onClick={toggleRole}
-              className="text-[13px] font-medium text-smoke hover:text-ink transition-colors hidden lg:block"
+              className="text-[13px] font-medium text-smoke hover:text-moss transition-colors hidden lg:block"
             >
               Switch to {profile.role === "customer" ? "Mate" : "Customer"}
             </button>
