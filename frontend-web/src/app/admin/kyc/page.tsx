@@ -74,7 +74,7 @@ export default function AdminKycPage() {
               <div className="aspect-video bg-mist relative border-b border-smoke/30 overflow-hidden">
                 {user.verificationDocUrl ? (
                   <img 
-                    src={user.verificationDocUrl.includes("dummy-document") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
+                    src={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
                     alt="Aadhar Document" 
                     className="w-full h-full object-cover"
                   />
@@ -87,7 +87,7 @@ export default function AdminKycPage() {
                 
                 {user.verificationDocUrl && (
                   <a 
-                    href={user.verificationDocUrl.includes("dummy-document") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl}
+                    href={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-paper font-bold text-[13px] gap-2 backdrop-blur-sm"
