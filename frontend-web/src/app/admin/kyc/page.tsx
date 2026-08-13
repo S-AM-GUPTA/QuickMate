@@ -7,6 +7,7 @@ import { FileText, CheckCircle, XCircle, ExternalLink, ShieldCheck } from "lucid
 export default function AdminKycPage() {
   const [pendingUsers, setPendingUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeDocUrl, setActiveDocUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPendingUsers = async () => {
@@ -93,14 +94,25 @@ export default function AdminKycPage() {
                 )}
                 
                 {user.verificationDocUrl && (
-                  <a 
-                    href={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-paper font-bold text-[13px] gap-2 backdrop-blur-sm"
+                  <button 
+                    onClick={() => {
+                      const url = user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl;
+                      
+                      if (url.startsWith("data:application/pdf")) {
+                         fetch(url).then(res => res.blob()).then(blob => {
+                             const blobUrl = URL.createObjectURL(blob);
+                             window.open(blobUrl, '_blank');
+                         });
+                      } else if (url.startsWith("data:image") || url.startsWith("data:")) {
+                         setActiveDocUrl(url); 
+                      } else {
+                         window.open(url, '_blank');
+                      }
+                    }}
+                    className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-paper font-bold text-[13px] gap-2 backdrop-blur-sm cursor-pointer w-full h-full border-none outline-none"
                   >
                     <ExternalLink className="w-4 h-4" /> View Full Document
-                  </a>
+                  </button>
                 )}
               </div>
               
@@ -130,6 +142,28 @@ export default function AdminKycPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      
+      {activeDocUrl && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/90 backdrop-blur-sm"
+          onClick={() => setActiveDocUrl(null)}
+        >
+          <div className="relative max-w-5xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center">
+            <button 
+              onClick={() => setActiveDocUrl(null)}
+              className="absolute top-4 right-4 bg-paper text-ink p-2 rounded-full hover:bg-sand transition-colors shadow-lg z-10"
+            >
+              <XCircle className="w-6 h-6" />
+            </button>
+            <img 
+              src={activeDocUrl} 
+              alt="Full Document View" 
+              className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
         </div>
       )}
     </div>
