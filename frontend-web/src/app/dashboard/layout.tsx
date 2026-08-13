@@ -133,7 +133,7 @@ function DashboardLayoutContent({
                 className="flex items-center gap-1.5 text-smoke text-[13px] font-medium bg-sand hover:bg-mist px-3 py-1.5 rounded-full border border-smoke/30 transition-colors cursor-pointer"
               >
                 <MapPin className="w-3.5 h-3.5" />
-                {address || "Fetching location..."}
+                <span>{address || "Fetching location..."}</span>
               </button>
               
               {showLocationDropdown && (
@@ -420,7 +420,7 @@ function DashboardLayoutContent({
             
             <div className="mt-auto pt-8 flex items-center gap-2 text-smoke text-[13px] font-medium bg-sand px-4 py-3 rounded-2xl border border-smoke/30">
               <MapPin className="w-4 h-4" />
-              {address || "Fetching location..."}
+              <span>{address || "Fetching location..."}</span>
             </div>
           </div>
         </div>

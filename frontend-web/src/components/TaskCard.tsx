@@ -65,6 +65,20 @@ export default function TaskCard({
       })
     : "Loading date...";
 
+  // Mask address for non-customers if the task is still OPEN
+  const getDisplayAddress = () => {
+    if (!task.address) return undefined;
+    if (task.status === "OPEN" && viewMode !== "customer") {
+      const parts = task.address.split(",");
+      if (parts.length > 2) {
+        return "Approx: " + parts.slice(-2).join(",").trim();
+      }
+      return "Approx: " + task.address;
+    }
+    return task.address;
+  };
+  const displayAddress = getDisplayAddress();
+
   return (
     <div className="group bg-paper rounded-2xl p-6 border border-smoke transition-all duration-300 flex flex-col justify-between">
       <div className="flex items-start justify-between gap-4">
@@ -102,10 +116,10 @@ export default function TaskCard({
         </div>
 
         {/* Location / Distance */}
-        {task.address && !(viewMode === "helper" && task.status === "OPEN") && (
-          <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30 max-w-[150px] truncate">
+        {displayAddress && (
+          <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30 max-w-[150px] truncate" title={displayAddress}>
             <MapPin className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">{task.address}</span>
+            <span className="truncate">{displayAddress}</span>
           </div>
         )}
         

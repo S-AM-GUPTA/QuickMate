@@ -7,6 +7,7 @@ import { AlertTriangle, Plus, X, MapPin } from "lucide-react";
 import TaskCard, { Task } from "@/components/TaskCard";
 import { useNotification } from "@/context/NotificationContext";
 import { useProfile } from "@/context/ProfileContext";
+import { TASK_CATEGORIES } from "@/lib/constants";
 import dynamic from 'next/dynamic';
 
 // Dynamically import map to avoid SSR issues
@@ -24,14 +25,7 @@ export default function TasksPage() {
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
 
-  const categories = [
-    "All",
-    "Handyman",
-    "Cleaning",
-    "Tech Support",
-    "Delivery",
-    "Errands",
-  ];
+  const categories = ["All", ...TASK_CATEGORIES];
 
   const fetchTasks = async () => {
     try {
@@ -104,6 +98,17 @@ export default function TasksPage() {
 
   const handlePostTask = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Content moderation check
+    if (formData.description.trim().length < 20) {
+      alert("Please provide a more detailed description (at least 20 characters).");
+      return;
+    }
+    if (/(.)\1{5,}/.test(formData.description)) {
+      alert("Description contains repetitive characters. Please provide a valid description.");
+      return;
+    }
+    
     try {
       const payload = { ...formData };
       payload.scheduledTime = new Date(formData.scheduledTime).toISOString();

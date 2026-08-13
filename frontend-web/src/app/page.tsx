@@ -107,7 +107,7 @@ export default function LandingPage() {
 
             {/* Quick Links */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[13px] font-medium text-slate mr-2">{'Popular: '}</span>
+              <span className="text-[13px] font-medium text-slate mr-2">{'Popular:'}</span>
               {["Handyman", "Cleaning", "Delivery", "Tech Help"].map((cat) => (
                 <button key={cat} onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-md bg-mist border border-hairline px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-paper hover:border-slate hover:shadow-sm transition-all">
                    {cat}
@@ -376,14 +376,11 @@ export default function LandingPage() {
             <h4 className="font-bold text-ink mb-6">Product</h4>
             <ul className="space-y-4">
               <li><Link href="/how-it-works" className="text-[14px] text-slate hover:text-moss transition-colors">How it works</Link></li>
-              <li><Link href="/pricing" className="text-[14px] text-slate hover:text-moss transition-colors">Pricing</Link></li>
-              <li><Link href="/enterprise" className="text-[14px] text-slate hover:text-moss transition-colors">Enterprise</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-ink mb-6">Company</h4>
             <ul className="space-y-4">
-              <li><Link href="/about" className="text-[14px] text-slate hover:text-moss transition-colors">About Us</Link></li>
               <li><Link href="/trust-and-safety" className="text-[14px] text-slate hover:text-moss transition-colors">Trust & Safety</Link></li>
               <li><Link href="/contact" className="text-[14px] text-slate hover:text-moss transition-colors">Contact</Link></li>
             </ul>
