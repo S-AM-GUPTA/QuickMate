@@ -24,6 +24,7 @@ interface TaskCardProps {
   onReleasePayment?: (task: Task) => void;
   onEditTask?: (task: Task) => void;
   onDeleteTask?: (task: Task) => void;
+  onUpdateStatus?: (task: Task, newStatus: string) => void;
 }
 
 export default function TaskCard({
@@ -34,6 +35,7 @@ export default function TaskCard({
   onReleasePayment,
   onEditTask,
   onDeleteTask,
+  onUpdateStatus,
 }: TaskCardProps) {
   const urgencyColors = {
     low: "bg-sand text-smoke border-smoke",
@@ -170,6 +172,25 @@ export default function TaskCard({
               Release Payment
             </button>
           )}
+
+        {/* Helper Options for Assigned / In Progress */}
+        {viewMode === "helper" && task.status === "ASSIGNED" && onUpdateStatus && (
+          <button
+            onClick={() => onUpdateStatus(task, "IN_PROGRESS")}
+            className="w-full flex items-center justify-center rounded-full bg-charcoal px-4 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition duration-200 cursor-pointer"
+          >
+            Start Task
+          </button>
+        )}
+
+        {viewMode === "helper" && task.status === "IN_PROGRESS" && onUpdateStatus && (
+          <button
+            onClick={() => onUpdateStatus(task, "COMPLETED")}
+            className="w-full flex items-center justify-center rounded-full bg-moss px-4 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition duration-200 cursor-pointer"
+          >
+            Mark as Completed
+          </button>
+        )}
       </div>
     </div>
   );

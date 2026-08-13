@@ -167,6 +167,17 @@ export default function TasksPage() {
     }
   };
 
+  const handleUpdateTaskStatus = async (task: Task, newStatus: string) => {
+    try {
+      await api.patch(`/tasks/${task.id}/status`, { status: newStatus });
+      addNotification(`Task marked as ${newStatus}`);
+      fetchTasks();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to update task status");
+    }
+  };
+
   // Filter by category selected in UI
   let filteredTasks = selectedCategory === "All" 
     ? tasks 
@@ -244,6 +255,7 @@ export default function TasksPage() {
               task={task}
               viewMode={profile.role}
               onPlaceBid={() => handlePlaceBidClick(task)}
+              onUpdateStatus={handleUpdateTaskStatus}
             />
           ))
         )}
@@ -263,24 +275,23 @@ export default function TasksPage() {
               <X className="w-5 h-5 text-ink" />
             </button>
 
-            <div className="p-8">
-              <h2 className="text-[28px] tracking-tight text-ink mb-6">Create New Operation</h2>
-              
-              <form onSubmit={handlePostTask}>
+            <form className="p-6 md:p-8" onSubmit={handlePostTask}>
+              <h2 className="text-2xl font-bold text-ink mb-6 tracking-tight">Post a New Task</h2>
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Title</label>
+                  <input 
+                    type="text" required minLength={5}
+                    className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                    placeholder="e.g. Help me move my sofa"
+                    value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
+                  />
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   
                   {/* Left Column: Form Fields */}
                   <div className="space-y-5">
-                    <div>
-                      <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Title</label>
-                      <input 
-                        type="text" required
-                        className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
-                        placeholder="e.g. Need help assembling IKEA furniture"
-                        value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
-                      />
-                    </div>
-
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Category</label>
@@ -372,12 +383,23 @@ export default function TasksPage() {
 
                 </div>
 
-                <div className="pt-6 mt-6 border-t border-smoke/20 flex justify-end gap-3">
-                  <button type="button" onClick={() => setShowPostModal(false)} className="px-6 py-3 rounded-full font-medium text-[14px] text-ink bg-sand hover:bg-smoke/20 transition-colors">Cancel</button>
-                  <button type="submit" className="px-8 py-3 rounded-full font-medium text-[14px] text-paper bg-charcoal hover:opacity-90 transition-opacity">Post Task Now</button>
+                <div className="flex gap-3 pt-4 border-t border-smoke/20">
+                  <button 
+                    type="button"
+                    onClick={() => setShowPostModal(false)}
+                    className="flex-1 bg-sand text-ink py-3.5 rounded-xl font-medium text-[15px] hover:bg-smoke/10 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit"
+                    className="flex-1 bg-charcoal text-paper py-3.5 rounded-xl font-medium text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    Post Task Now
+                  </button>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
         </div>
       )}
