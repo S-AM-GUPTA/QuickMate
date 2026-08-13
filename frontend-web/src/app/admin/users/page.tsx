@@ -150,7 +150,11 @@ export default function AdminUsersPage() {
                     {user.role === 'helper' ? (
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                           <span className="text-[12px] font-bold text-ink bg-mist px-2 py-0.5 rounded-full border border-smoke/20 flex items-center gap-1">⭐ {typeof user.rating === 'number' ? user.rating.toFixed(1) : "5.0"}</span>
+                           <span className="text-[12px] font-bold text-ink bg-mist px-2 py-0.5 rounded-full border border-smoke/20 flex items-center gap-1">
+                             {(!user.completedTasksCount || user.completedTasksCount === 0) 
+                               ? "No ratings yet" 
+                               : `⭐ ${typeof user.rating === 'number' ? user.rating.toFixed(1) : "5.0"}`}
+                           </span>
                            <span className="text-[11px] text-smoke font-semibold">{user.completedTasksCount || 0} tasks done</span>
                         </div>
                         {user.skills && user.skills.length > 0 ? (
@@ -184,7 +188,7 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {user.verificationDocUrl && (
+                      {user.verificationDocUrl && user.verificationStatus !== 'UNVERIFIED' && (
                         <a 
                           href={user.verificationDocUrl.includes("dummy-document") ? "https://placehold.co/600x400/png?text=KYC+Document" : user.verificationDocUrl}
                           target="_blank"

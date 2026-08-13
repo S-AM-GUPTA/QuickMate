@@ -11,6 +11,7 @@ export default function AdminDashboard() {
     totalTasks: 0,
     totalRevenue: 0,
     pendingBids: 0,
+    pendingKyc: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -90,35 +91,31 @@ export default function AdminDashboard() {
                 </div>
                 <span className="text-moss font-bold text-[12px] bg-moss/10 px-3 py-1 rounded-full border border-moss/20">Operational</span>
               </div>
-              <div className="flex items-center justify-between p-4 bg-mist rounded-xl border border-smoke/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#FACC15] animate-pulse"></div>
-                  <span className="font-semibold text-ink text-[14px]">AI Matching Engine</span>
-                </div>
-                <span className="text-[#FACC15] font-bold text-[12px] bg-[#FACC15]/10 px-3 py-1 rounded-full border border-[#FACC15]/20">Training</span>
-              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-paper rounded-2xl p-8 shadow-sm border border-smoke/30 h-[400px] flex flex-col">
-          <h3 className="text-xl text-ink mb-6 flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-moss" />
-            Action Required
-          </h3>
-          <div className="flex-1 rounded-xl bg-mist border border-smoke/30 flex flex-col items-center justify-center text-center p-6 gap-4">
-            <div className="w-16 h-16 bg-paper rounded-full flex items-center justify-center border border-smoke/20 shadow-sm">
-              <ShieldCheck className="w-8 h-8 text-smoke" />
+        {/* Only show Action Required if there are actually pending reviews */}
+        {stats.pendingKyc > 0 && (
+          <div className="bg-paper rounded-2xl p-8 shadow-sm border border-smoke/30 h-[400px] flex flex-col">
+            <h3 className="text-xl text-ink mb-6 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-moss" />
+              Action Required
+            </h3>
+            <div className="flex-1 rounded-xl bg-mist border border-smoke/30 flex flex-col items-center justify-center text-center p-6 gap-4">
+              <div className="w-16 h-16 bg-paper rounded-full flex items-center justify-center border border-smoke/20 shadow-sm">
+                <ShieldCheck className="w-8 h-8 text-smoke" />
+              </div>
+              <div>
+                <p className="text-[14px] font-bold text-ink">Pending KYC Reviews</p>
+                <p className="text-[13px] text-smoke mt-1">There are {stats.pendingKyc} Mates waiting for their Aadhar verification.</p>
+              </div>
+              <Link href="/admin/kyc" className="mt-2 bg-charcoal text-paper px-6 py-2.5 rounded-full text-[13px] font-bold shadow-md hover:opacity-90 flex items-center gap-2">
+                Review Now <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
-            <div>
-              <p className="text-[14px] font-bold text-ink">Pending KYC Reviews</p>
-              <p className="text-[13px] text-smoke mt-1">There are Mates waiting for their Aadhar verification.</p>
-            </div>
-            <Link href="/admin/kyc" className="mt-2 bg-charcoal text-paper px-6 py-2.5 rounded-full text-[13px] font-bold shadow-md hover:opacity-90 flex items-center gap-2">
-              Review Now <ArrowRight className="w-4 h-4" />
-            </Link>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

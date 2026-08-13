@@ -78,11 +78,17 @@ export default function HelperCard({ helper, onHire, onViewProfile }: HelperCard
             {/* Rating & Distance */}
             <div className="mt-1.5 flex items-center gap-2 text-[13px] font-medium">
               <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full border ${isPro ? 'bg-paper/10 border-paper/20 text-paper' : 'bg-sand border-smoke/30 text-ink'}`}>
-                <Star className={`h-3.5 w-3.5 fill-current ${isPro ? 'text-[#FACC15]' : 'text-[#FACC15]'}`} />
-                {helper.rating.toFixed(1)}
+                {(!helper.completedTasksCount || helper.completedTasksCount === 0) ? (
+                  "New"
+                ) : (
+                  <>
+                    <Star className={`h-3.5 w-3.5 fill-current ${isPro ? 'text-[#FACC15]' : 'text-[#FACC15]'}`} />
+                    {helper.rating.toFixed(1)}
+                  </>
+                )}
               </span>
               <span className={isPro ? 'text-paper/70' : 'text-smoke'}>
-                {helper.completedTasksCount} jobs
+                {helper.completedTasksCount || 0} jobs
               </span>
             </div>
           </div>

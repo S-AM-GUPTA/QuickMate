@@ -16,11 +16,16 @@ export class AdminService {
       where: { status: 'PENDING' },
     });
 
+    const pendingKyc = await this.prisma.user.count({
+      where: { verificationStatus: 'PENDING_REVIEW' },
+    });
+
     return {
       totalUsers,
       totalTasks,
       totalRevenue: totalRevenue._sum.budget || 0,
       pendingBids,
+      pendingKyc,
     };
   }
 
@@ -52,6 +57,7 @@ export class AdminService {
         isVerified: newIsVerified,
         verificationStatus: newIsVerified ? 'VERIFIED' : 'UNVERIFIED',
         role: newIsVerified && user.role === 'customer' ? 'helper' : user.role === 'helper' && !newIsVerified ? 'customer' : user.role,
+        verificationDocUrl: newIsVerified ? user.verificationDocUrl : null,
       },
     });
   }

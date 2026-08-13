@@ -54,10 +54,12 @@ export default function AdminTransactionsPage() {
           <h3 className="text-3xl text-ink flex items-center gap-1">
             <IndianRupee className="w-6 h-6" /> {totalVolume.toLocaleString()}
           </h3>
-          <div className="mt-4 flex items-center gap-2 text-[12px] font-bold text-moss">
-            <span className="bg-moss/10 px-2 py-0.5 rounded-full flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12.5%</span>
-            <span className="text-smoke">vs last month</span>
-          </div>
+          {totalVolume > 0 && (
+            <div className="mt-4 flex items-center gap-2 text-[12px] font-bold text-moss">
+              <span className="bg-moss/10 px-2 py-0.5 rounded-full flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 12.5%</span>
+              <span className="text-smoke">vs last month</span>
+            </div>
+          )}
         </div>
 
         <div className="bg-paper rounded-2xl p-6 shadow-sm border border-smoke/30 relative overflow-hidden">
@@ -65,10 +67,12 @@ export default function AdminTransactionsPage() {
           <h3 className="text-3xl text-moss flex items-center gap-1">
             <IndianRupee className="w-6 h-6" /> {platformFee.toLocaleString()}
           </h3>
-          <div className="mt-4 flex items-center gap-2 text-[12px] font-bold text-moss">
-            <span className="bg-moss/10 px-2 py-0.5 rounded-full flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 15.2%</span>
-            <span className="text-smoke">vs last month</span>
-          </div>
+          {platformFee > 0 && (
+            <div className="mt-4 flex items-center gap-2 text-[12px] font-bold text-moss">
+              <span className="bg-moss/10 px-2 py-0.5 rounded-full flex items-center"><ArrowUpRight className="w-3 h-3 mr-1"/> 15.2%</span>
+              <span className="text-smoke">vs last month</span>
+            </div>
+          )}
         </div>
 
         <div className="bg-paper rounded-2xl p-6 shadow-sm border border-smoke/30 relative overflow-hidden">
@@ -77,8 +81,14 @@ export default function AdminTransactionsPage() {
             <IndianRupee className="w-6 h-6" /> {totalEscrow.toLocaleString()}
           </h3>
           <div className="mt-4 flex items-center gap-2 text-[12px] font-bold text-smoke">
-            <span className="bg-mist border border-smoke/30 px-2 py-0.5 rounded-full flex items-center"><Clock className="w-3 h-3 mr-1"/> Active</span>
-            <span>Awaiting task completion</span>
+            {totalEscrow > 0 ? (
+              <>
+                <span className="bg-mist border border-smoke/30 px-2 py-0.5 rounded-full flex items-center"><Clock className="w-3 h-3 mr-1"/> Active</span>
+                <span>Awaiting task completion</span>
+              </>
+            ) : (
+              <span className="bg-mist border border-smoke/30 px-2 py-0.5 rounded-full flex items-center text-smoke/70">None</span>
+            )}
           </div>
         </div>
       </div>

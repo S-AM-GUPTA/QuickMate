@@ -76,6 +76,18 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
+    // Validate Name
+    const fName = firstName.trim().toLowerCase();
+    const lName = lastName.trim().toLowerCase();
+    if (fName === "new" && lName === "user") {
+      setError("Please provide a valid real name.");
+      return;
+    }
+    if (fName.length < 2 || lName.length < 1) {
+      setError("Please provide your full valid name.");
+      return;
+    }
+
     // Validate Phone Number
     const phoneRegex = /^\d{10}$/; // Basic 10 digit validation
     if (!phoneRegex.test(phone.replace(/\s+/g, ''))) {

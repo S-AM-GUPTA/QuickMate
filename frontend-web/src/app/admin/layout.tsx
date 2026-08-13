@@ -94,10 +94,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {pathname.split("/").pop() === "admin" ? "Overview" : pathname.split("/").pop()?.replace("-", " ")}
           </h1>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-mist px-4 py-2 rounded-full border border-smoke/20">
-              <div className="w-2 h-2 rounded-full bg-moss animate-pulse"></div>
-              <span className="text-[11px] font-bold text-ink tracking-widest uppercase">Live Mode</span>
-            </div>
             <div className="w-10 h-10 rounded-full bg-charcoal text-paper flex items-center justify-center font-bold shadow-sm">
               A
             </div>

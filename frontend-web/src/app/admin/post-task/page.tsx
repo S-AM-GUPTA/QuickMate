@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { TASK_CATEGORIES } from "@/lib/constants";
 
 export default function AdminPostTaskPage() {
   const router = useRouter();
@@ -15,25 +16,19 @@ export default function AdminPostTaskPage() {
   const defaultLat = 28.6315;
   const defaultLng = 77.2167;
 
+  const [consentGiven, setConsentGiven] = useState(false);
+
   const [formData, setFormData] = useState({
     customerId: "",
     title: "",
     description: "",
     budget: "",
-    category: "Data Entry",
+    category: TASK_CATEGORIES[0],
     urgency: "medium",
     scheduledTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 16),
   });
 
-  const categories = [
-    "Data Entry",
-    "Coffee & Lunch Runs",
-    "Pitch Deck Polish",
-    "Beta Testing",
-    "Tech & IT Help",
-    "Virtual Assistance",
-    "Office Errands"
-  ];
+  const categories = TASK_CATEGORIES;
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -59,6 +54,10 @@ export default function AdminPostTaskPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!consentGiven) {
+      alert("You must have explicit consent from the user to post on their behalf.");
+      return;
+    }
     setSubmitting(true);
     setSuccess(false);
 
@@ -206,6 +205,20 @@ export default function AdminPostTaskPage() {
               required
             />
           </div>
+        </div>
+
+        <div className="flex items-start gap-3 bg-sand p-4 rounded-xl border border-smoke/30">
+          <input 
+            type="checkbox" 
+            id="consent" 
+            checked={consentGiven}
+            onChange={(e) => setConsentGiven(e.target.checked)}
+            className="mt-1 shrink-0 cursor-pointer w-4 h-4 text-moss focus:ring-moss border-smoke/50 rounded"
+          />
+          <label htmlFor="consent" className="text-[13px] text-smoke cursor-pointer">
+            <span className="font-bold text-ink block mb-0.5">Authorization Confirmed</span>
+            I confirm that I have received explicit authorization from this user to post this task on their behalf.
+          </label>
         </div>
 
         <div className="pt-6 border-t border-smoke/30 flex justify-end">
