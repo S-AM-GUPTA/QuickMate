@@ -24,6 +24,15 @@ export default function TasksPage() {
   const [showPostModal, setShowPostModal] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
+  
+  // Bidding State
+  const [selectedTaskForBid, setSelectedTaskForBid] = useState<Task | null>(null);
+  const [isBidding, setIsBidding] = useState(false);
+  const [bidForm, setBidForm] = useState({
+    proposedAmount: 0,
+    estimatedCompletionTime: "",
+    note: "",
+  });
 
   const categories = ["All", ...TASK_CATEGORIES];
 
@@ -124,6 +133,40 @@ export default function TasksPage() {
     }
   };
 
+  const handlePlaceBidClick = (task: Task) => {
+    setSelectedTaskForBid(task);
+    setBidForm({
+      proposedAmount: task.budget, // Default to task's budget
+      estimatedCompletionTime: task.scheduledTime.slice(0, 16), // Default to task's deadline
+      note: "",
+    });
+  };
+
+  const handlePlaceBidSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTaskForBid) return;
+
+    setIsBidding(true);
+    try {
+      const payload = {
+        taskId: selectedTaskForBid.id,
+        proposedAmount: Number(bidForm.proposedAmount),
+        estimatedCompletionTime: new Date(bidForm.estimatedCompletionTime).toISOString(),
+        note: bidForm.note,
+      };
+      
+      await api.post("/bids", payload);
+      addNotification(`Successfully placed bid on "${selectedTaskForBid.title}"`);
+      
+      setSelectedTaskForBid(null);
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to place bid. Ensure your KYC is verified.");
+    } finally {
+      setIsBidding(false);
+    }
+  };
+
   // Filter by category selected in UI
   let filteredTasks = selectedCategory === "All" 
     ? tasks 
@@ -200,7 +243,7 @@ export default function TasksPage() {
               key={task.id}
               task={task}
               viewMode={profile.role}
-              onPlaceBid={() => addNotification(`Placed bid on ${task.title}`)}
+              onPlaceBid={() => handlePlaceBidClick(task)}
             />
           ))
         )}
@@ -332,6 +375,61 @@ export default function TasksPage() {
                 <div className="pt-6 mt-6 border-t border-smoke/20 flex justify-end gap-3">
                   <button type="button" onClick={() => setShowPostModal(false)} className="px-6 py-3 rounded-full font-medium text-[14px] text-ink bg-sand hover:bg-smoke/20 transition-colors">Cancel</button>
                   <button type="submit" className="px-8 py-3 rounded-full font-medium text-[14px] text-paper bg-charcoal hover:opacity-90 transition-opacity">Post Task Now</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bid Modal */}
+      {selectedTaskForBid && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-paper rounded-2xl border border-smoke/30 w-full max-w-lg relative animate-fade-in-up shadow-2xl">
+            <button 
+              onClick={() => setSelectedTaskForBid(null)}
+              className="absolute top-4 right-4 p-2 bg-sand rounded-full hover:bg-smoke/20 transition-colors z-10"
+            >
+              <X className="w-5 h-5 text-ink" />
+            </button>
+            <div className="p-8">
+              <h2 className="text-2xl tracking-tight text-ink mb-2">Place Your Bid</h2>
+              <p className="text-[14px] text-smoke mb-6">You are bidding on: <span className="font-bold">{selectedTaskForBid.title}</span></p>
+              
+              <form onSubmit={handlePlaceBidSubmit}>
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Your Proposed Amount (₹)</label>
+                    <input 
+                      type="number" required min="10"
+                      className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                      value={bidForm.proposedAmount} onChange={e => setBidForm({...bidForm, proposedAmount: Number(e.target.value)})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Estimated Completion Time</label>
+                    <input 
+                      type="datetime-local" required
+                      className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
+                      value={bidForm.estimatedCompletionTime} onChange={e => setBidForm({...bidForm, estimatedCompletionTime: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Why should they pick you? (Optional)</label>
+                    <textarea 
+                      rows={3}
+                      className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all resize-none"
+                      placeholder="I have 5 years of experience..."
+                      value={bidForm.note} onChange={e => setBidForm({...bidForm, note: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 mt-6 border-t border-smoke/20 flex justify-end gap-3">
+                  <button type="button" onClick={() => setSelectedTaskForBid(null)} className="px-6 py-2.5 rounded-full font-medium text-[14px] text-ink bg-sand hover:bg-smoke/20 transition-colors">Cancel</button>
+                  <button type="submit" disabled={isBidding} className="px-8 py-2.5 rounded-full font-medium text-[14px] text-paper bg-charcoal hover:opacity-90 transition-opacity disabled:opacity-50">
+                    {isBidding ? "Submitting..." : "Submit Bid"}
+                  </button>
                 </div>
               </form>
             </div>
