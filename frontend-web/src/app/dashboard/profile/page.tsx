@@ -74,23 +74,35 @@ export default function ProfilePage() {
         contentType: kycFile.type,
       });
 
+      let finalDocUrl = data.publicUrl;
+
       // 2. Try to upload to the presigned URL
       // (This will fail in Mock Mode, but that's expected. We catch it and continue)
       try {
-        await fetch(data.uploadUrl, {
-          method: 'PUT',
-          body: kycFile,
-          headers: {
-            'Content-Type': kycFile.type,
-          },
-        });
+        if (data.uploadUrl.includes("mock-r2-upload.com")) {
+          // MOCK MODE: Convert file to Base64 so it can actually be viewed in Admin panel
+          finalDocUrl = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(kycFile);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+          });
+        } else {
+          await fetch(data.uploadUrl, {
+            method: 'PUT',
+            body: kycFile,
+            headers: {
+              'Content-Type': kycFile.type,
+            },
+          });
+        }
       } catch (uploadError) {
-        console.warn("Upload to presigned URL failed (likely mock mode). Continuing with publicUrl.", uploadError);
+        console.warn("Upload to presigned URL failed. Continuing with publicUrl.", uploadError);
       }
 
       // 3. Patch backend with publicUrl
       await api.patch('/users/me/verification', {
-        docUrl: data.publicUrl
+        docUrl: finalDocUrl
       });
 
       // 4. Update local state

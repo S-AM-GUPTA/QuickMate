@@ -73,11 +73,18 @@ export default function AdminKycPage() {
             <div key={user.id} className="bg-paper rounded-2xl shadow-sm border border-smoke/30 overflow-hidden group hover:shadow-md transition-shadow">
               <div className="aspect-video bg-mist relative border-b border-smoke/30 overflow-hidden">
                 {user.verificationDocUrl ? (
-                  <img 
-                    src={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
-                    alt="Aadhar Document" 
-                    className="w-full h-full object-cover"
-                  />
+                  user.verificationDocUrl.includes("application/pdf") || user.verificationDocUrl.endsWith(".pdf") ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-sand text-smoke">
+                      <FileText className="w-12 h-12 mb-2 text-ink" />
+                      <span className="text-[13px] font-bold uppercase tracking-wider text-ink">PDF Document</span>
+                    </div>
+                  ) : (
+                    <img 
+                      src={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
+                      alt="Aadhar Document" 
+                      className="w-full h-full object-cover"
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-smoke">
                     <FileText className="w-8 h-8 mb-2 opacity-50" />
