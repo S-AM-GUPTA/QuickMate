@@ -37,6 +37,24 @@ export class AuthController {
 
   @Public()
   @HttpCode(HttpStatus.OK)
+  @Post('forgot-password')
+  forgotPassword(@Body('identifier') identifier: string) {
+    return this.authService.forgotPassword(identifier);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('reset-password')
+  resetPassword(@Body() resetDto: Record<string, any>) {
+    return this.authService.resetPassword(
+      resetDto.identifier,
+      resetDto.otpCode,
+      resetDto.newPassword,
+    );
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto.identifier, loginDto.password);

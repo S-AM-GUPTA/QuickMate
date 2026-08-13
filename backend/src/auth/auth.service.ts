@@ -201,6 +201,93 @@ export class AuthService {
     };
   }
 
+  async forgotPassword(identifier: string) {
+    const isEmail = identifier.includes('@');
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ email: identifier }, { phone: identifier }] },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found. Please check your email or phone number.');
+    }
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { otpCode, otpExpiresAt },
+    });
+
+    console.log(`\n[PASSWORD RESET OTP] ${otpCode} for ${identifier}\n`);
+
+    if (isEmail) {
+      try {
+        await this.transporter.sendMail({
+          from: `"QuickMate" <${process.env.SMTP_USER}>`,
+          to: identifier,
+          subject: 'Reset your QuickMate Password',
+          html: `
+            <div style="font-family: sans-serif; text-align: center; padding: 40px; background: #f9f9f9;">
+              <img src="https://quickmate.vercel.app/logo.png" alt="QuickMate Logo" style="height: 60px; margin-bottom: 20px;" />
+              <h2 style="color: #333; margin-bottom: 20px;">Reset your password</h2>
+              <p style="color: #666; font-size: 16px; margin-bottom: 30px;">
+                Use the following code to reset your password. It expires in 10 minutes.
+              </p>
+              <div style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #e11d48; background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; display: inline-block;">
+                ${otpCode}
+              </div>
+            </div>
+          `,
+        });
+      } catch (error) {
+        console.error('Failed to send email:', error);
+      }
+    }
+
+    return { message: 'Password reset code sent' };
+  }
+
+  async resetPassword(identifier: string, otpCode: string, newPassword?: string) {
+    if (!newPassword || newPassword.length < 8) {
+      throw new BadRequestException('Password must be at least 8 characters long');
+    }
+
+    const user = await this.prisma.user.findFirst({
+      where: { OR: [{ email: identifier }, { phone: identifier }] },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      user.otpCode !== otpCode ||
+      !user.otpExpiresAt ||
+      user.otpExpiresAt < new Date()
+    ) {
+      throw new BadRequestException('Invalid or expired code');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        otpCode: null,
+        otpExpiresAt: null,
+        password: hashedPassword,
+      },
+    });
+
+    const payload = { sub: user.id, role: user.role };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    };
+  }
+
   async loginWithOAuth(idToken: string) {
     try {
       const decodedToken = await this.firebaseService.getAuth().verifyIdToken(idToken);
