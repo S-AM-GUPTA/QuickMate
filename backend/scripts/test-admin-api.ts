@@ -4,7 +4,7 @@ async function test() {
   try {
     console.log('Logging in as admin...');
     const loginRes = await axios.post('http://localhost:3005/auth/login', {
-      identifier: 'admin@quickmate.com',
+      identifier: 'quickmate001@gmail.com',
       password: 'securepassword123'
     });
     

@@ -18,6 +18,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       try {
         const userProfile = localStorage.getItem("userProfile");
         if (!userProfile) {
+          document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
           router.push("/login");
           return;
         }

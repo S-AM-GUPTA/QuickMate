@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  const adminEmail = 'admin@quickmate.com';
+  const adminEmail = 'quickmate001@gmail.com';
   
   // Demote everyone except the specific admin
   const result = await prisma.user.updateMany({

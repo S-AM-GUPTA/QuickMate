@@ -34,6 +34,7 @@ api.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userProfile');
+        document.cookie = 'accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         
         // Don't redirect if we're already on the login page to avoid loops
         if (!window.location.pathname.includes('/login') && window.location.pathname !== '/') {

@@ -5,7 +5,7 @@ import crypto from 'crypto';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'admin@quickmate.com';
+  const email = 'quickmate001@gmail.com';
   const password = 'securepassword123';
   
   // Check if admin already exists
