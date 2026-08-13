@@ -81,7 +81,7 @@ export default function AdminKycPage() {
                     </div>
                   ) : (
                     <img 
-                      src={user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
+                      src={(!user.verificationDocUrl.startsWith("data:") && (user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock-r2-upload"))) ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl} 
                       alt="Aadhar Document" 
                       className="w-full h-full object-cover"
                     />
@@ -96,7 +96,8 @@ export default function AdminKycPage() {
                 {user.verificationDocUrl && (
                   <button 
                     onClick={() => {
-                      const url = user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock") ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl;
+                      const isDummy = !user.verificationDocUrl.startsWith("data:") && (user.verificationDocUrl.includes("dummy-document") || user.verificationDocUrl.includes("pub-quickmate") || user.verificationDocUrl.includes("mock-r2-upload"));
+                      const url = isDummy ? "https://placehold.co/600x400/png?text=Aadhar+Card" : user.verificationDocUrl;
                       
                       if (url.startsWith("data:application/pdf")) {
                          fetch(url).then(res => res.blob()).then(blob => {
