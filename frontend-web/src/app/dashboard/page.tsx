@@ -39,7 +39,7 @@ export default function DashboardOverview() {
     {
       id: 1,
       icon: <CheckCircle className="w-5 h-5" />,
-      title: 'Onboarding Flow UX Audit',
+      title: 'Task Completed',
       desc: 'Payment of ₹2,000 released from escrow to Sarah J.',
       time: '2h ago',
       isNew: false
@@ -56,7 +56,7 @@ export default function DashboardOverview() {
       id: 3,
       icon: <ArrowUpRight className="w-5 h-5" />,
       title: 'Task Live',
-      desc: 'Your request "Beta testing for new iOS app" is live and receiving bids.',
+      desc: 'Your request "Deep Cleaning 2BHK" is live and receiving bids.',
       time: '1d ago',
       isNew: false
     }
@@ -95,7 +95,7 @@ export default function DashboardOverview() {
           id: Date.now(),
           icon: <Activity className="w-5 h-5" />,
           title: 'New Bid Received',
-          desc: 'Alex M. applied to "Pitch Deck Polish - Seed Round".',
+          desc: 'Alex M. applied to "IKEA Furniture Assembly".',
           time: 'Just now',
           isNew: true
         };
@@ -114,7 +114,7 @@ export default function DashboardOverview() {
         {/* Simple Header */}
         <div className="flex justify-between items-center bg-paper p-6 rounded-2xl border border-smoke/60 shadow-sm">
           <div>
-            <h1 className="text-2xl font-serif text-ink tracking-tight mb-1">
+            <h1 className="text-2xl text-ink tracking-tight mb-1">
               Online & Ready to Earn.
             </h1>
             <p className="text-[14px] text-ink/60">Finding gigs near your location.</p>
@@ -137,7 +137,7 @@ export default function DashboardOverview() {
                 <span className="text-[13px] font-bold uppercase tracking-wider text-moss">Your Wallet</span>
                 <Wallet className="w-5 h-5 text-moss" />
               </div>
-              <h2 className="text-4xl font-serif text-ink mb-2 tracking-tight relative z-10">₹1,250</h2>
+              <h2 className="text-4xl text-ink mb-2 tracking-tight relative z-10">₹1,250</h2>
               <p className="text-[13px] text-ink/60 mb-6 relative z-10">Available to withdraw instantly.</p>
               <button className="w-full bg-moss text-paper py-3 rounded-xl text-[14px] font-bold hover:bg-moss/90 transition-colors shadow-[0_0_15px_rgba(80,146,9,0.3)] relative z-10">
                 Withdraw Funds
@@ -167,7 +167,7 @@ export default function DashboardOverview() {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-paper border border-smoke/60 rounded-2xl p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-serif text-ink flex items-center gap-2">
+                <h3 className="text-xl text-ink flex items-center gap-2">
                   <LayoutDashboard className="w-5 h-5" /> Open Gigs Near You
                 </h3>
                 <button className="text-[13px] font-medium text-ink/60 hover:text-moss transition-colors">Filters</button>
@@ -193,7 +193,7 @@ export default function DashboardOverview() {
                           <MapPin className="w-3 h-3"/> {gig.dist}
                         </span>
                       </div>
-                      <span className="text-[18px] font-serif font-bold text-ink">{gig.price}</span>
+                      <span className="text-[18px] font-bold text-ink">{gig.price}</span>
                     </div>
                     <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">{gig.title}</h4>
                     <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
@@ -208,7 +208,7 @@ export default function DashboardOverview() {
 
             {/* Active Bids */}
             <div className="bg-paper border border-smoke/60 rounded-2xl p-6 shadow-sm">
-              <h3 className="text-xl font-serif text-ink mb-4 flex items-center gap-2">
+              <h3 className="text-xl text-ink mb-4 flex items-center gap-2">
                 <Clock className="w-5 h-5" /> Pending Bids
               </h3>
               <div className="space-y-3">
@@ -241,14 +241,14 @@ export default function DashboardOverview() {
           <div className="max-w-xl">
             <span className="inline-flex items-center rounded-full bg-ink/5 px-3 py-1 text-[12px] font-medium text-ink mb-6 border border-ink/10 backdrop-blur-sm shadow-sm">
               <LayoutDashboard className="w-3.5 h-3.5 mr-2" />
-              OPERATIONS HQ
+              DASHBOARD
             </span>
-            <h1 className="text-[44px] md:text-5xl font-serif tracking-tight leading-tight mb-4">
+            <h1 className="text-[44px] md:text-5xl tracking-tight leading-tight mb-4">
               {greeting}. <br/>
-              <span className="text-ink/60">Ready to scale?</span>
+              <span className="text-ink/60">Need a hand?</span>
             </h1>
             <p className="text-[16px] text-ink/70 leading-relaxed max-w-md mb-8">
-              Delegate QA testing, pitch deck design, and data entry to verified mates instantly.
+              Delegate chores, running errands, and home repairs to verified mates instantly.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link 
@@ -266,7 +266,7 @@ export default function DashboardOverview() {
               Hours Saved
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-[44px] font-serif tracking-tight text-ink">
+              <span className="text-[44px] tracking-tight text-ink">
                 142
               </span>
               <span className="text-moss text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
@@ -283,7 +283,7 @@ export default function DashboardOverview() {
             <span className="text-[14px] font-medium uppercase tracking-wider">Active Escrow</span>
             <Wallet className="w-5 h-5 text-ink/70" />
           </div>
-          <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">₹4,500</span>
+          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">₹4,500</span>
           <span className="text-[13px] text-ink/60 font-medium relative z-10">Locked safely in escrow</span>
         </div>
 
@@ -293,7 +293,7 @@ export default function DashboardOverview() {
             <span className="text-[14px] font-medium uppercase tracking-wider">Tasks Completed</span>
             <CheckCircle className="w-5 h-5 text-ink/70" />
           </div>
-          <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">12</span>
+          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">12</span>
           <span className="text-[13px] text-ink/60 font-medium relative z-10">This month</span>
         </div>
 
@@ -303,7 +303,7 @@ export default function DashboardOverview() {
             <span className="text-[14px] font-medium uppercase tracking-wider">Verified Mates</span>
             <ShieldCheck className="w-5 h-5 text-ink/70" />
           </div>
-          <span className="text-[36px] font-serif tracking-tight text-ink mb-1 relative z-10">4</span>
+          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">4</span>
           <span className="text-[13px] text-ink/60 font-medium relative z-10">Ready to hire instantly</span>
         </div>
       </div>
@@ -313,7 +313,7 @@ export default function DashboardOverview() {
         {/* Active Tasks Section (2/3 width) */}
         <div className="lg:col-span-2 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-2xl font-serif text-ink flex items-center gap-2">
+            <h3 className="text-2xl text-ink flex items-center gap-2">
               <span className="relative flex h-3 w-3 mr-1">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-coral opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-coral"></span>
@@ -329,13 +329,13 @@ export default function DashboardOverview() {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Design</span>
+                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Handyman</span>
                     <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Due in 2 days</span>
                   </div>
-                  <h4 className="text-lg font-bold text-ink">Pitch Deck Polish - Seed Round</h4>
+                  <h4 className="text-lg font-bold text-ink">IKEA Furniture Assembly</h4>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[18px] font-serif text-ink">₹1,500</span>
+                  <span className="block text-[18px] text-ink">₹1,500</span>
                   <span className="text-[12px] font-medium text-moss bg-moss/10 px-2 py-0.5 rounded-full inline-block mt-1">In Progress</span>
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function DashboardOverview() {
                   <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
                 </div>
                 <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <Star className="w-4 h-4 text-ink" /> Mate Alex M. is finalizing the slides.
+                  <Star className="w-4 h-4 text-ink" /> Mate Alex M. is on the way.
                 </p>
               </div>
             </div>
@@ -359,13 +359,13 @@ export default function DashboardOverview() {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">QA Testing</span>
+                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Cleaning</span>
                     <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5 text-coral" /> Action Required</span>
                   </div>
-                  <h4 className="text-lg font-bold text-ink">Beta testing for new iOS app</h4>
+                  <h4 className="text-lg font-bold text-ink">Deep Cleaning 2BHK</h4>
                 </div>
                 <div className="text-right">
-                  <span className="block text-[18px] font-serif text-ink">₹800</span>
+                  <span className="block text-[18px] text-ink">₹800</span>
                   <span className="text-[12px] font-medium text-coral bg-coral/10 px-2 py-0.5 rounded-full inline-block mt-1">Review Pending</span>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function DashboardOverview() {
                   <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
                 </div>
                 <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-ink" /> Review submitted bugs and approve payment.
+                  <CheckCircle className="w-4 h-4 text-ink" /> Review completed work and approve payment.
                 </p>
               </div>
             </div>
@@ -388,7 +388,7 @@ export default function DashboardOverview() {
 
         {/* Activity Feed Section (1/3 width) */}
         <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-          <h3 className="text-2xl font-serif text-ink mb-6 flex items-center gap-2">
+          <h3 className="text-2xl text-ink mb-6 flex items-center gap-2">
             <Activity className="w-5 h-5" /> Activity Log
           </h3>
           <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">

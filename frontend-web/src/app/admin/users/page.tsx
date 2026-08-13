@@ -66,46 +66,46 @@ export default function AdminUsersPage() {
   });
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-slate-900">Registered Users</h2>
+    <div className="bg-paper rounded-2xl shadow-sm border border-smoke/30 overflow-hidden animate-fade-in-up">
+      <div className="p-6 border-b border-smoke/30 flex items-center justify-between bg-sand">
+        <h2 className="text-xl text-ink tracking-tight">Registered Users</h2>
         <div className="relative">
-          <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-smoke" />
           <input 
             type="text" 
             placeholder="Search users..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-4 py-2 border border-slate-200 rounded-full text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 w-64"
+            className="pl-9 pr-4 py-2 bg-paper border border-smoke/30 rounded-full text-[13px] text-ink focus:outline-none focus:border-moss transition-colors w-64"
           />
         </div>
       </div>
       
       {/* Tabs */}
-      <div className="flex border-b border-slate-200 px-6 gap-6 bg-slate-50/50">
+      <div className="flex border-b border-smoke/30 px-6 gap-6 bg-sand/50">
         <button
           onClick={() => setRoleFilter("all")}
-          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "all" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          className={`py-3 text-[13px] font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer ${roleFilter === "all" ? "border-moss text-moss" : "border-transparent text-smoke hover:text-ink"}`}
         >
           All Users
         </button>
         <button
           onClick={() => setRoleFilter("customer")}
-          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "customer" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          className={`py-3 text-[13px] font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer ${roleFilter === "customer" ? "border-moss text-moss" : "border-transparent text-smoke hover:text-ink"}`}
         >
           Customers
         </button>
         <button
           onClick={() => setRoleFilter("helper")}
-          className={`py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${roleFilter === "helper" ? "border-emerald-600 text-emerald-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+          className={`py-3 text-[13px] font-bold uppercase tracking-wider border-b-2 transition-colors cursor-pointer ${roleFilter === "helper" ? "border-moss text-moss" : "border-transparent text-smoke hover:text-ink"}`}
         >
           Mates (Helpers)
         </button>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-slate-600">
-          <thead className="bg-slate-50 text-xs uppercase text-slate-500 border-b border-slate-200 font-bold">
+        <table className="w-full text-left text-[14px] text-ink">
+          <thead className="bg-sand text-[11px] uppercase tracking-widest text-smoke border-b border-smoke/30 font-bold">
             <tr>
               <th className="px-6 py-4">User</th>
               <th className="px-6 py-4">Role</th>
@@ -118,30 +118,30 @@ export default function AdminUsersPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading users...</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-smoke text-[14px] font-medium">Loading users...</td>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">No users found</td>
+                <td colSpan={6} className="px-6 py-8 text-center text-smoke text-[14px] font-medium">No users found</td>
               </tr>
             ) : (
               filteredUsers.map((user) => (
-                <tr key={user.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                <tr key={user.id} className="border-b border-smoke/20 hover:bg-mist transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-charcoal text-paper flex items-center justify-center font-bold text-[16px]">
                         {user.name.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900">{user.name}</p>
-                        <p className="text-xs text-slate-500">{user.email}</p>
+                        <p className="font-bold text-ink">{user.name}</p>
+                        <p className="text-[12px] text-smoke">{user.email}</p>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      user.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                      user.role === 'helper' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-700'
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                      user.role === 'admin' ? 'bg-charcoal text-paper' :
+                      user.role === 'helper' ? 'bg-mist text-ink border border-smoke/30' : 'bg-sand text-smoke'
                     }`}>
                       {user.role}
                     </span>
@@ -150,36 +150,36 @@ export default function AdminUsersPage() {
                     {user.role === 'helper' ? (
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                           <span className="text-xs font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">⭐ {typeof user.rating === 'number' ? user.rating.toFixed(1) : "5.0"}</span>
-                           <span className="text-[10px] text-slate-500 font-semibold">{user.completedTasksCount || 0} tasks done</span>
+                           <span className="text-[12px] font-bold text-ink bg-mist px-2 py-0.5 rounded-full border border-smoke/20 flex items-center gap-1">⭐ {typeof user.rating === 'number' ? user.rating.toFixed(1) : "5.0"}</span>
+                           <span className="text-[11px] text-smoke font-semibold">{user.completedTasksCount || 0} tasks done</span>
                         </div>
                         {user.skills && user.skills.length > 0 ? (
                            <div className="flex flex-wrap gap-1 mt-1">
                               {user.skills.slice(0, 2).map((s: string) => (
-                                 <span key={s} className="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-medium">{s}</span>
+                                 <span key={s} className="text-[10px] bg-sand border border-smoke/30 text-ink px-2 py-0.5 rounded font-bold uppercase tracking-wide">{s}</span>
                               ))}
-                              {user.skills.length > 2 && <span className="text-[9px] text-slate-400">+{user.skills.length - 2}</span>}
+                              {user.skills.length > 2 && <span className="text-[10px] text-smoke font-bold">+{user.skills.length - 2}</span>}
                            </div>
                         ) : (
-                           <span className="text-[10px] text-slate-400 italic">No skills listed</span>
+                           <span className="text-[11px] text-smoke italic">No skills listed</span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400 italic">N/A</span>
+                      <span className="text-[12px] text-smoke italic">N/A</span>
                     )}
                   </td>
                   <td className="px-6 py-4">
                     {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? (
-                      <span className="flex items-center gap-1 text-emerald-600 font-semibold"><CheckCircle className="h-4 w-4" /> Verified Mate</span>
+                      <span className="flex items-center gap-1.5 text-moss font-bold text-[13px]"><CheckCircle className="h-4 w-4" /> Verified</span>
                     ) : user.verificationStatus === 'PENDING_REVIEW' ? (
                       <span className="flex flex-col gap-1">
-                        <span className="flex items-center gap-1 text-amber-600 font-semibold"><FileText className="h-4 w-4" /> Review Pending</span>
+                        <span className="flex items-center gap-1.5 text-coral font-bold text-[13px]"><FileText className="h-4 w-4" /> Review Pending</span>
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-slate-400 font-semibold"><ShieldAlert className="h-4 w-4" /> Unverified</span>
+                      <span className="flex items-center gap-1.5 text-smoke font-bold text-[13px]"><ShieldAlert className="h-4 w-4" /> Unverified</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 font-medium">
+                  <td className="px-6 py-4 font-medium text-smoke text-[13px]">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -189,16 +189,16 @@ export default function AdminUsersPage() {
                           href={user.verificationDocUrl.includes("dummy-document") ? "https://placehold.co/600x400/png?text=KYC+Document" : user.verificationDocUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-bold text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors flex items-center gap-1"
+                          className="font-bold text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full bg-mist border border-smoke/30 text-ink hover:bg-sand transition-colors flex items-center gap-1.5"
                           title="View Document"
                         >
-                          <ExternalLink className="h-3 w-3" /> Doc
+                          <ExternalLink className="h-3.5 w-3.5" /> Doc
                         </a>
                       )}
                       {(user.verificationStatus === 'PENDING_REVIEW') && (
                         <button 
                           onClick={() => handleReject(user.id)}
-                          className="font-bold text-xs px-3 py-1.5 rounded-full transition-colors bg-red-50 text-red-600 hover:bg-red-100"
+                          className="font-bold text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-colors border border-coral/30 text-coral hover:bg-coral/10"
                         >
                           Reject
                         </button>
@@ -206,18 +206,18 @@ export default function AdminUsersPage() {
                       {(user.verificationStatus !== 'UNVERIFIED' || user.role === 'helper') && (
                         <button 
                           onClick={() => handleVerifyToggle(user.id)}
-                          className={`font-bold text-xs px-3 py-1.5 rounded-full transition-colors ${
+                          className={`font-bold text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-colors border ${
                             user.verificationStatus === 'VERIFIED' || user.role === 'helper'
-                              ? "bg-amber-50 text-amber-600 hover:bg-amber-100" 
-                              : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100"
+                              ? "border-smoke/40 text-smoke hover:bg-smoke/10 hover:text-ink" 
+                              : "border-moss/40 text-moss hover:bg-moss/10"
                           }`}
                         >
-                          {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? "Unverify" : "Verify"}
+                          {user.verificationStatus === 'VERIFIED' || user.role === 'helper' ? "Revoke" : "Approve"}
                         </button>
                       )}
                       <button 
                         onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-600 hover:text-red-800 bg-red-50 p-1.5 rounded-full hover:bg-red-100 transition-colors"
+                        className="text-red-500 hover:text-red-600 bg-red-50 p-1.5 rounded-full border border-red-100 hover:bg-red-100 transition-colors ml-1"
                         title="Delete User"
                       >
                         <Trash2 className="w-4 h-4" />

@@ -345,35 +345,35 @@ function DashboardLayoutContent({
             <Link
               href="/dashboard/tasks"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-serif transition-all ${isActive('/dashboard/tasks') ? 'text-ink' : 'text-smoke'}`}
+              className={`text-2xl transition-all ${isActive('/dashboard/tasks') ? 'text-ink' : 'text-smoke'}`}
             >
               Tasks
             </Link>
             <Link
               href="/dashboard/mates"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-serif transition-all ${isActive('/dashboard/mates') ? 'text-ink' : 'text-smoke'}`}
+              className={`text-2xl transition-all ${isActive('/dashboard/mates') ? 'text-ink' : 'text-smoke'}`}
             >
               Mates
             </Link>
             <Link
               href="/dashboard/analytics"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-serif transition-all ${isActive('/dashboard/analytics') ? 'text-ink' : 'text-smoke'}`}
+              className={`text-2xl transition-all ${isActive('/dashboard/analytics') ? 'text-ink' : 'text-smoke'}`}
             >
               Analytics
             </Link>
             <Link
               href="/dashboard/wallet"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-serif transition-all ${isActive('/dashboard/wallet') ? 'text-ink' : 'text-smoke'}`}
+              className={`text-2xl transition-all ${isActive('/dashboard/wallet') ? 'text-ink' : 'text-smoke'}`}
             >
               Wallet
             </Link>
             <Link
               href="/dashboard/profile"
               onClick={() => setMobileMenuOpen(false)}
-              className={`text-2xl font-serif transition-all ${isActive('/dashboard/profile') ? 'text-ink' : 'text-smoke'}`}
+              className={`text-2xl transition-all ${isActive('/dashboard/profile') ? 'text-ink' : 'text-smoke'}`}
             >
               Account
             </Link>
@@ -382,7 +382,7 @@ function DashboardLayoutContent({
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="text-2xl font-serif transition-all text-coral"
+                className="text-2xl transition-all text-coral"
               >
                 Admin Panel
               </Link>

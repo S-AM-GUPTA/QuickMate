@@ -73,12 +73,12 @@ export default function LandingPage() {
           <div className="text-left max-w-2xl z-10 w-full">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-mist text-ink text-[13px] font-medium mb-8 border border-hairline shadow-sm hover:shadow-md transition-shadow">
               <Sparkles className="h-4 w-4 text-moss" />
-              Over 15,000 tasks completed for busy people everywhere
+              Over 500+ tasks completed for busy people everywhere
             </div>
             
             <h1 className="text-[52px] md:text-[64px] lg:text-[72px] font-bold tracking-tight text-ink mb-6 leading-[1.1]">
-              Delegate work.<br/>
-              Scale faster.
+              Get help.<br/>
+              Gain happiness.
             </h1>
             
             <p className="text-[18px] text-slate mb-10 leading-[1.6] max-w-[580px]">
@@ -107,7 +107,7 @@ export default function LandingPage() {
 
             {/* Quick Links */}
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[13px] font-medium text-slate mr-2">Popular:</span>
+              <span className="text-[13px] font-medium text-slate mr-2">{'Popular: '}</span>
               {["Handyman", "Cleaning", "Delivery", "Tech Help"].map((cat) => (
                 <button key={cat} onClick={() => router.push("/login")} className="flex items-center gap-1.5 rounded-md bg-mist border border-hairline px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-paper hover:border-slate hover:shadow-sm transition-all">
                    {cat}
@@ -144,19 +144,6 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Trusted By Logos */}
-      <section className="py-10 border-y border-hairline bg-mist/50 overflow-hidden">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <p className="text-center text-[13px] font-bold tracking-widest text-slate uppercase mb-8">Trusted by thousands of busy individuals</p>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-700">
-            {['Acme Corp', 'GlobalBank', 'NexusFlow', 'Quantum', 'StarkTech'].map((company) => (
-              <div key={company} className="text-[20px] font-black tracking-tighter text-charcoal">
-                {company}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* How It Works Section */}
       <section id="how-it-works" className="bg-paper py-24 px-6 relative">
@@ -180,7 +167,7 @@ export default function LandingPage() {
               {
                 icon: Zap,
                 title: "2. Match & Hire",
-                desc: "Get matched with rigorously vetted professionals. Review their portfolios, read reviews, and hire with one click.",
+                desc: "Get matched with rigorously vetted professionals. Review their profiles, read reviews, and hire with one click.",
               },
               {
                 icon: CheckCircle,
@@ -255,7 +242,7 @@ export default function LandingPage() {
           The QuickMate Pledge
         </h2>
         <p className="text-[18px] text-slate leading-[1.7] mb-16 max-w-3xl mx-auto">
-          Your peace of mind is our product. We enforce strict identity verification, rigorous portfolio reviews, and a secure escrow system. You only pay when the work meets your exact standards.
+          Your peace of mind is our product. We enforce strict identity verification, rigorous profile reviews, and a secure escrow system. You only pay when the work meets your exact standards.
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
@@ -295,10 +282,10 @@ export default function LandingPage() {
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16 animate-fade-in-up">
             <h2 className="text-[36px] md:text-[44px] font-bold text-paper mb-4 tracking-tight">
-              Trusted by operators everywhere
+              Trusted by homeowners everywhere
             </h2>
             <p className="text-[18px] text-fog max-w-2xl mx-auto">
-              Don't just take our word for it. Here's what busy people are saying about scaling their output with QuickMate.
+              Don't just take our word for it. Here's what busy people are saying about getting their time back with QuickMate.
             </p>
           </div>
           
@@ -352,10 +339,10 @@ export default function LandingPage() {
         
         <div className="max-w-3xl mx-auto animate-fade-in-up">
           <h3 className="mb-6 text-[44px] md:text-[56px] font-bold text-ink tracking-tight leading-tight">
-            Ready to scale your output?
+            Ready to reclaim your time?
           </h3>
           <p className="mb-10 text-[20px] text-slate leading-relaxed">
-            Stop letting operations slow you down. Find a trusted Mate today and get back to building the future.
+            Stop letting chores slow you down. Find a trusted Mate today and get back to what matters.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
@@ -388,17 +375,17 @@ export default function LandingPage() {
           <div>
             <h4 className="font-bold text-ink mb-6">Product</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">How it works</Link></li>
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Pricing</Link></li>
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Enterprise</Link></li>
+              <li><Link href="/how-it-works" className="text-[14px] text-slate hover:text-moss transition-colors">How it works</Link></li>
+              <li><Link href="/pricing" className="text-[14px] text-slate hover:text-moss transition-colors">Pricing</Link></li>
+              <li><Link href="/enterprise" className="text-[14px] text-slate hover:text-moss transition-colors">Enterprise</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-ink mb-6">Company</h4>
             <ul className="space-y-4">
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">About Us</Link></li>
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Trust & Safety</Link></li>
-              <li><Link href="#" className="text-[14px] text-slate hover:text-moss transition-colors">Contact</Link></li>
+              <li><Link href="/about" className="text-[14px] text-slate hover:text-moss transition-colors">About Us</Link></li>
+              <li><Link href="/trust-and-safety" className="text-[14px] text-slate hover:text-moss transition-colors">Trust & Safety</Link></li>
+              <li><Link href="/contact" className="text-[14px] text-slate hover:text-moss transition-colors">Contact</Link></li>
             </ul>
           </div>
         </div>
@@ -407,8 +394,8 @@ export default function LandingPage() {
             © 2026 QuickMate. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <Link href="#" className="text-[14px] text-slate hover:text-ink transition-colors">Privacy Policy</Link>
-            <Link href="#" className="text-[14px] text-slate hover:text-ink transition-colors">Terms of Service</Link>
+            <Link href="/privacy-policy" className="text-[14px] text-slate hover:text-ink transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="text-[14px] text-slate hover:text-ink transition-colors">Terms of Service</Link>
           </div>
         </div>
       </footer>

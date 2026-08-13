@@ -96,30 +96,30 @@ export default function AdminPostTaskPage() {
   };
 
   if (loading) {
-    return <div className="animate-pulse flex p-8">Loading users...</div>;
+    return <div className="animate-pulse flex p-8 text-smoke text-[14px]">Loading users...</div>;
   }
 
   return (
-    <div className="max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-6 border-b border-slate-200">
-        <h2 className="text-lg font-bold text-slate-900">Post Task on Behalf of User</h2>
-        <p className="text-sm text-slate-500 mt-1">Create a task manually for a user who contacted you on WhatsApp.</p>
+    <div className="max-w-2xl bg-paper rounded-2xl shadow-sm border border-smoke/30 overflow-hidden animate-fade-in-up">
+      <div className="p-6 border-b border-smoke/30 bg-sand">
+        <h2 className="text-xl text-ink tracking-tight">Post Task on Behalf of User</h2>
+        <p className="text-[13px] text-smoke mt-1">Create a task manually for a user who contacted you directly.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {success && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl font-medium">
+          <div className="p-4 bg-moss/10 border border-moss/30 text-moss rounded-xl font-bold text-[13px]">
             Task successfully created!
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-1">Select User (Requested By)</label>
+          <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Select User (Requested By)</label>
           <select 
             name="customerId" 
             value={formData.customerId} 
             onChange={handleChange}
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+            className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors"
             required
           >
             {users.map(u => (
@@ -129,34 +129,34 @@ export default function AdminPostTaskPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-1">Task Title</label>
+          <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Task Title</label>
           <input 
             type="text" 
             name="title" 
             value={formData.title} 
             onChange={handleChange}
             placeholder="e.g. Need Pitch Deck formatting"
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+            className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors placeholder:text-smoke/50"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-slate-700 mb-1">Description</label>
+          <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Description</label>
           <textarea 
             name="description" 
             value={formData.description} 
             onChange={handleChange}
             rows={3}
             placeholder="Details about the task..."
-            className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none resize-none"
+            className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors placeholder:text-smoke/50 resize-none"
             required
           ></textarea>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Budget (₹)</label>
+            <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Budget (₹)</label>
             <input 
               type="number" 
               name="budget" 
@@ -164,17 +164,17 @@ export default function AdminPostTaskPage() {
               onChange={handleChange}
               placeholder="e.g. 50"
               min="10"
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
+              className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors placeholder:text-smoke/50"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Category</label>
+            <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Category</label>
             <select 
               name="category" 
               value={formData.category} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors"
             >
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -183,12 +183,12 @@ export default function AdminPostTaskPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Urgency</label>
+            <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Urgency</label>
             <select 
               name="urgency" 
               value={formData.urgency} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 bg-slate-50 text-slate-900 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -196,23 +196,23 @@ export default function AdminPostTaskPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Scheduled Time</label>
+            <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Scheduled Time</label>
             <input 
               type="datetime-local" 
               name="scheduledTime" 
               value={formData.scheduledTime} 
               onChange={handleChange}
-              className="w-full border border-slate-300 rounded-xl px-4 py-2 text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none"
+              className="w-full border border-smoke/30 rounded-xl px-4 py-2.5 bg-mist text-[14px] text-ink focus:bg-paper focus:ring-1 focus:ring-moss focus:border-moss outline-none transition-colors"
               required
             />
           </div>
         </div>
 
-        <div className="pt-4 border-t border-slate-100 flex justify-end">
+        <div className="pt-6 border-t border-smoke/30 flex justify-end">
           <button 
             type="submit" 
             disabled={submitting}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-6 rounded-xl transition-colors disabled:opacity-50"
+            className="bg-moss hover:bg-moss/90 text-paper font-bold py-2.5 px-6 rounded-xl transition-colors shadow-md disabled:opacity-50 text-[14px]"
           >
             {submitting ? "Posting Task..." : "Post Task for User"}
           </button>

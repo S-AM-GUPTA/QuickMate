@@ -33,7 +33,7 @@ export default function AnalyticsPage() {
     <div className="space-y-8 animate-fade-in-up">
       
       <div>
-        <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink leading-tight">Analytics</h1>
+        <h1 className="text-4xl md:text-5xl tracking-tight text-ink leading-tight">Analytics</h1>
         <p className="text-smoke font-medium text-[16px] mt-1">
           {isCustomer ? "Track your spending and task performance." : "Track your earnings and profile growth."}
         </p>
@@ -50,7 +50,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-sand rounded-full text-ink"><CreditCard className="w-4 h-4" /></div>
               </div>
               <div>
-                <div className="text-[32px] font-serif tracking-tight text-ink mb-1">{customerStats.totalSpent}</div>
+                <div className="text-[32px] tracking-tight text-ink mb-1">{customerStats.totalSpent}</div>
                 <div className="flex items-center gap-1 text-[13px] font-medium text-moss">
                   <TrendingUp className="w-3.5 h-3.5" /> {customerStats.spentTrend} this month
                 </div>
@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-sand rounded-full text-ink"><CheckCircle className="w-4 h-4" /></div>
               </div>
               <div>
-                <div className="text-[32px] font-serif tracking-tight text-ink mb-1">{customerStats.tasksPosted}</div>
+                <div className="text-[32px] tracking-tight text-ink mb-1">{customerStats.tasksPosted}</div>
                 <div className="flex items-center gap-1 text-[13px] font-medium text-moss">
                   <TrendingUp className="w-3.5 h-3.5" /> {customerStats.tasksTrend} this month
                 </div>
@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-sand rounded-full text-ink"><Users className="w-4 h-4" /></div>
               </div>
               <div>
-                <div className="text-[32px] font-serif tracking-tight text-ink mb-1">{customerStats.activeMates}</div>
+                <div className="text-[32px] tracking-tight text-ink mb-1">{customerStats.activeMates}</div>
                 <div className="flex items-center gap-1 text-[13px] font-medium text-moss">
                   <TrendingUp className="w-3.5 h-3.5" /> {customerStats.activeTrend} this month
                 </div>
@@ -87,7 +87,7 @@ export default function AnalyticsPage() {
           {/* Mock Spending Chart Area */}
           <div className="bg-paper rounded-2xl border border-smoke/30 p-8 shadow-sm">
              <div className="flex items-center justify-between mb-8">
-               <h3 className="text-xl font-serif text-ink">Spending Overview</h3>
+               <h3 className="text-xl text-ink">Spending Overview</h3>
                <select className="bg-sand border border-smoke/30 rounded-full px-4 py-1.5 text-[13px] font-medium text-ink outline-none">
                  <option>Last 6 Months</option>
                  <option>This Year</option>
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-paper/10 rounded-full text-paper"><Activity className="w-4 h-4" /></div>
               </div>
               <div className="relative z-10">
-                <div className="text-[32px] font-serif tracking-tight text-paper mb-1">{helperStats.totalEarned}</div>
+                <div className="text-[32px] tracking-tight text-paper mb-1">{helperStats.totalEarned}</div>
                 <div className="flex items-center gap-1 text-[13px] font-bold text-[#FACC15]">
                   <TrendingUp className="w-3.5 h-3.5" /> {helperStats.earnedTrend} this month
                 </div>
@@ -135,7 +135,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-sand rounded-full text-ink"><Target className="w-4 h-4" /></div>
               </div>
               <div>
-                <div className="text-[32px] font-serif tracking-tight text-ink mb-1">{helperStats.tasksCompleted}</div>
+                <div className="text-[32px] tracking-tight text-ink mb-1">{helperStats.tasksCompleted}</div>
                 <div className="flex items-center gap-1 text-[13px] font-medium text-moss">
                   <TrendingUp className="w-3.5 h-3.5" /> {helperStats.tasksTrend} this month
                 </div>
@@ -148,7 +148,7 @@ export default function AnalyticsPage() {
                 <div className="p-2 bg-sand rounded-full text-ink"><Eye className="w-4 h-4" /></div>
               </div>
               <div>
-                <div className="text-[32px] font-serif tracking-tight text-ink mb-1">{helperStats.profileViews}</div>
+                <div className="text-[32px] tracking-tight text-ink mb-1">{helperStats.profileViews}</div>
                 <div className="flex items-center gap-1 text-[13px] font-medium text-moss">
                   <TrendingUp className="w-3.5 h-3.5" /> {helperStats.viewsTrend} this month
                 </div>
@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
           {/* Mock Earnings Chart Area */}
           <div className="bg-paper rounded-2xl border border-smoke/30 p-8 shadow-sm">
              <div className="flex items-center justify-between mb-8">
-               <h3 className="text-xl font-serif text-ink">Earnings Overview</h3>
+               <h3 className="text-xl text-ink">Earnings Overview</h3>
                <select className="bg-sand border border-smoke/30 rounded-full px-4 py-1.5 text-[13px] font-medium text-ink outline-none">
                  <option>Last 6 Months</option>
                  <option>This Year</option>

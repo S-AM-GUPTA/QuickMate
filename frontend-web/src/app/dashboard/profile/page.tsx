@@ -65,7 +65,7 @@ export default function ProfilePage() {
       
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink leading-tight">Account Profile</h1>
+          <h1 className="text-4xl md:text-5xl tracking-tight text-ink leading-tight">Account Profile</h1>
           <p className="text-smoke font-medium text-[16px] mt-2">Manage your identity, tier, and security settings.</p>
         </div>
         {!isEditing && (
@@ -112,7 +112,7 @@ export default function ProfilePage() {
               {profile.role === 'helper' && (
                 <>
                   <div className="md:col-span-2 mt-4 pt-6 border-t border-smoke/20">
-                    <h3 className="text-[16px] font-serif tracking-tight text-ink mb-4">Mate Configuration</h3>
+                    <h3 className="text-[16px] tracking-tight text-ink mb-4">Mate Configuration</h3>
                   </div>
                   
                   <div className="md:col-span-2 flex flex-col md:flex-row gap-4 mb-2">
@@ -164,11 +164,11 @@ export default function ProfilePage() {
           <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-smoke/30">
               <div className="flex items-center gap-6">
-                <div className="w-24 h-24 rounded-full bg-sand border border-smoke flex items-center justify-center text-[32px] font-serif text-ink">
+                <div className="w-24 h-24 rounded-full bg-sand border border-smoke flex items-center justify-center text-[32px] text-ink">
                   {profile.name.charAt(0)}
                 </div>
                 <div>
-                  <h2 className="text-3xl font-serif tracking-tight text-ink mb-1">{profile.name}</h2>
+                  <h2 className="text-3xl tracking-tight text-ink mb-1">{profile.name}</h2>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase border ${
                       profile.verificationStatus === "VERIFIED" 
@@ -235,7 +235,7 @@ export default function ProfilePage() {
         <div className="bg-paper rounded-2xl p-8 border border-smoke/50 shadow-sm">
           {profile.role === 'customer' ? (
             <div>
-              <h2 className="text-[20px] font-serif text-ink mb-2">Want to Earn Money?</h2>
+              <h2 className="text-[20px] text-ink mb-2">Want to Earn Money?</h2>
               <p className="text-[14px] text-smoke mb-6 max-w-xl">
                 Switch to a Mate account to start bidding on tasks and offering your professional services to customers.
               </p>
@@ -251,7 +251,7 @@ export default function ProfilePage() {
             </div>
           ) : profile.verificationStatus !== 'VERIFIED' ? (
             <div>
-              <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
+              <h2 className="text-[20px] text-ink mb-2 flex items-center gap-2">
                 <Shield className="w-5 h-5" /> Mate Identity Verification
               </h2>
               <p className="text-[14px] text-smoke mb-6 max-w-xl">
@@ -280,7 +280,7 @@ export default function ProfilePage() {
             <div>
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-[20px] font-serif text-ink mb-2 flex items-center gap-2">
+                  <h2 className="text-[20px] text-ink mb-2 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-moss" /> Identity Verified
                   </h2>
                   <p className="text-[14px] text-smoke">

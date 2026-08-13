@@ -98,19 +98,19 @@ export default function ChatSim({
   };
 
   return (
-    <div className="flex h-[420px] flex-col rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div className="flex h-[420px] flex-col rounded-2xl border border-hairline bg-paper shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between bg-slate-50/50 px-4 py-3 border-b border-slate-100">
+      <div className="flex items-center justify-between bg-mist/50 px-4 py-3 border-b border-hairline">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-moss/20 text-xs font-bold text-moss">
             {otherUser.name.charAt(0)}
           </div>
           <div>
-            <h5 className="text-sm font-semibold text-slate-800">
+            <h5 className="text-sm font-semibold text-ink">
               {otherUser.name}
             </h5>
-            <span className="text-[10px] text-emerald-500 font-medium flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[10px] text-moss font-medium flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-moss animate-pulse"></span>
               Online
             </span>
           </div>
@@ -132,12 +132,12 @@ export default function ChatSim({
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm ${
                   isMe
-                    ? "bg-emerald-600 text-white rounded-tr-none"
-                    : "bg-slate-100 text-slate-800 rounded-tl-none"
+                    ? "bg-moss text-paper rounded-tr-none"
+                    : "bg-mist text-ink rounded-tl-none"
                 }`}
               >
                 {!isMe && (
-                  <span className="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-0.5">
+                  <span className="block text-[10px] font-bold text-moss uppercase tracking-wider mb-0.5">
                     {msg.senderName}
                   </span>
                 )}
@@ -160,11 +160,11 @@ export default function ChatSim({
 
         {isTyping && (
           <div className="flex justify-start">
-            <div className="rounded-2xl rounded-tl-none bg-slate-100 px-4 py-2.5">
+            <div className="rounded-2xl rounded-tl-none bg-mist px-4 py-2.5">
               <div className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400"></span>
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:0.2s]"></span>
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:0.4s]"></span>
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-smoke"></span>
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-smoke [animation-delay:0.2s]"></span>
+                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-smoke [animation-delay:0.4s]"></span>
               </div>
             </div>
           </div>
@@ -174,19 +174,19 @@ export default function ChatSim({
       {/* Input panel */}
       <form
         onSubmit={handleSend}
-        className="flex items-center gap-2 border-t border-slate-100 p-3 bg-slate-50/50"
+        className="flex items-center gap-2 border-t border-hairline p-3 bg-mist/50"
       >
         <input
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder={`Message ${otherUser.name}...`}
-          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 transition-all"
+          className="flex-1 rounded-xl border border-hairline bg-paper px-4 py-2.5 text-sm outline-none focus:border-moss focus:ring-4 focus:ring-moss/10 transition-all text-ink placeholder:text-smoke"
         />
         <button
           type="submit"
           disabled={!inputText.trim()}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow hover:bg-emerald-500 disabled:opacity-50 transition cursor-pointer"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-moss text-paper shadow hover:bg-moss/90 disabled:opacity-50 transition cursor-pointer"
         >
           <Send className="h-4 w-4" />
         </button>

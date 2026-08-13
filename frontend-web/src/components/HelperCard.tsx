@@ -46,7 +46,7 @@ export default function HelperCard({ helper, onHire, onViewProfile }: HelperCard
           className={`flex gap-4 ${onViewProfile ? "cursor-pointer" : ""}`}
           onClick={() => onViewProfile?.(helper)}
         >
-          <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[24px] font-serif border ${isPro ? 'bg-paper/10 border-paper/20 text-paper' : 'bg-sand border-smoke text-ink'}`}>
+          <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[24px] border ${isPro ? 'bg-paper/10 border-paper/20 text-paper' : 'bg-sand border-smoke text-ink'}`}>
             {helper.name.charAt(0)}
             {helper.isVerified && !isPro && (
               <span className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-moss/20 text-moss border-2 border-paper">
@@ -61,7 +61,7 @@ export default function HelperCard({ helper, onHire, onViewProfile }: HelperCard
           </div>
           <div className="flex flex-col justify-center pt-0.5">
             <div className="flex items-center gap-1.5">
-              <h4 className={`text-[18px] font-serif tracking-tight transition-colors ${onViewProfile ? (isPro ? "group-hover:text-paper/80" : "group-hover:text-smoke") : ""} ${isPro ? "text-paper" : "text-ink"}`}>
+              <h4 className={`text-[18px] tracking-tight transition-colors ${onViewProfile ? (isPro ? "group-hover:text-paper/80" : "group-hover:text-smoke") : ""} ${isPro ? "text-paper" : "text-ink"}`}>
                 {helper.name}
               </h4>
             </div>

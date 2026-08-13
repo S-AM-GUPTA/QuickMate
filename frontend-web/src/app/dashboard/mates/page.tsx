@@ -98,7 +98,7 @@ export default function MatesPage() {
       
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink leading-tight">
+          <h1 className="text-4xl md:text-5xl tracking-tight text-ink leading-tight">
             {profile.role === "customer" ? "Mates Network" : "Mate Verification"}
           </h1>
           <p className="text-smoke text-[16px] mt-2">
@@ -115,7 +115,7 @@ export default function MatesPage() {
           <div className="flex items-start gap-6 flex-col md:flex-row">
             
             <div className="flex-1">
-              <h2 className="text-2xl font-serif text-ink mb-2 flex items-center gap-2">
+              <h2 className="text-2xl text-ink mb-2 flex items-center gap-2">
                 <ShieldCheck className="w-6 h-6 text-ink" /> Become a Verified Mate
               </h2>
               <p className="text-smoke text-[15px] mb-6 max-w-xl">
@@ -166,7 +166,7 @@ export default function MatesPage() {
                 <div className="w-20 h-20 bg-[#FACC15]/20 rounded-full flex items-center justify-center mb-4 border border-[#FACC15]/50">
                   <Star className="w-10 h-10 text-[#FACC15] fill-current" />
                 </div>
-                <h2 className="text-3xl font-serif text-paper mb-2">You are a Professional Mate!</h2>
+                <h2 className="text-3xl text-paper mb-2">You are a Professional Mate!</h2>
                 <p className="text-paper/70 text-[16px] max-w-lg mb-4">
                   As a {profile.profession || "Specialist"}, your profile is highlighted to customers looking for premium, verified tradesmen.
                 </p>
@@ -179,7 +179,7 @@ export default function MatesPage() {
                 <div className="w-16 h-16 bg-moss/20 rounded-full flex items-center justify-center mb-4 border border-moss/50">
                   <ShieldCheck className="w-8 h-8 text-moss" />
                 </div>
-                <h2 className="text-2xl font-serif text-ink mb-2">You are a Verified Mate!</h2>
+                <h2 className="text-2xl text-ink mb-2">You are a Verified Mate!</h2>
                 <p className="text-smoke text-[15px] max-w-md mb-4">
                   Your identity has been verified. You can now browse tasks in the Tasks Market and submit bids for any flexible job.
                 </p>
@@ -222,7 +222,7 @@ export default function MatesPage() {
                     <Star className="w-6 h-6 text-[#FACC15] fill-current" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-serif text-ink">Professional Mates</h3>
+                    <h3 className="text-2xl text-ink">Professional Mates</h3>
                     <p className="text-[13px] font-medium text-smoke">Top-rated, verified experts. Guaranteed quality.</p>
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export default function MatesPage() {
                     <Users className="w-6 h-6 text-ink" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-serif text-ink">All Available Mates</h3>
+                    <h3 className="text-2xl text-ink">All Available Mates</h3>
                     <p className="text-[13px] font-medium text-smoke">Browse all verified and unverified mates nearby.</p>
                   </div>
                 </div>

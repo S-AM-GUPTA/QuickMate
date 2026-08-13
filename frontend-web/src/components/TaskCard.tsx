@@ -18,7 +18,7 @@ export interface Task {
 
 interface TaskCardProps {
   task: Task;
-  viewMode: "helper" | "customer";
+  viewMode: "admin" | "helper" | "customer";
   onPlaceBid?: (task: Task) => void;
   onViewBids?: (task: Task) => void;
   onReleasePayment?: (task: Task) => void;
@@ -73,14 +73,14 @@ export default function TaskCard({
           <span className="inline-flex items-center rounded-full bg-sand px-3 py-1 text-[12px] font-medium text-smoke border border-smoke/50">
             {task.category}
           </span>
-          <h3 className="mt-4 text-[20px] font-serif tracking-tight text-ink group-hover:text-smoke transition-colors leading-tight line-clamp-2">
+          <h3 className="mt-4 text-[20px] tracking-tight text-ink group-hover:text-smoke transition-colors leading-tight line-clamp-2">
             {task.title}
           </h3>
         </div>
         
         {/* Budget */}
         <div className="flex flex-col items-end shrink-0">
-          <span className="text-[24px] font-serif text-ink tracking-tight">₹{task.budget}</span>
+          <span className="text-[24px] text-ink tracking-tight">₹{task.budget}</span>
           {viewMode === "customer" && task.status === "OPEN" && (
             <span className="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-medium bg-sand text-smoke border border-smoke/50">
               2 Bids
@@ -102,7 +102,7 @@ export default function TaskCard({
         </div>
 
         {/* Location / Distance */}
-        {task.address && (
+        {task.address && !(viewMode === "helper" && task.status === "OPEN") && (
           <div className="flex items-center gap-1.5 text-[13px] font-medium text-smoke bg-sand px-2.5 py-1 rounded-full border border-smoke/30 max-w-[150px] truncate">
             <MapPin className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{task.address}</span>

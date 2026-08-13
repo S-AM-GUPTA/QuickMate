@@ -22,6 +22,7 @@ export default function TasksPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [showPostModal, setShowPostModal] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
 
   const categories = [
     "All",
@@ -124,8 +125,9 @@ export default function TasksPage() {
     : tasks.filter(t => t.category.toLowerCase() === selectedCategory.toLowerCase());
     
   // Filter for Pro Mates (Specialists) to only see relevant tasks
-  if (profile.role === "helper" && profile.mateTier === "specialist" && profile.profession) {
-    const profString = profile.profession.toLowerCase();
+  const isSpecialist = profile.role === "helper" && profile.mateTier === "specialist" && profile.profession;
+  if (isSpecialist && !showAllTasks) {
+    const profString = profile.profession!.toLowerCase();
     filteredTasks = filteredTasks.filter(t => {
       const catString = t.category.toLowerCase();
       return profString.includes(catString) || catString.includes(profString);
@@ -137,7 +139,7 @@ export default function TasksPage() {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink">Tasks Market</h1>
+          <h1 className="text-4xl md:text-5xl tracking-tight text-ink">Tasks Market</h1>
           <p className="text-smoke font-medium text-[16px] mt-1">
             {profile.role === "customer" 
               ? "Browse active operations or post your own."
@@ -168,6 +170,17 @@ export default function TasksPage() {
             {cat}
           </button>
         ))}
+        {isSpecialist && (
+          <div className="ml-auto flex items-center gap-3 px-2 border-l border-smoke/30 pl-4">
+            <span className="text-[13px] font-medium text-ink">Show All Categories</span>
+            <button
+              onClick={() => setShowAllTasks(!showAllTasks)}
+              className={`relative h-6 w-11 rounded-full transition-colors cursor-pointer ${showAllTasks ? 'bg-moss' : 'bg-smoke/30'}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-paper transition-transform ${showAllTasks ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -203,7 +216,7 @@ export default function TasksPage() {
             </button>
 
             <div className="p-8">
-              <h2 className="text-[28px] font-serif tracking-tight text-ink mb-6">Create New Operation</h2>
+              <h2 className="text-[28px] tracking-tight text-ink mb-6">Create New Operation</h2>
               
               <form onSubmit={handlePostTask}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

@@ -19,7 +19,7 @@ const fontSerif = Hedvig_Letters_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "QuickMate",
+  title: "QuickMate - Get help. Gain happiness.",
   description: "Book trusted, background-checked help for cleaning, handyman services, delivery, and everyday tasks.",
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className={`${fontSans.variable} ${fontSerif.variable} font-sans min-h-full flex flex-col bg-parchment text-ink tracking-wide`}>
+      <body className={`${fontSans.variable} font-sans min-h-full flex flex-col bg-parchment text-ink tracking-wide`}>
         <NotificationProvider>
           {children}
           <SupportChatbot />

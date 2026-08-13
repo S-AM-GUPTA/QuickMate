@@ -100,7 +100,7 @@ export default function WalletPage() {
     <div className="space-y-8 animate-fade-in-up">
       
       <div>
-        <h1 className="text-4xl md:text-5xl font-serif tracking-tight text-ink leading-tight">Wallet & Escrow</h1>
+        <h1 className="text-4xl md:text-5xl tracking-tight text-ink leading-tight">Wallet & Escrow</h1>
         <p className="text-smoke font-medium text-[16px] mt-1">Manage your funds, payment methods, and security.</p>
       </div>
 
@@ -113,7 +113,7 @@ export default function WalletPage() {
           <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6">
             <div>
               <span className="text-[13px] font-semibold tracking-wider uppercase text-paper/70 mb-2 block">Available Balance</span>
-              <div className="text-[56px] font-serif tracking-tight">₹{balance.toLocaleString()}</div>
+              <div className="text-[56px] tracking-tight">₹{balance.toLocaleString()}</div>
             </div>
             
             <button 
@@ -133,7 +133,7 @@ export default function WalletPage() {
             </div>
             <div>
               <span className="text-[12px] font-semibold uppercase tracking-wider text-smoke block">In Escrow</span>
-              <div className="text-2xl font-serif tracking-tight text-ink">₹4,500</div>
+              <div className="text-2xl tracking-tight text-ink">₹4,500</div>
             </div>
           </div>
           <p className="text-[13px] text-smoke font-medium leading-relaxed">Funds locked securely for active tasks. They are released only upon completion.</p>
@@ -145,7 +145,7 @@ export default function WalletPage() {
         
         {/* Transaction History (2/3) */}
         <div className="lg:col-span-2">
-          <h3 className="text-2xl font-serif text-ink mb-4">Transaction History</h3>
+          <h3 className="text-2xl text-ink mb-4">Transaction History</h3>
           
           <div className="bg-paper rounded-2xl border border-smoke/30 overflow-hidden shadow-sm">
             {transactions.length === 0 ? (
@@ -160,7 +160,7 @@ export default function WalletPage() {
                       <p className="text-[13px] text-smoke">Pitch Deck Polish • 2h ago</p>
                     </div>
                   </div>
-                  <div className="font-serif text-[22px] tracking-tight text-ink">
+                  <div className="text-[22px] tracking-tight text-ink">
                     -₹2,000
                   </div>
                 </div>
@@ -175,7 +175,7 @@ export default function WalletPage() {
                       <p className="text-[13px] text-smoke">via UPI • 1d ago</p>
                     </div>
                   </div>
-                  <div className="font-serif text-[22px] tracking-tight text-ink">
+                  <div className="text-[22px] tracking-tight text-ink">
                     +₹10,000
                   </div>
                 </div>
