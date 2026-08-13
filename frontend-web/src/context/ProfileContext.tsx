@@ -10,7 +10,7 @@ interface ProfileData {
   address: string;
   role: "customer" | "helper" | "admin";
   isVerified: boolean;
-  verificationStatus: "UNVERIFIED" | "PENDING" | "VERIFIED" | "REJECTED";
+  verificationStatus: "UNVERIFIED" | "PENDING" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
   mateTier?: "generalist" | "specialist";
   profession?: string;
 }

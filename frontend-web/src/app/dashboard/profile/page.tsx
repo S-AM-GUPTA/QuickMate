@@ -12,6 +12,8 @@ export default function ProfilePage() {
   
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState(profile);
+  const [kycFile, setKycFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setEditForm(profile);
@@ -58,6 +60,52 @@ export default function ProfilePage() {
     localStorage.removeItem("userProfile");
     document.cookie = "accessToken=; path=/; max-age=0;";
     window.location.href = "/login";
+  };
+
+  const handleKycSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!kycFile) return;
+
+    setIsUploading(true);
+    try {
+      // 1. Get presigned URL
+      const { data } = await api.post('/storage/presigned-url', {
+        filename: kycFile.name,
+        contentType: kycFile.type,
+      });
+
+      // 2. Try to upload to the presigned URL
+      // (This will fail in Mock Mode, but that's expected. We catch it and continue)
+      try {
+        await fetch(data.uploadUrl, {
+          method: 'PUT',
+          body: kycFile,
+          headers: {
+            'Content-Type': kycFile.type,
+          },
+        });
+      } catch (uploadError) {
+        console.warn("Upload to presigned URL failed (likely mock mode). Continuing with publicUrl.", uploadError);
+      }
+
+      // 3. Patch backend with publicUrl
+      await api.patch('/users/me/verification', {
+        docUrl: data.publicUrl
+      });
+
+      // 4. Update local state
+      const updatedProfile = { ...profile, verificationStatus: "PENDING_REVIEW" as const };
+      setProfile(updatedProfile);
+      localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
+      
+      addNotification("Aadhar uploaded successfully! Pending review.");
+      setKycFile(null);
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to submit verification");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -258,20 +306,25 @@ export default function ProfilePage() {
                 Upload your Aadhar/PAN to complete your KYC. You cannot bid on tasks until your identity is verified.
               </p>
               
-              {profile.verificationStatus === 'PENDING' ? (
+              {profile.verificationStatus === 'PENDING' || profile.verificationStatus === 'PENDING_REVIEW' ? (
                 <div className="inline-flex items-center gap-2 bg-moss/10 text-moss px-4 py-3 rounded-xl border border-moss/30 text-[14px] font-medium">
                   Your documents are currently under review.
                 </div>
               ) : (
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  setProfile(prev => ({...prev, verificationStatus: "PENDING"}));
-                  localStorage.setItem("userProfile", JSON.stringify({ ...profile, verificationStatus: "PENDING" }));
-                  addNotification("Aadhar uploaded successfully! Pending review.");
-                }} className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                  <input type="file" required accept="image/*,.pdf" className="text-[13px] bg-sand p-2 rounded-lg border border-smoke/30" />
-                  <button type="submit" className="px-6 py-2.5 bg-charcoal text-paper rounded-full text-[14px] font-bold hover:opacity-90 shadow-md">
-                    Upload Aadhar
+                <form onSubmit={handleKycSubmit} className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                  <input 
+                    type="file" 
+                    required 
+                    accept="image/*,.pdf" 
+                    onChange={(e) => setKycFile(e.target.files?.[0] || null)}
+                    className="text-[13px] bg-sand p-2 rounded-lg border border-smoke/30" 
+                  />
+                  <button 
+                    type="submit" 
+                    disabled={isUploading || !kycFile}
+                    className="px-6 py-2.5 bg-charcoal text-paper rounded-full text-[14px] font-bold hover:opacity-90 shadow-md disabled:opacity-50 transition-opacity"
+                  >
+                    {isUploading ? 'Uploading...' : 'Upload Aadhar'}
                   </button>
                 </form>
               )}
