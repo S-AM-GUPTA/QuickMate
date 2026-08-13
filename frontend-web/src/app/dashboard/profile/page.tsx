@@ -230,14 +230,22 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-3xl tracking-tight text-ink mb-1">{profile.name}</h2>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase border ${
-                      profile.verificationStatus === "VERIFIED" 
-                        ? "bg-moss/10 text-moss border-moss/30" 
-                        : "bg-sand text-smoke border-smoke/50"
-                    }`}>
-                      <Shield className="w-3.5 h-3.5" />
-                      {profile.verificationStatus === "VERIFIED" ? "Verified ID" : "Unverified"}
-                    </span>
+                    {profile.role !== 'admin' && (
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase border ${
+                        profile.verificationStatus === "VERIFIED" 
+                          ? "bg-moss/10 text-moss border-moss/30" 
+                          : "bg-sand text-smoke border-smoke/50"
+                      }`}>
+                        <Shield className="w-3.5 h-3.5" />
+                        {profile.verificationStatus === "VERIFIED" ? "Verified ID" : "Unverified"}
+                      </span>
+                    )}
+                    
+                    {profile.role === 'admin' && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase bg-charcoal text-paper border border-charcoal">
+                        <Shield className="w-3.5 h-3.5" /> Super Admin
+                      </span>
+                    )}
                     
                     {profile.role === 'helper' && profile.mateTier === 'specialist' && (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase bg-[#FACC15] text-charcoal border border-[#FACC15] shadow-sm">
@@ -291,7 +299,7 @@ export default function ProfilePage() {
       </div>
 
       {/* KYC / BECOME A MATE SECTION */}
-      {!isEditing && (
+      {!isEditing && profile.role !== 'admin' && (
         <div className="bg-paper rounded-2xl p-8 border border-smoke/50 shadow-sm">
           {profile.role === 'customer' ? (
             <div>
