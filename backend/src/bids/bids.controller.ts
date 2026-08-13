@@ -1,9 +1,11 @@
-import { Controller, Post, Get, Patch, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Param, UseGuards } from '@nestjs/common';
 import { BidsService } from './bids.service';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { AuthGuard } from '../auth/auth.guard';
 import type { User } from '@prisma/client';
 
 @Controller('bids')
+@UseGuards(AuthGuard)
 export class BidsController {
   constructor(private bidsService: BidsService) {}
 

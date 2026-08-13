@@ -10,25 +10,40 @@ export class BidsService {
     if (!task) throw new NotFoundException('Task not found');
     if (task.status !== 'OPEN') throw new BadRequestException('Task is not open for bids');
 
-    const bid = await this.prisma.bid.create({
-      data: {
+    const existingBid = await this.prisma.bid.findFirst({
+      where: {
         taskId: dto.taskId,
-        helperId: helperId,
-        proposedAmount: dto.proposedAmount,
-        estimatedCompletionTime: new Date(dto.estimatedCompletionTime),
-        note: dto.note
+        helperId: helperId
       }
     });
+    if (existingBid) {
+      throw new BadRequestException('You have already placed a bid for this task.');
+    }
 
-    await this.prisma.notification.create({
-      data: {
-        userId: task.customerId,
-        title: 'New Bid Received',
-        message: `A helper has placed a bid of $${dto.proposedAmount} on your task "${task.title}".`,
-      }
-    });
+    try {
+      const bid = await this.prisma.bid.create({
+        data: {
+          taskId: dto.taskId,
+          helperId: helperId,
+          proposedAmount: dto.proposedAmount,
+          estimatedCompletionTime: new Date(dto.estimatedCompletionTime),
+          note: dto.note || ''
+        }
+      });
 
-    return bid;
+      await this.prisma.notification.create({
+        data: {
+          userId: task.customerId,
+          title: 'New Bid Received',
+          message: `A helper has placed a bid of $${dto.proposedAmount} on your task "${task.title}".`,
+        }
+      });
+
+      return bid;
+    } catch (error) {
+      console.error('Error placing bid:', error);
+      throw new BadRequestException('Failed to place bid. Please try again.');
+    }
   }
 
   async getBidsForTask(taskId: string, customerId: string) {
