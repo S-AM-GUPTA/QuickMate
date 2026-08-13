@@ -198,8 +198,8 @@ export default function DashboardOverview() {
                     <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">{gig.title}</h4>
                     <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
                     <div className="flex gap-3">
-                      <button className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
-                      <button className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
+                      <button onClick={() => window.location.href = '/dashboard/tasks'} className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
+                      <button onClick={() => window.location.href = '/dashboard/tasks'} className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
                     </div>
                   </div>
                 ))}
