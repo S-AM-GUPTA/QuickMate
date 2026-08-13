@@ -34,6 +34,11 @@ export default function TasksPage() {
     note: "",
   });
 
+  // Review Offers State
+  const [selectedTaskForReview, setSelectedTaskForReview] = useState<Task | null>(null);
+  const [bidsForTask, setBidsForTask] = useState<any[]>([]);
+  const [isFetchingBids, setIsFetchingBids] = useState(false);
+
   const categories = ["All", ...TASK_CATEGORIES];
 
   const fetchTasks = async () => {
@@ -167,6 +172,36 @@ export default function TasksPage() {
     }
   };
 
+  const handleViewBidsClick = async (task: Task) => {
+    setSelectedTaskForReview(task);
+    setIsFetchingBids(true);
+    setBidsForTask([]);
+    try {
+      const res = await api.get(`/bids/task/${task.id}`);
+      setBidsForTask(res.data);
+    } catch (err: any) {
+      console.error(err);
+      alert("Failed to fetch offers for this task.");
+      setSelectedTaskForReview(null);
+    } finally {
+      setIsFetchingBids(false);
+    }
+  };
+
+  const handleAcceptBid = async (bidId: string) => {
+    if (!confirm("Are you sure you want to accept this offer? This will deduct the proposed amount from your wallet and hold it in escrow.")) return;
+    
+    try {
+      await api.patch(`/bids/${bidId}/accept`, {});
+      addNotification("Offer accepted! Escrow funded and task assigned.");
+      setSelectedTaskForReview(null);
+      fetchTasks();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to accept offer. Check your wallet balance.");
+    }
+  };
+
   const handleUpdateTaskStatus = async (task: Task, newStatus: string) => {
     try {
       await api.patch(`/tasks/${task.id}/status`, { status: newStatus });
@@ -255,6 +290,7 @@ export default function TasksPage() {
               task={task}
               viewMode={profile.role}
               onPlaceBid={() => handlePlaceBidClick(task)}
+              onViewBids={() => handleViewBidsClick(task)}
               onUpdateStatus={handleUpdateTaskStatus}
             />
           ))
@@ -400,6 +436,73 @@ export default function TasksPage() {
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Review Offers Modal */}
+      {selectedTaskForReview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-paper rounded-2xl border border-smoke/30 w-full max-w-2xl relative animate-fade-in-up shadow-2xl max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setSelectedTaskForReview(null)}
+              className="absolute top-4 right-4 p-2 bg-sand rounded-full hover:bg-smoke/20 transition-colors z-10"
+            >
+              <X className="w-5 h-5 text-ink" />
+            </button>
+            <div className="p-8">
+              <h2 className="text-2xl tracking-tight text-ink mb-2">Review Offers</h2>
+              <p className="text-[14px] text-smoke mb-6">Received bids for: <span className="font-bold">{selectedTaskForReview.title}</span></p>
+              
+              {isFetchingBids ? (
+                <div className="flex justify-center py-12">
+                  <div className="w-8 h-8 border-2 border-smoke/30 border-t-ink rounded-full animate-spin"></div>
+                </div>
+              ) : bidsForTask.length === 0 ? (
+                <div className="text-center py-12 bg-sand rounded-xl border border-dashed border-smoke/40">
+                  <p className="text-smoke font-medium">No offers have been placed yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {bidsForTask.map((bid) => (
+                    <div key={bid.id} className="bg-sand border border-smoke/30 rounded-xl p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-semibold text-ink text-[16px]">{bid.helper.name}</h4>
+                          {bid.helper.isVerified && (
+                            <span className="text-[11px] font-bold bg-moss/10 text-moss px-2 py-0.5 rounded-full uppercase tracking-wide">Verified Mate</span>
+                          )}
+                        </div>
+                        <p className="text-smoke text-[13px] mb-2 flex items-center gap-1.5">
+                          ⭐ {Number(bid.helper.rating).toFixed(1)} Rating • {bid.helper.completedTasksCount || 0} completed tasks
+                        </p>
+                        
+                        <div className="bg-paper/50 rounded-lg p-3 text-[13px] text-ink border border-smoke/20">
+                          <p className="font-medium text-smoke text-[11px] uppercase tracking-wider mb-1">Proposal</p>
+                          <p>{bid.note || "No additional notes provided."}</p>
+                          <p className="mt-2 font-medium text-charcoal">
+                            Can complete by: {new Date(bid.estimatedCompletionTime).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 md:gap-3 shrink-0">
+                        <div className="text-left md:text-right">
+                          <p className="text-[11px] font-semibold text-smoke uppercase tracking-wider">Asking Price</p>
+                          <p className="text-[24px] tracking-tight text-ink">₹{bid.proposedAmount}</p>
+                        </div>
+                        <button
+                          onClick={() => handleAcceptBid(bid.id)}
+                          className="bg-charcoal text-paper px-6 py-2.5 rounded-full font-medium text-[14px] hover:opacity-90 transition-opacity shadow-sm whitespace-nowrap"
+                        >
+                          Accept Offer
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
