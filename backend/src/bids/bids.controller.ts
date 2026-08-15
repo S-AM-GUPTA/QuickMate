@@ -17,6 +17,11 @@ export class BidsController {
     return this.bidsService.placeBid(user.id, dto);
   }
 
+  @Get('my')
+  async getMyBids(@CurrentUser() user: User) {
+    return this.bidsService.getMyBids(user.id);
+  }
+
   @Get('task/:taskId')
   async getBidsForTask(
     @Param('taskId') taskId: string,

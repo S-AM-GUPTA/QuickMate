@@ -25,6 +25,15 @@ export default function TasksPage() {
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
   
+  // Tabs State
+  const [activeTab, setActiveTab] = useState<string>("Tasks Market");
+  const [myBids, setMyBids] = useState<any[]>([]);
+  const [isFetchingMyBids, setIsFetchingMyBids] = useState(false);
+
+  useEffect(() => {
+    setActiveTab(profile.role === "customer" ? "Active Tasks" : "Tasks Market");
+  }, [profile.role]);
+  
   // Bidding State
   const [selectedTaskForBid, setSelectedTaskForBid] = useState<Task | null>(null);
   const [isBidding, setIsBidding] = useState(false);
@@ -55,6 +64,24 @@ export default function TasksPage() {
   useEffect(() => {
     fetchTasks();
   }, []);
+
+  const fetchMyBids = async () => {
+    setIsFetchingMyBids(true);
+    try {
+      const res = await api.get('/bids/my');
+      setMyBids(res.data);
+    } catch (err: any) {
+      console.warn('Failed to fetch my bids', err.message);
+    } finally {
+      setIsFetchingMyBids(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "My Bids") {
+      fetchMyBids();
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     if (searchParams.get("post") === "true") {
@@ -214,7 +241,7 @@ export default function TasksPage() {
   };
 
   // Filter by category selected in UI
-  let filteredTasks = selectedCategory === "All" 
+  let categoryFilteredTasks = selectedCategory === "All" 
     ? tasks 
     : tasks.filter(t => t.category.toLowerCase() === selectedCategory.toLowerCase());
     
@@ -222,11 +249,45 @@ export default function TasksPage() {
   const isSpecialist = profile.role === "helper" && profile.mateTier === "specialist" && profile.profession;
   if (isSpecialist && !showAllTasks) {
     const profString = profile.profession!.toLowerCase();
-    filteredTasks = filteredTasks.filter(t => {
+    categoryFilteredTasks = categoryFilteredTasks.filter(t => {
       const catString = t.category.toLowerCase();
       return profString.includes(catString) || catString.includes(profString);
     });
   }
+
+  let finalTasks = categoryFilteredTasks;
+  
+  if (profile.role === "customer") {
+    if (activeTab === "Active Tasks") {
+      finalTasks = categoryFilteredTasks.filter(t => ["OPEN", "ASSIGNED", "IN_PROGRESS"].includes(t.status));
+    } else if (activeTab === "Past Tasks") {
+      finalTasks = categoryFilteredTasks.filter(t => ["COMPLETED", "CANCELLED", "DISPUTED"].includes(t.status));
+    }
+  } else {
+    if (activeTab === "Tasks Market") {
+      finalTasks = categoryFilteredTasks.filter(t => t.status === "OPEN");
+    } else if (activeTab === "My Jobs") {
+      finalTasks = categoryFilteredTasks.filter(t => ["ASSIGNED", "IN_PROGRESS", "COMPLETED"].includes(t.status) && t.assignedHelperId === profile.id);
+    } else if (activeTab === "My Bids") {
+      const bidTasks = myBids.map(bid => ({ ...bid.task, bidDetails: bid }));
+      
+      finalTasks = selectedCategory === "All" 
+        ? bidTasks 
+        : bidTasks.filter(t => t.category.toLowerCase() === selectedCategory.toLowerCase());
+        
+      if (isSpecialist && !showAllTasks) {
+        const profString = profile.profession!.toLowerCase();
+        finalTasks = finalTasks.filter(t => {
+          const catString = t.category.toLowerCase();
+          return profString.includes(catString) || catString.includes(profString);
+        });
+      }
+    }
+  }
+
+  const customerTabs = ["Active Tasks", "Past Tasks"];
+  const helperTabs = ["Tasks Market", "My Bids", "My Jobs"];
+  const currentTabs = profile.role === "customer" ? customerTabs : helperTabs;
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -250,7 +311,23 @@ export default function TasksPage() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-b border-smoke/30 pb-6">
+      <div className="flex gap-6 border-b border-smoke/30 overflow-x-auto hide-scrollbar">
+        {currentTabs.map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`pb-3 text-[15px] font-medium whitespace-nowrap border-b-2 transition-colors ${
+              activeTab === tab
+                ? "border-charcoal text-ink"
+                : "border-transparent text-smoke hover:text-ink"
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 border-b border-smoke/30 pb-6 pt-2">
         {categories.map((cat) => (
           <button
             key={cat}
@@ -278,21 +355,35 @@ export default function TasksPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTasks.length === 0 ? (
+        {isFetchingMyBids && activeTab === "My Bids" ? (
+          <div className="col-span-full flex justify-center py-12">
+            <div className="w-8 h-8 border-2 border-smoke/30 border-t-ink rounded-full animate-spin"></div>
+          </div>
+        ) : finalTasks.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-smoke/40 bg-sand py-16">
             <AlertTriangle className="h-8 w-8 text-smoke/50 mb-2" />
             <p className="text-[14px] font-medium text-smoke">No Tasks Found</p>
           </div>
         ) : (
-          filteredTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              viewMode={profile.role}
-              onPlaceBid={() => handlePlaceBidClick(task)}
-              onViewBids={() => handleViewBidsClick(task)}
-              onUpdateStatus={handleUpdateTaskStatus}
-            />
+          finalTasks.map((task: any) => (
+            <div key={task.id} className="relative">
+              {task.bidDetails && (
+                <div className={`absolute -top-3 right-4 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider z-10 shadow-sm border ${
+                  task.bidDetails.status === 'PENDING' ? 'bg-mustard text-ink border-mustard/50' : 
+                  task.bidDetails.status === 'ACCEPTED' ? 'bg-moss text-paper border-moss/50' : 
+                  'bg-smoke/20 text-smoke border-smoke/30'
+                }`}>
+                  {task.bidDetails.status} BID: ₹{task.bidDetails.proposedAmount}
+                </div>
+              )}
+              <TaskCard
+                task={task}
+                viewMode={profile.role}
+                onPlaceBid={() => handlePlaceBidClick(task)}
+                onViewBids={() => handleViewBidsClick(task)}
+                onUpdateStatus={handleUpdateTaskStatus}
+              />
+            </div>
           ))
         )}
       </div>

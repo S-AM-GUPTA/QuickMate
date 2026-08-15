@@ -214,15 +214,6 @@ function DashboardLayoutContent({
               Account
             </Link>
 
-            {profile.role === 'admin' && (
-              <Link
-                href="/admin"
-                className="text-[14px] font-bold text-coral hover:text-coral/80 transition-colors cursor-pointer ml-2 bg-coral/10 px-3 py-1 rounded-full border border-coral/20"
-              >
-                Admin Panel
-              </Link>
-            )}
-
             <div className="relative">
               <button
                 onClick={() => {
@@ -378,16 +369,6 @@ function DashboardLayoutContent({
             >
               Account
             </Link>
-
-            {profile.role === 'admin' && (
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-2xl transition-all text-coral"
-              >
-                Admin Panel
-              </Link>
-            )}
             
             <div className="h-px w-full bg-smoke/50 my-2"></div>
             

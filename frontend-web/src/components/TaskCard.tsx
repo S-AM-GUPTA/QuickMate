@@ -14,6 +14,8 @@ export interface Task {
   distance?: number;
   latitude?: number;
   longitude?: number;
+  assignedHelperId?: string;
+  bidDetails?: any;
 }
 
 interface TaskCardProps {

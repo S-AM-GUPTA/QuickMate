@@ -21,7 +21,8 @@ export default function DashboardOverview() {
       price: '₹1,200',
       title: 'Fix Leaking Kitchen Sink Faucet',
       desc: 'Looking for a professional plumber to fix a persistent leak under the kitchen sink. Parts will be provided.',
-      isNew: false
+      isNew: false,
+      isFixedPrice: true
     },
     {
       id: 2,
@@ -31,7 +32,8 @@ export default function DashboardOverview() {
       price: '₹2,500',
       title: 'Setup Home Wi-Fi Mesh Network',
       desc: 'Need help setting up a 3-node TP-Link mesh network in a 3BHK apartment. Dead zones in master bedroom.',
-      isNew: false
+      isNew: false,
+      isFixedPrice: false
     }
   ]);
 
@@ -81,7 +83,8 @@ export default function DashboardOverview() {
           price: '₹400',
           title: 'Deliver Documents to Cyber City',
           desc: 'Urgent document delivery from Sector 44 to Cyber City. Need it done within next 2 hours.',
-          isNew: true
+          isNew: true,
+          isFixedPrice: Math.random() > 0.5
         };
         return [newGig, ...prev.slice(0, 3)];
       });
@@ -174,35 +177,53 @@ export default function DashboardOverview() {
               </div>
               
               <div className="space-y-4">
-                {openGigs.map(gig => (
-                  <div 
-                    key={gig.id} 
-                    className={`group border rounded-xl p-5 hover:border-moss/50 hover:shadow-md transition-all cursor-pointer bg-white relative overflow-hidden ${gig.isNew ? 'animate-fade-in border-moss/40 shadow-sm' : 'border-smoke/40'}`}
-                  >
-                    {gig.isNew && (
-                      <div className="absolute top-0 right-0 bg-moss text-paper text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider animate-pulse">
-                        New Match
-                      </div>
-                    )}
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex gap-2 items-center mt-1">
-                        <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${gig.tagColor}`}>
-                          {gig.tag}
-                        </span>
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-ink/50">
-                          <MapPin className="w-3 h-3"/> {gig.dist}
-                        </span>
-                      </div>
-                      <span className="text-[18px] font-bold text-ink">{gig.price}</span>
-                    </div>
-                    <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">{gig.title}</h4>
-                    <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
-                    <div className="flex gap-3">
-                      <button onClick={() => window.location.href = '/dashboard/tasks'} className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Accept Job</button>
-                      <button onClick={() => window.location.href = '/dashboard/tasks'} className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
-                    </div>
+                {openGigs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 px-4 text-center bg-sand/30 rounded-xl border border-dashed border-smoke/60">
+                    <MapPin className="w-10 h-10 text-smoke/50 mb-3" />
+                    <h4 className="text-[15px] font-bold text-ink mb-1">No gigs near you right now</h4>
+                    <p className="text-[13px] text-ink/60 mb-4 max-w-[250px]">We couldn't find any open tasks within your current radius.</p>
+                    <button className="text-[13px] font-bold text-moss bg-moss/10 px-4 py-2 rounded-lg hover:bg-moss/20 transition-colors">
+                      Adjust Filters & Radius
+                    </button>
                   </div>
-                ))}
+                ) : (
+                  openGigs.map(gig => (
+                    <div 
+                      key={gig.id} 
+                      className={`group border rounded-xl p-5 hover:border-moss/50 hover:shadow-md transition-all cursor-pointer bg-white relative overflow-hidden ${gig.isNew ? 'animate-fade-in border-moss/40 shadow-sm' : 'border-smoke/40'}`}
+                    >
+                      {gig.isNew && (
+                        <div className="absolute top-0 right-0 bg-moss text-paper text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider animate-pulse z-10">
+                          New Match
+                        </div>
+                      )}
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex gap-2 items-center mt-1">
+                          <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider ${gig.tagColor}`}>
+                            {gig.tag}
+                          </span>
+                          <span className="flex items-center gap-1 text-[11px] font-medium text-ink/50">
+                            <MapPin className="w-3 h-3"/> {gig.dist}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${gig.isFixedPrice ? 'bg-paper text-ink border-smoke/60' : 'bg-sand text-ink/70 border-dashed border-smoke/60'}`}>
+                            {gig.isFixedPrice ? 'Fixed Price' : 'Open to Bids'}
+                          </span>
+                        </div>
+                        <span className="text-[18px] font-bold text-ink">{gig.price}</span>
+                      </div>
+                      <h4 className="text-[16px] font-bold text-ink mb-1 group-hover:text-moss transition-colors">{gig.title}</h4>
+                      <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
+                      <div className="flex gap-3">
+                        {gig.isFixedPrice ? (
+                          <button onClick={() => { alert('Accept Job feature currently requires backend endpoint. Redirecting...'); window.location.href = '/dashboard/tasks'; }} className="flex-1 bg-moss text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-moss/90 transition-colors">Accept Job</button>
+                        ) : (
+                          <button onClick={() => window.location.href = '/dashboard/tasks'} className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Place Offer</button>
+                        )}
+                        <button onClick={() => window.location.href = '/dashboard/tasks'} className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 
@@ -260,32 +281,52 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          {/* Quick Stat inside Hero */}
-          <div className="hidden md:flex flex-col gap-2 bg-paper/60 backdrop-blur-md p-6 rounded-2xl border border-ink/5 shrink-0 min-w-[200px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
-            <span className="text-[13px] font-medium text-ink/60 uppercase tracking-wider">
-              Hours Saved
-            </span>
-            <div className="flex items-baseline gap-2">
-              <span className="text-[44px] tracking-tight text-ink">
-                142
+          {/* Quick Stat inside Hero (Hidden for zero state) */}
+          {activityLog.length > 0 && (
+            <div className="hidden md:flex flex-col gap-2 bg-paper/60 backdrop-blur-md p-6 rounded-2xl border border-ink/5 shrink-0 min-w-[200px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+              <span className="text-[13px] font-medium text-ink/60 uppercase tracking-wider">
+                Hours Saved
               </span>
-              <span className="text-moss text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-[44px] tracking-tight text-ink">
+                  142
+                </span>
+                <span className="text-moss text-[13px] font-medium flex items-center"><TrendingUp className="w-3.5 h-3.5 mr-1" />+24%</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-        <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Wallet className="w-24 h-24" /></div>
-          <div className="flex justify-between items-center text-ink mb-4 relative z-10">
-            <span className="text-[14px] font-medium uppercase tracking-wider">Active Escrow</span>
-            <Wallet className="w-5 h-5 text-ink/70" />
+      {activityLog.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 px-6 bg-sand/30 border border-dashed border-smoke/60 rounded-3xl text-center animate-fade-in-up">
+          <div className="w-16 h-16 bg-paper border border-smoke/40 rounded-full flex items-center justify-center mb-6 shadow-sm">
+            <LayoutDashboard className="w-8 h-8 text-ink/40" />
           </div>
-          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">₹4,500</span>
-          <span className="text-[13px] text-ink/60 font-medium relative z-10">Locked safely in escrow</span>
+          <h2 className="text-3xl font-bold text-ink mb-3 tracking-tight">Welcome to QuickMate</h2>
+          <p className="text-[16px] text-ink/60 max-w-md mb-8 leading-relaxed">
+            Your dashboard is currently empty. Post your first task to see active operations, escrow balances, and your activity history here.
+          </p>
+          <Link 
+            href="/dashboard/tasks?post=true"
+            className="rounded-full bg-moss text-paper px-8 py-3.5 text-[15px] font-bold hover:bg-moss/90 transition-all shadow-[0_0_15px_rgba(80,146,9,0.3)] hover:-translate-y-0.5"
+          >
+            Post Your First Task
+          </Link>
         </div>
+      ) : (
+        <>
+          {/* Metrics Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+            <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Wallet className="w-24 h-24" /></div>
+              <div className="flex justify-between items-center text-ink mb-4 relative z-10">
+                <span className="text-[14px] font-medium uppercase tracking-wider">Active Escrow</span>
+                <Wallet className="w-5 h-5 text-ink/70" />
+              </div>
+              <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">₹4,500</span>
+              <span className="text-[13px] text-ink/60 font-medium relative z-10">Locked safely in escrow</span>
+            </div>
 
         <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
           <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><CheckCircle className="w-24 h-24" /></div>
@@ -348,9 +389,14 @@ export default function DashboardOverview() {
                 <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
                   <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
                 </div>
-                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <Star className="w-4 h-4 text-ink" /> Mate Alex M. is on the way.
-                </p>
+                <div className="pt-2 border-t border-smoke/30 mt-3 flex items-center justify-between">
+                  <p className="text-[13px] text-ink/60 flex items-center gap-2">
+                    <Star className="w-4 h-4 text-ink" /> Mate Alex M. is on the way.
+                  </p>
+                  <button className="flex items-center gap-1.5 text-[12px] font-bold text-coral hover:bg-coral/10 px-2.5 py-1.5 rounded-lg transition-colors border border-transparent hover:border-coral/20">
+                    <AlertCircle className="w-3.5 h-3.5" /> Report Issue
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -378,9 +424,14 @@ export default function DashboardOverview() {
                 <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
                   <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
                 </div>
-                <p className="text-[13px] text-ink/60 pt-2 border-t border-smoke/30 mt-3 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-ink" /> Review completed work and approve payment.
-                </p>
+                <div className="pt-3 border-t border-smoke/30 mt-3">
+                  <p className="text-[13px] text-ink/60 flex items-center gap-2 mb-3">
+                    <CheckCircle className="w-4 h-4 text-ink" /> Review completed work and approve payment.
+                  </p>
+                  <button className="w-full bg-charcoal text-paper py-2 rounded-lg text-[13px] font-bold hover:opacity-90 transition-opacity">
+                    Review & Approve Payment
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -417,6 +468,8 @@ export default function DashboardOverview() {
           </div>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 }

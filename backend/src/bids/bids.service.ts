@@ -59,7 +59,22 @@ export class BidsService {
           select: { id: true, name: true, phone: true, rating: true, completedTasksCount: true, isVerified: true, skills: true }
         }
       },
-      orderBy: { proposedAmount: 'asc' }
+    });
+  }
+
+  async getMyBids(helperId: string) {
+    return this.prisma.bid.findMany({
+      where: { helperId },
+      include: {
+        task: {
+          include: {
+            customer: {
+              select: { id: true, name: true, rating: true, isVerified: true }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
     });
   }
 

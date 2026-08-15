@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { api } from "@/lib/api";
 
 interface ProfileData {
+  id?: string;
   name: string;
   email: string;
   phone: string;
