@@ -113,7 +113,7 @@ export default function TasksPage() {
           try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
             const data = await res.json();
-            const locationName = data.address?.city || data.address?.town || data.address?.neighbourhood || data.display_name.split(",")[0] || "Location found";
+            const locationName = data.address?.suburb || data.address?.neighbourhood || data.address?.village || data.address?.town || data.address?.city || data.display_name.split(",")[0] || "Location found";
             
             setFormData(prev => ({
               ...prev,

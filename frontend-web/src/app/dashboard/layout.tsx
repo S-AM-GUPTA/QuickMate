@@ -52,7 +52,7 @@ function DashboardLayoutContent({
             const data = await res.json();
             
             // Extract a concise location name (city or neighborhood)
-            const locationName = data.address?.city || data.address?.town || data.address?.neighbourhood || "Location found";
+            const locationName = data.address?.suburb || data.address?.neighbourhood || data.address?.village || data.address?.town || data.address?.city || data.display_name?.split(",")[0] || "Location found";
             setAddress(locationName);
             setShowLocationDropdown(false);
           } catch (err) {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -24,6 +24,12 @@ const LocationMarker = ({ onLocationSelect, defaultLat, defaultLng }: MapPickerP
     defaultLat && defaultLng ? new L.LatLng(defaultLat, defaultLng) : null
   );
 
+  useEffect(() => {
+    if (defaultLat && defaultLng) {
+      setPosition(new L.LatLng(defaultLat, defaultLng));
+    }
+  }, [defaultLat, defaultLng]);
+
   useMapEvents({
     click: async (e) => {
       setPosition(e.latlng);
@@ -32,7 +38,7 @@ const LocationMarker = ({ onLocationSelect, defaultLat, defaultLng }: MapPickerP
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`
         );
         const data = await res.json();
-        const addressName = data.display_name || "Custom Location";
+        const addressName = data.address?.suburb || data.address?.neighbourhood || data.address?.village || data.address?.town || data.address?.city || data.display_name.split(",")[0] || "Custom Location";
         onLocationSelect(e.latlng.lat, e.latlng.lng, addressName);
       } catch (err) {
         console.error("Reverse geocoding failed", err);
@@ -42,6 +48,14 @@ const LocationMarker = ({ onLocationSelect, defaultLat, defaultLng }: MapPickerP
   });
 
   return position === null ? null : <Marker position={position} />;
+};
+
+const MapUpdater = ({ lat, lng }: { lat: number; lng: number }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom());
+  }, [lat, lng, map]);
+  return null;
 };
 
 export default function MapPicker({ onLocationSelect, defaultLat = 28.6304, defaultLng = 77.2177 }: MapPickerProps) {
@@ -65,6 +79,7 @@ export default function MapPicker({ onLocationSelect, defaultLat = 28.6304, defa
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <LocationMarker onLocationSelect={onLocationSelect} defaultLat={defaultLat} defaultLng={defaultLng} />
+      <MapUpdater lat={defaultLat} lng={defaultLng} />
     </MapContainer>
   );
 }
