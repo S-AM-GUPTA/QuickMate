@@ -222,6 +222,59 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* AI Features Section */}
+      <section className="bg-sand/30 py-24 px-6 border-y border-hairline relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-overlay" style={{
+          background: 'radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.4) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.3) 0%, transparent 40%)'
+        }} />
+        <div className="max-w-[1200px] mx-auto relative z-10">
+          <div className="text-center mb-16 animate-fade-in-up">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orchid/10 text-orchid text-[13px] font-bold tracking-wider uppercase mb-4 border border-orchid/20 shadow-sm">
+              <Sparkles className="h-4 w-4" /> Powered by AI
+            </span>
+            <h2 className="text-[36px] md:text-[44px] font-bold text-ink mb-6 tracking-tight">
+              Smarter matching. Fairer prices.
+            </h2>
+            <p className="text-[18px] text-slate max-w-2xl mx-auto leading-[1.6]">
+              QuickMate uses advanced artificial intelligence to ensure every task is completed efficiently, safely, and fairly.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div className="bg-paper p-8 rounded-md border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+              <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+                <Search className="h-6 w-6 text-ink" />
+              </div>
+              <h4 className="text-[18px] font-bold text-ink mb-3">Smart Mate Matching</h4>
+              <p className="text-[15px] text-slate leading-relaxed">
+                Our AI ranks suitable nearby mates using complex factors such as distance, specialized skills, ratings, and previous performance.
+              </p>
+            </div>
+            
+            <div className="bg-paper p-8 rounded-md border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start relative overflow-hidden animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orchid to-moss" />
+              <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+                <Zap className="h-6 w-6 text-ink" />
+              </div>
+              <h4 className="text-[18px] font-bold text-ink mb-3">Dynamic Price Suggestion</h4>
+              <p className="text-[15px] text-slate leading-relaxed">
+                Never guess what to pay. Our AI helps you determine a reasonable price based on task type, location, time, and real-time demand.
+              </p>
+            </div>
+            
+            <div className="bg-paper p-8 rounded-md border border-hairline shadow-sm hover:shadow-lg transition-all flex flex-col items-start animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+              <div className="h-12 w-12 rounded-md bg-mist flex items-center justify-center mb-6 border border-hairline">
+                <ShieldCheck className="h-6 w-6 text-ink" />
+              </div>
+              <h4 className="text-[18px] font-bold text-ink mb-3">AI Safety & Fraud Detection</h4>
+              <p className="text-[15px] text-slate leading-relaxed">
+                Trust is our currency. We utilize AI-based detection to identify suspicious activity and improve overall trust within the platform.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Trust & Safety Section */}
       <section className="py-24 px-6 max-w-[1000px] mx-auto text-center animate-fade-in-up">
         <div className="inline-flex h-20 w-20 items-center justify-center rounded-md bg-mist mb-8 border border-hairline shadow-sm">
