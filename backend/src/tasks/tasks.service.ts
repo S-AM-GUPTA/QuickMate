@@ -105,7 +105,7 @@ export class TasksService {
       )
     `;
 
-    const rankedHelpers = helpers.map(h => {
+    const rankedHelpers = helpers.map((h: any) => {
       // Calculate match score
       let score = 50;
       
@@ -128,7 +128,7 @@ export class TasksService {
         distanceKm: Math.round(distKm * 10) / 10,
         matchScore: Math.round(score)
       };
-    }).sort((a, b) => b.matchScore - a.matchScore);
+    }).sort((a: any, b: any) => b.matchScore - a.matchScore);
 
     return rankedHelpers;
   }
