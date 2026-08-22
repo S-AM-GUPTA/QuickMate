@@ -11,6 +11,7 @@ export default function AdminPostTaskPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [isGettingPrice, setIsGettingPrice] = useState(false);
   
   // Default QuickMate Hub coordinates (Delhi)
   const defaultLat = 28.6315;
@@ -50,6 +51,29 @@ export default function AdminPostTaskPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSuggestPrice = async () => {
+    if (!formData.title || !formData.description) {
+      alert("Please provide a title and description first for an accurate suggestion.");
+      return;
+    }
+    setIsGettingPrice(true);
+    try {
+      const res = await api.post("/tasks/price-suggestion", {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        urgency: formData.urgency,
+      });
+      setFormData(prev => ({ ...prev, budget: res.data.suggestedPrice.toString() }));
+      alert(`Suggested price of ₹${res.data.suggestedPrice} applied!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to get price suggestion.");
+    } finally {
+      setIsGettingPrice(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,7 +179,17 @@ export default function AdminPostTaskPage() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-[12px] font-bold text-ink uppercase tracking-wider mb-2">Budget (₹)</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-[12px] font-bold text-ink uppercase tracking-wider">Budget (₹)</label>
+              <button 
+                type="button" 
+                onClick={handleSuggestPrice} 
+                disabled={isGettingPrice}
+                className="text-[11px] font-bold text-charcoal bg-[#FACC15] hover:opacity-90 transition-opacity px-2 py-0.5 rounded shadow-sm disabled:opacity-50"
+              >
+                {isGettingPrice ? "Calculating..." : "Suggest Price ✨"}
+              </button>
+            </div>
             <input 
               type="number" 
               name="budget" 

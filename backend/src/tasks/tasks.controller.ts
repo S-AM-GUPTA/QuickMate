@@ -15,9 +15,10 @@ export class TasksController {
     let basePrice = 100;
     
     // Category modifiers
-    if (dto.category === 'Moving') basePrice += 200;
+    if (dto.category === 'Moving assistance') basePrice += 200;
     if (dto.category === 'Cleaning') basePrice += 150;
-    if (dto.category === 'Tech') basePrice += 100;
+    if (dto.category === 'Tech support' || dto.category === 'Repair') basePrice += 150;
+    if (dto.category === 'Delivery' || dto.category === 'Grocery help') basePrice += 50;
     
     // Text length modifier (longer = more complex)
     const textLen = (dto.title?.length || 0) + (dto.description?.length || 0);

@@ -47,6 +47,7 @@ export default function TasksPage() {
   const [selectedTaskForReview, setSelectedTaskForReview] = useState<Task | null>(null);
   const [bidsForTask, setBidsForTask] = useState<any[]>([]);
   const [isFetchingBids, setIsFetchingBids] = useState(false);
+  const [isGettingPrice, setIsGettingPrice] = useState(false);
 
   const categories = ["All", ...TASK_CATEGORIES];
 
@@ -135,6 +136,29 @@ export default function TasksPage() {
       );
     } else {
       setIsFetchingLocation(false);
+    }
+  };
+
+  const handleSuggestPrice = async () => {
+    if (!formData.title || !formData.description) {
+      alert("Please provide a title and description first for an accurate suggestion.");
+      return;
+    }
+    setIsGettingPrice(true);
+    try {
+      const res = await api.post("/tasks/price-suggestion", {
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        urgency: formData.urgency,
+      });
+      setFormData(prev => ({ ...prev, budget: res.data.suggestedPrice }));
+      addNotification(`Suggested price of ₹${res.data.suggestedPrice} applied!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to get price suggestion.");
+    } finally {
+      setIsGettingPrice(false);
     }
   };
 
@@ -459,7 +483,17 @@ export default function TasksPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider mb-2">Budget (₹)</label>
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="block text-[13px] font-semibold text-ink uppercase tracking-wider">Budget (₹)</label>
+                          <button 
+                            type="button" 
+                            onClick={handleSuggestPrice} 
+                            disabled={isGettingPrice}
+                            className="text-[11px] font-bold text-charcoal bg-[#FACC15] hover:opacity-90 transition-opacity px-2 py-0.5 rounded shadow-sm disabled:opacity-50"
+                          >
+                            {isGettingPrice ? "Calculating..." : "Suggest Price ✨"}
+                          </button>
+                        </div>
                         <input 
                           type="number" required min="10"
                           className="w-full bg-sand border border-smoke/30 rounded-xl px-4 py-3 text-[14px] font-medium text-ink outline-none focus:border-ink transition-all"
