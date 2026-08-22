@@ -10,6 +10,17 @@ export class BidsService {
     if (!task) throw new NotFoundException('Task not found');
     if (task.status !== 'OPEN') throw new BadRequestException('Task is not open for bids');
 
+    // AI Safety & Fraud Detection: Check for anomalous bids
+    if (dto.proposedAmount > task.budget * 5) {
+      throw new BadRequestException('Bid amount is suspiciously high and has been flagged by our Safety engine.');
+    }
+    if (dto.proposedAmount < task.budget * 0.1) {
+      throw new BadRequestException('Bid amount is suspiciously low and has been flagged by our Safety engine.');
+    }
+    if (dto.note?.toLowerCase().includes('cash outside') || dto.note?.toLowerCase().includes('pay directly')) {
+      throw new BadRequestException('Bypassing the platform escrow is not allowed. Bid flagged by our Safety engine.');
+    }
+
     const existingBid = await this.prisma.bid.findFirst({
       where: {
         taskId: dto.taskId,

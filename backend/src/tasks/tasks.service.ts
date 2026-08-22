@@ -7,11 +7,140 @@ export class TasksService {
   constructor(private prisma: PrismaService) {}
 
   /**
+   * AI-driven Dynamic Price Suggestion
+   * Considers category base, complexity, urgency, and real-time platform demand.
+   */
+  async getDynamicPriceSuggestion(dto: { title: string; description: string; category: string; urgency: string }) {
+    let basePrice = 200; // Base starting price
+
+    // Category modifiers
+    if (dto.category === 'Moving assistance') basePrice = 600;
+    else if (dto.category === 'Cleaning') basePrice = 400;
+    else if (dto.category === 'Tech support' || dto.category === 'Repair') basePrice = 500;
+    else if (dto.category === 'Delivery' || dto.category === 'Grocery help') basePrice = 250;
+    
+    // Natural Language Processing complexity heuristic (longer/detailed = more complex)
+    const textLen = (dto.title?.length || 0) + (dto.description?.length || 0);
+    if (textLen > 150) basePrice += 150;
+    else if (textLen > 50) basePrice += 50;
+
+    // Urgency modifier
+    let urgencyMultiplier = 1.0;
+    if (dto.urgency === 'urgent') urgencyMultiplier = 1.5;
+    else if (dto.urgency === 'low') urgencyMultiplier = 0.8;
+
+    // Real-time demand calculation (Simulated AI feature)
+    // Counts open tasks in the same category to gauge current demand
+    const openTasksCount = await this.prisma.task.count({
+      where: {
+        category: dto.category,
+        status: 'OPEN'
+      }
+    });
+
+    // Surge pricing based on demand: +5% for every open task in that category (capped at 1.5x)
+    const demandSurge = Math.min(1.0 + (openTasksCount * 0.05), 1.5);
+    
+    // Time of day surge (e.g. night time 10 PM - 6 AM is more expensive)
+    const currentHour = new Date().getHours();
+    const timeSurge = (currentHour >= 22 || currentHour < 6) ? 1.2 : 1.0;
+
+    // Final AI computed price
+    const finalPrice = basePrice * urgencyMultiplier * demandSurge * timeSurge;
+
+    return {
+      suggestedPrice: Math.round(finalPrice / 10) * 10, // Round to nearest 10
+      currency: 'INR',
+      breakdown: {
+        basePrice,
+        urgencyMultiplier,
+        demandSurge,
+        timeSurge,
+        currentCategoryDemand: openTasksCount
+      }
+    };
+  }
+
+  /**
+   * AI-based Safety & Fraud Detection
+   * Evaluates if a task has suspicious elements before creation.
+   */
+  private analyzeFraudRisk(dto: CreateTaskDto): boolean {
+    const suspiciousKeywords = ['pay outside', 'cash only', 'wire transfer', 'crypto', 'scam', 'money laundering', 'western union'];
+    const textToAnalyze = `${dto.title} ${dto.description}`.toLowerCase();
+    
+    // Check for suspicious phrases
+    for (const keyword of suspiciousKeywords) {
+      if (textToAnalyze.includes(keyword)) {
+        return true;
+      }
+    }
+    
+    // Check for abnormal budgets (e.g., > ₹1,00,000 for simple chores)
+    if (dto.budget > 100000 && ['Cleaning', 'Delivery', 'Grocery help', 'Miscellaneous errands'].includes(dto.category)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Smart Mate Matching Engine
+   * Ranks suitable nearby mates using distance, skills, ratings, and past performance.
+   */
+  async getSmartMatches(taskId: string) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    
+    const radiusMeters = 50000; // 50 km radius to find mates
+    const helpers: any = await this.prisma.$queryRaw`
+      SELECT u.id, u.name, u.rating, u.completed_tasks_count as "completedTasksCount", u.skills, u.coords, u.latitude, u.longitude,
+      ST_Distance(u.coords, ST_SetSRID(ST_MakePoint(${task.longitude}, ${task.latitude}), 4326)) as distance
+      FROM users u
+      WHERE u.role = 'helper'
+      AND ST_DWithin(
+        u.coords, 
+        ST_SetSRID(ST_MakePoint(${task.longitude}, ${task.latitude}), 4326), 
+        ${radiusMeters}
+      )
+    `;
+
+    const rankedHelpers = helpers.map(h => {
+      // Calculate match score
+      let score = 50;
+      
+      const distKm = h.distance / 1000;
+      if (distKm < 5) score += 30;
+      else if (distKm < 15) score += 15;
+      else if (distKm < 30) score += 5;
+      
+      const hasSkill = Array.isArray(h.skills) && h.skills.includes(task.category);
+      if (hasSkill) score += 15;
+      
+      score += (h.rating / 5) * 15;
+      score += Math.min((h.completedTasksCount || 0) / 50, 1) * 10;
+      
+      return {
+        id: h.id,
+        name: h.name,
+        rating: h.rating,
+        completedTasksCount: h.completedTasksCount,
+        distanceKm: Math.round(distKm * 10) / 10,
+        matchScore: Math.round(score)
+      };
+    }).sort((a, b) => b.matchScore - a.matchScore);
+
+    return rankedHelpers;
+  }
+
+  /**
    * Creates a new task posted by a customer.
-   * Note: The database trigger "update_task_coords" automatically computes
-   * and updates the PostGIS Point coords based on the latitude and longitude.
    */
   async createTask(customerId: string, dto: CreateTaskDto) {
+    if (this.analyzeFraudRisk(dto)) {
+      throw new BadRequestException('Task flagged for suspicious activity or policy violation by our AI Safety engine.');
+    }
+
     const customer = await this.prisma.user.findUnique({
       where: { id: customerId },
     });

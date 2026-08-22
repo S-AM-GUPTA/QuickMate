@@ -11,27 +11,7 @@ export class TasksController {
 
   @Post('price-suggestion')
   async suggestPrice(@Body() dto: { title: string; description: string; category: string; urgency: string }) {
-    // Heuristic Simulation for AI Price Suggestion
-    let basePrice = 100;
-    
-    // Category modifiers
-    if (dto.category === 'Moving assistance') basePrice += 200;
-    if (dto.category === 'Cleaning') basePrice += 150;
-    if (dto.category === 'Tech support' || dto.category === 'Repair') basePrice += 150;
-    if (dto.category === 'Delivery' || dto.category === 'Grocery help') basePrice += 50;
-    
-    // Text length modifier (longer = more complex)
-    const textLen = (dto.title?.length || 0) + (dto.description?.length || 0);
-    if (textLen > 100) basePrice += 50;
-    
-    // Urgency modifier
-    if (dto.urgency === 'urgent') basePrice *= 1.5;
-    if (dto.urgency === 'low') basePrice *= 0.8;
-    
-    return {
-      suggestedPrice: Math.round(basePrice),
-      currency: 'INR'
-    };
+    return this.tasksService.getDynamicPriceSuggestion(dto);
   }
 
   @Post()
@@ -52,6 +32,12 @@ export class TasksController {
     @CurrentUser() user: User,
   ) {
     return this.tasksService.updateTaskStatus(id, status, user.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get(':id/matches')
+  async getSmartMatches(@Param('id') id: string) {
+    return this.tasksService.getSmartMatches(id);
   }
 
   @Patch(':id')
