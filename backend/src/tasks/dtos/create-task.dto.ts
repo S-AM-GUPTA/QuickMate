@@ -55,4 +55,7 @@ export class CreateTaskDto {
   @IsString({ each: true })
   @IsOptional()
   attachmentUrls?: string[];
+
+  @IsOptional()
+  isFixedPrice?: boolean;
 }

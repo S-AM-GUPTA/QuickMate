@@ -52,7 +52,7 @@ export default function TasksPage() {
 
   const fetchTasks = async () => {
     try {
-      const res = await api.get('/tasks');
+      const res = await api.get(`/tasks?role=${profile.role}`);
       setTasks(res.data);
     } catch (err: any) {
       if (err.response?.status !== 401) {
@@ -63,7 +63,7 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [profile.role]);
 
   const fetchMyBids = async () => {
     setIsFetchingMyBids(true);
@@ -93,12 +93,13 @@ export default function TasksPage() {
     title: "",
     description: "",
     budget: "" as unknown as number,
-    category: "Handyman",
+    category: TASK_CATEGORIES[0],
     urgency: "medium" as "low" | "medium" | "urgent",
     latitude: 28.6304,
     longitude: 77.2177,
     scheduledTime: new Date(Date.now() + 86400000).toISOString().slice(0, 16),
     address: "",
+    isFixedPrice: false,
   });
 
   const fetchCurrentLocation = () => {
@@ -141,6 +142,10 @@ export default function TasksPage() {
     e.preventDefault();
     
     // Content moderation check
+    if (formData.title.trim().split(/\s+/).length < 3) {
+      alert("Please provide a more descriptive title (at least 3 words).");
+      return;
+    }
     if (formData.description.trim().length < 20) {
       alert("Please provide a more detailed description (at least 20 characters).");
       return;
@@ -165,7 +170,20 @@ export default function TasksPage() {
     }
   };
 
-  const handlePlaceBidClick = (task: Task) => {
+  const handlePlaceBidClick = async (task: Task) => {
+    if ((task as any).isFixedPrice) {
+      if (!confirm("Are you sure you want to accept this job instantly?")) return;
+      try {
+        await api.post(`/tasks/${task.id}/instant-accept`);
+        addNotification(`Successfully assigned to "${task.title}"!`);
+        fetchTasks();
+      } catch (err: any) {
+        console.error("Instant accept failed", err);
+        alert(err.response?.data?.message || "Failed to accept task.");
+      }
+      return;
+    }
+
     setSelectedTaskForBid(task);
     setBidForm({
       proposedAmount: task.budget, // Default to task's budget
@@ -361,8 +379,19 @@ export default function TasksPage() {
           </div>
         ) : finalTasks.length === 0 ? (
           <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-smoke/40 bg-sand py-16">
-            <AlertTriangle className="h-8 w-8 text-smoke/50 mb-2" />
-            <p className="text-[14px] font-medium text-smoke">No Tasks Found</p>
+            <AlertTriangle className="h-8 w-8 text-smoke/50 mb-4" />
+            <p className="text-[16px] font-bold text-ink mb-2">No Tasks Found</p>
+            <p className="text-[14px] text-smoke text-center max-w-sm mb-6">
+              There are currently no tasks matching your filters. Try widening your search radius or checking back later.
+            </p>
+            {selectedCategory !== "All" && (
+              <button 
+                onClick={() => setSelectedCategory("All")}
+                className="bg-paper border border-smoke/50 text-ink px-6 py-2 rounded-full font-medium text-[13px] hover:bg-sand transition-colors"
+              >
+                Clear Category Filters
+              </button>
+            )}
           </div>
         ) : (
           finalTasks.map((task: any) => (
@@ -438,6 +467,19 @@ export default function TasksPage() {
                           value={formData.budget} onChange={e => setFormData({...formData, budget: Number(e.target.value)})}
                         />
                       </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 bg-sand/50 p-3 rounded-xl border border-smoke/30">
+                      <input 
+                        type="checkbox" 
+                        id="isFixedPrice"
+                        checked={formData.isFixedPrice}
+                        onChange={e => setFormData({...formData, isFixedPrice: e.target.checked})}
+                        className="w-4 h-4 rounded border-smoke/40 text-moss focus:ring-moss/20"
+                      />
+                      <label htmlFor="isFixedPrice" className="text-[13px] font-medium text-ink">
+                        Make this a <span className="font-bold">Fixed Price</span> task (Allows instant assignment)
+                      </label>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">

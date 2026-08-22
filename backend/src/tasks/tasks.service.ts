@@ -31,13 +31,15 @@ export class TasksService {
         address: dto.address,
         scheduledTime: new Date(dto.scheduledTime),
         attachmentUrls: dto.attachmentUrls || [],
+        isFixedPrice: dto.isFixedPrice || false,
         customerId: customerId,
       },
     });
   }
 
-  async getTasks(user: any) {
-    if (user.role === 'customer') {
+  async getTasks(user: any, requestedRole?: string) {
+    const roleToUse = requestedRole || user.role;
+    if (roleToUse === 'customer') {
       // Return tasks posted by this customer
       return this.prisma.task.findMany({
         where: { customerId: user.id },
@@ -141,6 +143,62 @@ export class TasksService {
 
     return this.prisma.task.delete({
       where: { id: taskId },
+    });
+  }
+
+  async instantAccept(taskId: string, helperId: string) {
+    const task = await this.prisma.task.findUnique({ where: { id: taskId } });
+    if (!task) throw new NotFoundException('Task not found');
+    if (task.status !== 'OPEN') throw new BadRequestException('Task is not open');
+    if (!task.isFixedPrice) throw new BadRequestException('This task does not support instant accept');
+
+    const customer = await this.prisma.user.findUnique({ where: { id: task.customerId } });
+    if ((customer?.walletBalance || 0) < task.budget) {
+      throw new BadRequestException('Customer has insufficient funds in escrow. Cannot instantly accept.');
+    }
+
+    return this.prisma.$transaction(async (prisma) => {
+      // Deduct budget from customer's wallet
+      await prisma.user.update({
+        where: { id: task.customerId },
+        data: { walletBalance: { decrement: task.budget } }
+      });
+      await prisma.transaction.create({
+        data: {
+          userId: task.customerId,
+          amount: task.budget,
+          type: 'DEBIT',
+          description: `Payment for task: ${task.title}`
+        }
+      });
+
+      // Create an accepted bid to maintain history
+      const bid = await prisma.bid.create({
+        data: {
+          taskId: taskId,
+          helperId: helperId,
+          proposedAmount: task.budget,
+          estimatedCompletionTime: task.scheduledTime,
+          status: 'ACCEPTED',
+          note: 'Instantly accepted via Fixed Price option'
+        }
+      });
+
+      // Assign the task to the helper
+      await prisma.task.update({
+        where: { id: taskId },
+        data: { status: 'ASSIGNED', assignedHelperId: helperId }
+      });
+
+      await prisma.notification.create({
+        data: {
+          userId: task.customerId,
+          title: 'Task Accepted',
+          message: `A helper has instantly accepted your fixed-price task "${task.title}".`,
+        }
+      });
+
+      return { success: true, message: 'Task instantly accepted', bid };
     });
   }
 }

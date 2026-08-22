@@ -231,11 +231,14 @@ export default function ProfilePage() {
                   <h2 className="text-3xl tracking-tight text-ink mb-1">{profile.name}</h2>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     {profile.role !== 'admin' && (
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase border ${
-                        profile.verificationStatus === "VERIFIED" 
-                          ? "bg-moss/10 text-moss border-moss/30" 
-                          : "bg-sand text-smoke border-smoke/50"
-                      }`}>
+                      <span 
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase border cursor-help ${
+                          profile.verificationStatus === "VERIFIED" 
+                            ? "bg-moss/10 text-moss border-moss/30" 
+                            : "bg-sand text-smoke border-smoke/50"
+                        }`}
+                        title={profile.verificationStatus === "VERIFIED" ? "Identity Confirmed: This user has passed Aadhaar/PAN KYC verification." : "Unverified"}
+                      >
                         <Shield className="w-3.5 h-3.5" />
                         {profile.verificationStatus === "VERIFIED" ? "Verified ID" : "Unverified"}
                       </span>
@@ -248,7 +251,10 @@ export default function ProfilePage() {
                     )}
                     
                     {profile.role === 'helper' && profile.mateTier === 'specialist' && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase bg-[#FACC15] text-charcoal border border-[#FACC15] shadow-sm">
+                      <span 
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold tracking-wider uppercase bg-[#FACC15] text-charcoal border border-[#FACC15] shadow-sm cursor-help"
+                        title="Specialist Tier: This mate has verified professional experience in their specific trade."
+                      >
                         <Star className="w-3.5 h-3.5 fill-current" /> PRO Mate
                       </span>
                     )}
@@ -275,14 +281,26 @@ export default function ProfilePage() {
                 <span className="flex items-center gap-2 text-[12px] font-semibold tracking-wider text-smoke uppercase mb-1">
                   <Phone className="w-4 h-4" /> Phone Number
                 </span>
-                <p className="font-medium text-[16px] text-ink">{profile.phone || "Not provided"}</p>
+                {profile.phone ? (
+                  <p className="font-medium text-[16px] text-ink">{profile.phone}</p>
+                ) : (
+                  <button onClick={() => setIsEditing(true)} className="text-[14px] font-medium text-charcoal hover:underline flex items-center gap-1">
+                    Add your phone number &rarr;
+                  </button>
+                )}
               </div>
 
               <div className="space-y-1 md:col-span-2">
                 <span className="flex items-center gap-2 text-[12px] font-semibold tracking-wider text-smoke uppercase mb-1">
                   <MapPin className="w-4 h-4" /> Primary Location
                 </span>
-                <p className="font-medium text-[16px] text-ink">{profile.address || "Not provided"}</p>
+                {profile.address ? (
+                  <p className="font-medium text-[16px] text-ink">{profile.address}</p>
+                ) : (
+                  <button onClick={() => setIsEditing(true)} className="text-[14px] font-medium text-charcoal hover:underline flex items-center gap-1">
+                    Add your location &rarr;
+                  </button>
+                )}
               </div>
               
               {profile.role === 'helper' && profile.profession && (
@@ -351,23 +369,28 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div>
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <h2 className="text-[20px] text-ink mb-2 flex items-center gap-2">
                     <Shield className="w-5 h-5 text-moss" /> Identity Verified
                   </h2>
-                  <p className="text-[14px] text-smoke">
+                  <p className="text-[14px] text-smoke max-w-lg">
                     Your Aadhar KYC is complete. You are a trusted mate on the platform!
                   </p>
                 </div>
                 
                 {profile.role === 'helper' && profile.mateTier !== 'specialist' && (
-                  <button 
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center gap-2 bg-[#FACC15] text-charcoal px-5 py-2.5 rounded-full text-[13px] font-bold shadow-md hover:opacity-90 transition-opacity"
-                  >
-                    <Star className="w-4 h-4 fill-current" /> Upgrade to PRO Mate
-                  </button>
+                  <div className="flex flex-col items-end text-right">
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center gap-2 bg-[#FACC15] text-charcoal px-5 py-2.5 rounded-full text-[13px] font-bold shadow-md hover:opacity-90 transition-opacity mb-2"
+                    >
+                      <Star className="w-4 h-4 fill-current" /> Upgrade to PRO Mate
+                    </button>
+                    <p className="text-[12px] text-smoke max-w-[200px]">
+                      Highlight your profile to customers looking for premium, verified tradesmen.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

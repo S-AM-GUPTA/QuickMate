@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dtos/create-task.dto';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -40,8 +40,8 @@ export class TasksController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getTasks(@CurrentUser() user: User) {
-    return this.tasksService.getTasks(user);
+  async getTasks(@CurrentUser() user: User, @Query('role') role?: string) {
+    return this.tasksService.getTasks(user, role);
   }
 
   @Patch(':id/status')
@@ -65,5 +65,11 @@ export class TasksController {
   @Delete(':id')
   async deleteTask(@Param('id') id: string, @CurrentUser() user: User) {
     return this.tasksService.deleteTask(id, user.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/instant-accept')
+  async instantAccept(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.tasksService.instantAccept(id, user.id);
   }
 }

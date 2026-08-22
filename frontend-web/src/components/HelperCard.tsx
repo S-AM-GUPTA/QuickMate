@@ -35,7 +35,10 @@ export default function HelperCard({ helper, onHire, onViewProfile }: HelperCard
       
       {/* PRO Badge Overlay */}
       {isPro && (
-        <div className="absolute -top-3 left-6 bg-[#FACC15] text-charcoal px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase border-2 border-paper shadow-sm flex items-center gap-1">
+        <div 
+          className="absolute -top-3 left-6 bg-[#FACC15] text-charcoal px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase border-2 border-paper shadow-sm flex items-center gap-1 cursor-help"
+          title="Specialist Tier: This mate has verified professional experience in their specific trade."
+        >
           <Star className="w-3 h-3 fill-current" /> Pro Mate
         </div>
       )}
@@ -49,12 +52,18 @@ export default function HelperCard({ helper, onHire, onViewProfile }: HelperCard
           <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-[24px] border ${isPro ? 'bg-paper/10 border-paper/20 text-paper' : 'bg-sand border-smoke text-ink'}`}>
             {helper.name.charAt(0)}
             {helper.isVerified && !isPro && (
-              <span className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-moss/20 text-moss border-2 border-paper">
+              <span 
+                className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-moss/20 text-moss border-2 border-paper cursor-help"
+                title="Identity Confirmed: This user has passed Aadhaar/PAN KYC verification."
+              >
                 <CheckCircle className="h-3 w-3 fill-current" />
               </span>
             )}
             {isPro && (
-              <span className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#FACC15] text-charcoal border-2 border-charcoal">
+              <span 
+                className="absolute -bottom-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#FACC15] text-charcoal border-2 border-charcoal cursor-help"
+                title="Identity Confirmed: This user has passed Aadhaar/PAN KYC verification."
+              >
                 <ShieldCheck className="h-3 w-3 fill-current" />
               </span>
             )}

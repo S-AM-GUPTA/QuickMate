@@ -1,7 +1,9 @@
 export const TASK_CATEGORIES = [
-  "Handyman",
-  "Cleaning",
-  "Tech Support",
   "Delivery",
-  "Errands",
+  "Cleaning",
+  "Repair",
+  "Moving assistance",
+  "Grocery help",
+  "Tech support",
+  "Miscellaneous errands",
 ];

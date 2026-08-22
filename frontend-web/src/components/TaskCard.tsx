@@ -16,6 +16,7 @@ export interface Task {
   longitude?: number;
   assignedHelperId?: string;
   bidDetails?: any;
+  isFixedPrice?: boolean;
 }
 
 interface TaskCardProps {
@@ -88,9 +89,20 @@ export default function TaskCard({
       <div className="flex items-start justify-between gap-4">
         {/* Category & Title */}
         <div>
-          <span className="inline-flex items-center rounded-full bg-sand px-3 py-1 text-[12px] font-medium text-smoke border border-smoke/50">
-            {task.category}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full bg-sand px-3 py-1 text-[12px] font-medium text-smoke border border-smoke/50">
+              {task.category}
+            </span>
+            {task.status === "OPEN" && (
+              <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase border ${
+                task.isFixedPrice 
+                  ? 'bg-moss/10 text-moss border-moss/30' 
+                  : 'bg-[#FACC15]/20 text-charcoal border-[#FACC15]/30'
+              }`}>
+                {task.isFixedPrice ? "Fixed Price" : "Open to Bids"}
+              </span>
+            )}
+          </div>
           <h3 className="mt-4 text-[20px] tracking-tight text-ink group-hover:text-smoke transition-colors leading-tight line-clamp-2">
             {task.title}
           </h3>
@@ -149,9 +161,13 @@ export default function TaskCard({
         {viewMode === "helper" && task.status === "OPEN" && onPlaceBid && (
           <button
             onClick={() => onPlaceBid(task)}
-            className="w-full flex items-center justify-center rounded-full bg-charcoal px-4 py-2.5 text-[14px] font-medium text-paper hover:opacity-90 transition duration-200 cursor-pointer"
+            className={`w-full flex items-center justify-center rounded-full px-4 py-2.5 text-[14px] font-medium transition duration-200 cursor-pointer ${
+              task.isFixedPrice 
+                ? 'bg-moss text-paper hover:opacity-90' 
+                : 'bg-charcoal text-paper hover:opacity-90'
+            }`}
           >
-            Place a Bid
+            {task.isFixedPrice ? "Accept Job" : "Place a Bid"}
           </button>
         )}
 

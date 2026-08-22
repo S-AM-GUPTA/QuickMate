@@ -7,6 +7,7 @@ import {
   ShieldCheck, Activity, Star, Clock, AlertCircle, FileText, LayoutDashboard, MapPin
 } from "lucide-react";
 import { useProfile } from "@/context/ProfileContext";
+import { api } from "@/lib/api";
 
 export default function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
@@ -70,6 +71,35 @@ export default function DashboardOverview() {
     else if (hour < 17) setGreeting("Good afternoon");
     else setGreeting("Good evening");
 
+    const fetchTasks = async () => {
+      try {
+        if (profile.role !== 'customer') {
+          const response = await api.get(`/tasks?role=${profile.role}`);
+          const tasks = response.data;
+          
+          if (tasks && tasks.length > 0) {
+            setOpenGigs(tasks.map((t: any) => ({
+              id: t.id,
+              tag: t.category,
+              tagColor: t.isFixedPrice ? 'text-moss bg-moss/10' : 'text-charcoal bg-[#FACC15]/20',
+              dist: 'Nearby', 
+              price: `₹${t.budget}`,
+              title: t.title,
+              desc: t.description,
+              isNew: false,
+              isFixedPrice: t.isFixedPrice
+            })));
+          } else {
+            setOpenGigs([]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch real tasks:", err);
+      }
+    };
+
+    fetchTasks();
+
     // Simulate real-time gigs coming in for Mates
     const gigInterval = setInterval(() => {
       setOpenGigs(prev => {
@@ -110,7 +140,7 @@ export default function DashboardOverview() {
       clearInterval(gigInterval);
       clearInterval(activityInterval);
     };
-  }, []);
+  }, [profile.role]);
   if (profile.role !== 'customer') {
     return (
       <div className="space-y-6 w-full max-w-7xl mx-auto animate-fade-in-up">
@@ -215,11 +245,19 @@ export default function DashboardOverview() {
                       <p className="text-[13px] text-ink/70 mb-4 line-clamp-2">{gig.desc}</p>
                       <div className="flex gap-3">
                         {gig.isFixedPrice ? (
-                          <button onClick={() => { alert('Accept Job feature currently requires backend endpoint. Redirecting...'); window.location.href = '/dashboard/tasks'; }} className="flex-1 bg-moss text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-moss/90 transition-colors">Accept Job</button>
+                          <button onClick={async () => {
+                            try {
+                              await api.post(`/tasks/${gig.id}/instant-accept`);
+                              alert('Task instantly accepted successfully!');
+                              window.location.href = '/dashboard/tasks';
+                            } catch (err: any) {
+                              alert(err.response?.data?.message || 'Failed to accept task.');
+                            }
+                          }} className="flex-1 bg-moss text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-moss/90 transition-colors">Accept Job</button>
                         ) : (
-                          <button onClick={() => window.location.href = '/dashboard/tasks'} className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Place Offer</button>
+                          <button onClick={() => window.location.href = `/dashboard/tasks`} className="flex-1 bg-ink text-paper py-2 rounded-lg text-[13px] font-bold hover:bg-ink/80 transition-colors">Place Offer</button>
                         )}
-                        <button onClick={() => window.location.href = '/dashboard/tasks'} className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
+                        <button onClick={() => window.location.href = `/dashboard/tasks`} className="px-4 border border-smoke/60 text-ink rounded-lg text-[13px] font-bold hover:bg-sand transition-colors">Details</button>
                       </div>
                     </div>
                   ))

@@ -128,18 +128,7 @@ export default function LandingPage() {
               <img src="https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=600&auto=format&fit=crop" alt="Tools" className="w-full h-full object-cover" />
             </div>
 
-            {/* Decorative Badge */}
-            <div className="absolute top-[15%] left-[-5%] bg-paper/90 backdrop-blur-md p-4 rounded-md border border-hairline z-40 shadow-xl animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-md bg-mist border border-hairline flex items-center justify-center">
-                  <ShieldCheck className="h-6 w-6 text-moss" />
-                </div>
-                <div>
-                  <p className="text-[15px] font-bold text-ink">Verified Mates</p>
-                  <p className="text-[13px] text-slate font-medium">100% Identity checked</p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
       </main>
