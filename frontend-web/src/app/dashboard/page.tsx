@@ -13,57 +13,9 @@ export default function DashboardOverview() {
   const [greeting, setGreeting] = useState("Good morning");
   const { profile } = useProfile();
 
-  const [openGigs, setOpenGigs] = useState([
-    {
-      id: 1,
-      tag: 'Plumbing',
-      tagColor: 'text-moss bg-moss/10',
-      dist: '2.4 km away',
-      price: '₹1,200',
-      title: 'Fix Leaking Kitchen Sink Faucet',
-      desc: 'Looking for a professional plumber to fix a persistent leak under the kitchen sink. Parts will be provided.',
-      isNew: false,
-      isFixedPrice: true
-    },
-    {
-      id: 2,
-      tag: 'Tech Help',
-      tagColor: 'text-charcoal bg-[#FACC15]/20',
-      dist: '5.1 km away',
-      price: '₹2,500',
-      title: 'Setup Home Wi-Fi Mesh Network',
-      desc: 'Need help setting up a 3-node TP-Link mesh network in a 3BHK apartment. Dead zones in master bedroom.',
-      isNew: false,
-      isFixedPrice: false
-    }
-  ]);
-
-  const [activityLog, setActivityLog] = useState([
-    {
-      id: 1,
-      icon: <CheckCircle className="w-5 h-5" />,
-      title: 'Task Completed',
-      desc: 'Payment of ₹2,000 released from escrow to Sarah J.',
-      time: '2h ago',
-      isNew: false
-    },
-    {
-      id: 2,
-      icon: <Wallet className="w-5 h-5" />,
-      title: 'Funds Processed',
-      desc: '₹10,000 successfully added to your secure escrow wallet via UPI.',
-      time: '5h ago',
-      isNew: false
-    },
-    {
-      id: 3,
-      icon: <ArrowUpRight className="w-5 h-5" />,
-      title: 'Task Live',
-      desc: 'Your request "Deep Cleaning 2BHK" is live and receiving bids.',
-      time: '1d ago',
-      isNew: false
-    }
-  ]);
+  const [openGigs, setOpenGigs] = useState<any[]>([]);
+  const [activeTasks, setActiveTasks] = useState<any[]>([]);
+  const [activityLog, setActivityLog] = useState<any[]>([]);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -73,11 +25,11 @@ export default function DashboardOverview() {
 
     const fetchTasks = async () => {
       try {
-        if (profile.role !== 'customer') {
-          const response = await api.get(`/tasks?role=${profile.role}`);
-          const tasks = response.data;
-          
-          if (tasks && tasks.length > 0) {
+        const response = await api.get(`/tasks?role=${profile.role}`);
+        const tasks = response.data;
+        
+        if (tasks && tasks.length > 0) {
+          if (profile.role !== 'customer') {
             setOpenGigs(tasks.map((t: any) => ({
               id: t.id,
               tag: t.category,
@@ -87,11 +39,15 @@ export default function DashboardOverview() {
               title: t.title,
               desc: t.description,
               isNew: false,
-              isFixedPrice: t.isFixedPrice
+              isFixedPrice: t.isFixedPrice,
+              originalTask: t
             })));
           } else {
-            setOpenGigs([]);
+            setActiveTasks(tasks);
           }
+        } else {
+          setOpenGigs([]);
+          setActiveTasks([]);
         }
       } catch (err) {
         console.error("Failed to fetch real tasks:", err);
@@ -99,47 +55,6 @@ export default function DashboardOverview() {
     };
 
     fetchTasks();
-
-    // Simulate real-time gigs coming in for Mates
-    const gigInterval = setInterval(() => {
-      setOpenGigs(prev => {
-        if (prev.length > 4) return prev; // Limit mock items
-        
-        const newGig = {
-          id: Date.now(),
-          tag: 'Delivery',
-          tagColor: 'text-blue-600 bg-blue-100',
-          dist: '1.2 km away',
-          price: '₹400',
-          title: 'Deliver Documents to Cyber City',
-          desc: 'Urgent document delivery from Sector 44 to Cyber City. Need it done within next 2 hours.',
-          isNew: true,
-          isFixedPrice: Math.random() > 0.5
-        };
-        return [newGig, ...prev.slice(0, 3)];
-      });
-    }, 12000);
-
-    // Simulate real-time activity for Customers
-    const activityInterval = setInterval(() => {
-      setActivityLog(prev => {
-        if (prev.length > 5) return prev; // Limit mock items
-        const newLog = {
-          id: Date.now(),
-          icon: <Activity className="w-5 h-5" />,
-          title: 'New Bid Received',
-          desc: 'Alex M. applied to "IKEA Furniture Assembly".',
-          time: 'Just now',
-          isNew: true
-        };
-        return [newLog, ...prev.slice(0, 4)];
-      });
-    }, 18000);
-
-    return () => {
-      clearInterval(gigInterval);
-      clearInterval(activityInterval);
-    };
   }, [profile.role]);
   if (profile.role !== 'customer') {
     return (
@@ -170,7 +85,7 @@ export default function DashboardOverview() {
                 <span className="text-[13px] font-bold uppercase tracking-wider text-moss">Your Wallet</span>
                 <Wallet className="w-5 h-5 text-moss" />
               </div>
-              <h2 className="text-4xl text-ink mb-2 tracking-tight relative z-10">₹1,250</h2>
+              <h2 className="text-4xl text-ink mb-2 tracking-tight relative z-10">₹{profile.walletBalance?.toLocaleString() || 0}</h2>
               <p className="text-[13px] text-ink/60 mb-6 relative z-10">Available to withdraw instantly.</p>
               <button className="w-full bg-moss text-paper py-3 rounded-xl text-[14px] font-bold hover:bg-moss/90 transition-colors shadow-[0_0_15px_rgba(80,146,9,0.3)] relative z-10">
                 Withdraw Funds
@@ -182,15 +97,15 @@ export default function DashboardOverview() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center border-b border-smoke/40 pb-3">
                   <span className="text-[13px] text-ink/70">Rating</span>
-                  <span className="text-[14px] font-bold flex items-center gap-1"><Star className="w-4 h-4 text-amber-400 fill-amber-400"/> 4.9</span>
+                  <span className="text-[14px] font-bold flex items-center gap-1"><Star className="w-4 h-4 text-amber-400 fill-amber-400"/> {profile.rating?.toFixed(1) || "5.0"}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-smoke/40 pb-3">
                   <span className="text-[13px] text-ink/70">Jobs Completed</span>
-                  <span className="text-[14px] font-bold">34</span>
+                  <span className="text-[14px] font-bold">{profile.completedTasksCount || 0}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-[13px] text-ink/70">On-Time Rate</span>
-                  <span className="text-[14px] font-bold text-moss">98%</span>
+                  <span className="text-[14px] font-bold text-moss">{(profile.completedTasksCount || 0) < 5 ? "100%" : "98%"}</span>
                 </div>
               </div>
             </div>
@@ -271,12 +186,8 @@ export default function DashboardOverview() {
                 <Clock className="w-5 h-5" /> Pending Bids
               </h3>
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-sand/30 rounded-lg border border-smoke/40 hover:bg-sand transition-colors cursor-pointer">
-                  <div>
-                    <h4 className="text-[14px] font-bold text-ink">Deep Cleaning 2BHK</h4>
-                    <p className="text-[12px] text-ink/60">Your bid: ₹1,500</p>
-                  </div>
-                  <span className="text-[11px] font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded">Awaiting Approval</span>
+                <div className="p-4 text-center text-ink/60 text-[13px] border border-dashed border-smoke/60 rounded-lg">
+                  No pending bids right now.
                 </div>
               </div>
             </div>
@@ -372,8 +283,8 @@ export default function DashboardOverview() {
             <span className="text-[14px] font-medium uppercase tracking-wider">Tasks Completed</span>
             <CheckCircle className="w-5 h-5 text-ink/70" />
           </div>
-          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">12</span>
-          <span className="text-[13px] text-ink/60 font-medium relative z-10">This month</span>
+          <span className="text-[36px] tracking-tight text-ink mb-1 relative z-10">{profile.completedTasksCount || 0}</span>
+          <span className="text-[13px] text-ink/60 font-medium relative z-10">Total lifetime</span>
         </div>
 
         <div className="bg-sand p-6 rounded-2xl border border-smoke/60 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col group relative overflow-hidden">
@@ -403,75 +314,40 @@ export default function DashboardOverview() {
           </div>
           
           <div className="space-y-4">
-            {/* Task Card 1 */}
-            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Handyman</span>
-                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Due in 2 days</span>
+            {activeTasks.length === 0 ? (
+              <div className="bg-paper rounded-2xl border border-dashed border-smoke/60 p-10 text-center text-ink/60">
+                No active operations. Post a task to get started!
+              </div>
+            ) : (
+              activeTasks.map(task => (
+                <div key={task.id} className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">{task.category}</span>
+                        <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {task.isFixedPrice ? 'Fixed Price' : 'Bidding'}</span>
+                      </div>
+                      <h4 className="text-lg font-bold text-ink">{task.title}</h4>
+                    </div>
+                    <div className="text-right">
+                      <span className="block text-[18px] text-ink">₹{task.budget}</span>
+                      <span className={`text-[12px] font-medium px-2 py-0.5 rounded-full inline-block mt-1 ${task.status === 'IN_PROGRESS' ? 'text-moss bg-moss/10' : 'text-charcoal bg-sand'}`}>{task.status.replace('_', ' ')}</span>
+                    </div>
                   </div>
-                  <h4 className="text-lg font-bold text-ink">IKEA Furniture Assembly</h4>
-                </div>
-                <div className="text-right">
-                  <span className="block text-[18px] text-ink">₹1,500</span>
-                  <span className="text-[12px] font-medium text-moss bg-moss/10 px-2 py-0.5 rounded-full inline-block mt-1">In Progress</span>
-                </div>
-              </div>
-              
-              <div className="space-y-2 mt-4">
-                <div className="flex justify-between text-[13px] font-medium text-ink">
-                  <span>Progress</span>
-                  <span>75%</span>
-                </div>
-                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
-                  <div className="h-full bg-ink rounded-full" style={{ width: '75%' }}></div>
-                </div>
-                <div className="pt-2 border-t border-smoke/30 mt-3 flex items-center justify-between">
-                  <p className="text-[13px] text-ink/60 flex items-center gap-2">
-                    <Star className="w-4 h-4 text-ink" /> Mate Alex M. is on the way.
-                  </p>
-                  <button className="flex items-center gap-1.5 text-[12px] font-bold text-coral hover:bg-coral/10 px-2.5 py-1.5 rounded-lg transition-colors border border-transparent hover:border-coral/20">
-                    <AlertCircle className="w-3.5 h-3.5" /> Report Issue
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Task Card 2 */}
-            <div className="bg-paper rounded-2xl border border-smoke/60 p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-sand px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase text-ink">Cleaning</span>
-                    <span className="text-[12px] text-ink/60 font-medium flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5 text-coral" /> Action Required</span>
+                  
+                  <div className="space-y-2 mt-4">
+                    <div className="pt-2 border-t border-smoke/30 mt-3 flex items-center justify-between">
+                      <p className="text-[13px] text-ink/60 flex items-center gap-2">
+                        <Star className="w-4 h-4 text-ink" /> {task.assignedHelperId ? "Mate assigned." : "Awaiting assignment."}
+                      </p>
+                      <button onClick={() => window.location.href = `/dashboard/tasks`} className="flex items-center gap-1.5 text-[12px] font-bold text-ink hover:bg-sand px-2.5 py-1.5 rounded-lg transition-colors border border-transparent hover:border-smoke/60">
+                        View Details
+                      </button>
+                    </div>
                   </div>
-                  <h4 className="text-lg font-bold text-ink">Deep Cleaning 2BHK</h4>
                 </div>
-                <div className="text-right">
-                  <span className="block text-[18px] text-ink">₹800</span>
-                  <span className="text-[12px] font-medium text-coral bg-coral/10 px-2 py-0.5 rounded-full inline-block mt-1">Review Pending</span>
-                </div>
-              </div>
-              
-              <div className="space-y-2 mt-4">
-                <div className="flex justify-between text-[13px] font-medium text-ink">
-                  <span>Progress</span>
-                  <span>90%</span>
-                </div>
-                <div className="h-2 w-full bg-sand rounded-full overflow-hidden">
-                  <div className="h-full bg-coral rounded-full" style={{ width: '90%' }}></div>
-                </div>
-                <div className="pt-3 border-t border-smoke/30 mt-3">
-                  <p className="text-[13px] text-ink/60 flex items-center gap-2 mb-3">
-                    <CheckCircle className="w-4 h-4 text-ink" /> Review completed work and approve payment.
-                  </p>
-                  <button className="w-full bg-charcoal text-paper py-2 rounded-lg text-[13px] font-bold hover:opacity-90 transition-opacity">
-                    Review & Approve Payment
-                  </button>
-                </div>
-              </div>
-            </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -482,23 +358,29 @@ export default function DashboardOverview() {
           </h3>
           <div className="bg-paper rounded-2xl border border-smoke/60 overflow-hidden shadow-sm">
             
-            {activityLog.map((log, index) => (
-              <div key={log.id} className={`flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group ${index !== activityLog.length -1 ? 'border-b border-smoke/60' : ''} ${log.isNew ? 'bg-moss/5 animate-fade-in' : ''}`}>
-                <div className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all ${log.isNew ? 'bg-moss text-paper border-moss shadow-[0_0_10px_rgba(80,146,9,0.3)]' : 'bg-sand border-smoke/60 text-ink'}`}>
-                  {log.icon}
-                </div>
-                <div className="flex-1 pt-1">
-                  <div className="flex justify-between items-start">
-                    <p className="text-[14px] font-bold text-ink leading-tight mb-1">{log.title}</p>
-                    {log.isNew && <span className="text-[10px] font-bold text-moss bg-moss/10 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">New</span>}
-                  </div>
-                  <p className="text-[13px] text-ink/60 leading-snug">
-                    {log.desc}
-                  </p>
-                  <span className="text-[11px] font-medium text-ink/40 mt-2 block">{log.time}</span>
-                </div>
+            {activityLog.length === 0 ? (
+              <div className="p-6 text-center text-[13px] text-ink/60">
+                No recent activity.
               </div>
-            ))}
+            ) : (
+              activityLog.map((log, index) => (
+                <div key={log.id} className={`flex items-start gap-4 p-5 hover:bg-sand/50 transition-colors cursor-pointer group ${index !== activityLog.length -1 ? 'border-b border-smoke/60' : ''} ${log.isNew ? 'bg-moss/5 animate-fade-in' : ''}`}>
+                  <div className={`w-10 h-10 rounded-full border flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-moss group-hover:text-paper transition-all ${log.isNew ? 'bg-moss text-paper border-moss shadow-[0_0_10px_rgba(80,146,9,0.3)]' : 'bg-sand border-smoke/60 text-ink'}`}>
+                    {log.icon}
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex justify-between items-start">
+                      <p className="text-[14px] font-bold text-ink leading-tight mb-1">{log.title}</p>
+                      {log.isNew && <span className="text-[10px] font-bold text-moss bg-moss/10 px-2 py-0.5 rounded uppercase tracking-wider animate-pulse">New</span>}
+                    </div>
+                    <p className="text-[13px] text-ink/60 leading-snug">
+                      {log.desc}
+                    </p>
+                    <span className="text-[11px] font-medium text-ink/40 mt-2 block">{log.time}</span>
+                  </div>
+                </div>
+              ))
+            )}
 
             <div className="bg-sand/30 p-3 text-center border-t border-smoke/60">
               <button className="text-[13px] font-medium text-ink hover:text-moss transition-colors">View All History</button>

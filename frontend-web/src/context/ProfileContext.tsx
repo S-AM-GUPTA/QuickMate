@@ -14,6 +14,9 @@ interface ProfileData {
   verificationStatus: "UNVERIFIED" | "PENDING" | "PENDING_REVIEW" | "VERIFIED" | "REJECTED";
   mateTier?: "generalist" | "specialist";
   profession?: string;
+  rating?: number;
+  completedTasksCount?: number;
+  walletBalance?: number;
 }
 
 interface ProfileContextType {
@@ -32,7 +35,10 @@ const defaultProfile: ProfileData = {
   isVerified: false,
   verificationStatus: "UNVERIFIED",
   mateTier: "generalist",
-  profession: ""
+  profession: "",
+  rating: 5.0,
+  completedTasksCount: 0,
+  walletBalance: 0
 };
 
 const ProfileContext = createContext<ProfileContextType>({
